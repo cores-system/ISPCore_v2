@@ -1,0 +1,353 @@
+﻿@using ISPCore.Models.Databases;
+@using ISPCore.Engine.Common.Views
+@using Microsoft.EntityFrameworkCore
+@using ISPCore.Models.Security.AntiDdos
+@model CoreDB
+
+@{
+    int pageSize = 20;
+    int page = (int)ViewData["page"];
+    var jsonDB = (ISPCore.Models.Databases.json.JsonDB)ViewData["jsonDB"];
+    var mdJurn = Model.AntiDdos_Jurnals.AsNoTracking().AsEnumerable().Reverse();
+
+    var DtNumberOfRequestDay = (IList<NumberOfRequestDay>)ViewData["DtNumberOfRequestDay"];
+    string NumberOfRequestDayValues = "{x:'0:00',y:0},{x:'1:00',y:0},{x:'2:00',y:0},{x:'3:00',y:0},{x:'4:00',y:0},{x:'5:00',y:0},{x:'6:00',y:0},{x:'7:00',y:0},{x:'8:00',y:0},{x:'9:00',y:0},{x:'10:00',y:0},{x:'11:00',y:0},{x:'12:00',y:0},{x:'13:00',y:0},{x:'14:00',y:0},{x:'15:00',y:0},{x:'16:00',y:0},{x:'17:00',y:0},{x:'18:00',y:0},{x:'19:00',y:0},{x:'20:00',y:0},{x:'21:00',y:0},{x:'22:00',y:0},{x:'23:00',y:0}";
+
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+@if ((bool)ViewData["IsJurnal"])
+{
+    <div class="wrapper">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+                @{
+                    var navPage = new NavPage<Jurnal>(mdJurn, Context, pageSize, page);
+                }
+                @Html.Partial("Common/JurnalAntiDdos.cshtml", navPage.GetItems())
+                @Html.Raw(navPage.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+else
+{
+    <div class="wrapper">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="stat-reguest-24-hours" class="chart-holder with-3d-shadow with-transitions">
+                    <svg style="overflow: initial;"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var data = [
+            @{ 
+                string tmp1 = NumberOfRequestDayValues;
+                string tmp2 = NumberOfRequestDayValues;
+            }
+            @foreach (var item in DtNumberOfRequestDay)
+            {
+                if (item.Time.Day == DateTime.Now.Day)
+                {
+                    tmp1 = tmp1.Replace("{x:'" + item.Time.Hour + ":00',y:0}", "{x:'" + item.Time.Hour + ":00',y:" + item.value + "}");
+                    tmp2 = tmp2.Replace("{x:'" + item.Time.Hour + ":00',y:0}", "{x:'" + item.Time.Hour + ":00',y:" + item.CountBlocked + "}");
+                }
+            }
+            
+            @Html.Raw("{key: 'tcp/udp - max', nonStackable: false, values: [ " + tmp1 + " ] },")
+            @Html.Raw("{key: 'Blocked IP', nonStackable: false, values: [ " + tmp2 + " ] }")
+        ];
+
+        $(function () { dashboard.init("#stat-reguest-24-hours svg", data, "stat-reguest-24-hours",false); });
+
+    </script>
+
+
+
+    <div class="wrapper">
+
+        <div class="tabs">
+            <ul class="nav nav-tabs nav-tabs-arrowed" role="tablist">
+                <li class="active"><a href="#tab-stats" role="tab" data-toggle="tab">Статистика за месяц</a></li>
+                <li><a href="#tab-jurnal" role="tab" data-toggle="tab">Журнал</a></li>
+                <li><a href="#tab-settings" role="tab" data-toggle="tab">Настройки</a></li>
+                <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+            </ul>
+            <div class="panel-body tab-content">
+
+                <div class="tab-pane active" id="tab-stats">
+                    <div class="page-subtitle">
+                        <h3>Статистика</h3>
+                        <p>Максимальное количество открытых соединений и количество заблокированных IP в сутки</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>tcp/upd</th>
+                                    <th>Заблокировано</th>
+                                    <th width="110" class="text-center">Дата</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.AntiDdos_NumberOfRequestMonths.AsNoTracking().AsEnumerable().Reverse())
+                                {
+                                    <tr>
+                                        <td>@item.value</td>
+                                        <td>@item.CountBlocked</td>
+                                        <td class="text-center">@item.Time.ToString("dd.MM.yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-jurnal">
+                    @{
+                        var navPage = new NavPage<Jurnal>(mdJurn, Context, pageSize, page);
+                    }
+                    @Html.Partial("Common/JurnalAntiDdos.cshtml", navPage.GetItems())
+                    @Html.Raw(navPage.Nav("&IsJurnal=true"))
+                </div>
+
+                <div class="tab-pane" id="tab-settings">
+                    <div class="tab-pane active row" id="tab-base">
+                        <form id="form">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label>AntiDdos<span>мониторинг</span></label>
+                                    <select class="form-control selectpicker" name="antiDdos.IsActive">
+                                        @Html.Raw(SelectPickerTo.Bool(jsonDB.AntiDdos.IsActive, "Включен", "Отключить", "Выключен", "Включить"))
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Журнал<span>заблокированных IP</span></label>
+                                    <select class="form-control selectpicker showJurnal" onchange="showFiled(this, 'FiledGeoIP')" name="antiDdos.Jurnal">
+                                        @Html.Raw(SelectPickerTo.Bool(jsonDB.AntiDdos.Jurnal, "Включен", "Отключить", "Выключен", "Включить"))
+                                    </select>
+                                </div>
+
+                                <div class="form-group FiledGeoIP">
+                                    <label>Данные<span>'Geo IP' для заблокированных IP</span></label>
+                                    <select class="form-control selectpicker" name="antiDdos.GeoIP">
+                                        @Html.Raw(SelectPickerTo.Bool(jsonDB.AntiDdos.GeoIP, "Записываются", "Не записывать", "Не записываются", "Записывать"))
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Режим <span>активной блокировки</span></label>
+                                    <select class="form-control selectpicker" name="antiDdos.ActiveLockMode">
+                                        @Html.Raw(SelectPickerTo.Bool(jsonDB.AntiDdos.ActiveLockMode, "Включен", "Отключить", "Выключен", "Включить"))
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Проверять<span>PTR</span></label>
+                                    <select class="form-control selectpicker showDNSLookupWhite" name="antiDdos.DNSLookupEnabled">
+                                        @Html.Raw(SelectPickerTo.Bool(jsonDB.AntiDdos.DNSLookupEnabled, "Да", "Нет", "Нет", "Да"))
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="float: right">
+                                <div class="form-group">
+                                    <label>Интерфейс<span>eth0/ens33</span></label>
+                                    <input type="text" name="antiDdos.Interface"
+                                           @if (jsonDB.AntiDdos.Interface != "any") { <text> value="@jsonDB.AntiDdos.Interface" </text>   }
+                                           class="form-control" placeholder="По умолчанию: any" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Список<span>проверяемых портов</span></label>
+                                    <input type="text" name="antiDdos.CheckPorts"
+                                           @if (jsonDB.AntiDdos.CheckPorts != "80,443,53") { <text> value="@jsonDB.AntiDdos.CheckPorts" </text>   }
+                                           class="form-control" placeholder="По умолчанию: 80,443,53" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Время<span>блокировки в минутах</span></label>
+                                    <input type="number" pattern="^[0-9]+$" name="antiDdos.BlockingTime"
+                                           @if (jsonDB.AntiDdos.BlockingTime != 15) { <text> value="@jsonDB.AntiDdos.BlockingTime" </text>   }
+                                           class="form-control" placeholder="По умолчанию: 15 минут" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Максимальное<span>количиство 'tcp/udp' за 120 секунд</span></label>
+                                    <input type="number" pattern="^[0-9]+$" name="antiDdos.NumberOfRequestsIn120Second"
+                                           @if (jsonDB.AntiDdos.NumberOfRequestsIn120Second != 400) { <text> value="@jsonDB.AntiDdos.NumberOfRequestsIn120Second" </text>   }
+                                           class="form-control" placeholder="По умолчанию: 400 tcp/udp" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Максимальный <span>размер допустимого всплеска</span></label>
+                                    <input type="number" pattern="^[0-9]+$" name="antiDdos.MaximumBurstSize"
+                                           @if (jsonDB.AntiDdos.MaximumBurstSize != 80) { <text> value="@jsonDB.AntiDdos.MaximumBurstSize" </text>   }
+                                           class="form-control" placeholder="По умолчанию: 80 tcp/upd" />
+                                </div>
+
+                                <button class="btn btn-success t_left" style="margin-top: 10px;" onclick="saveEditSite(this, '/security/anti-ddos/save'); return false;">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-faq">
+
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3">
+
+                            <div id="dev-faq-form">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                        <div class="input-group-btn">
+                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p id="dev-faq-search-result"></p>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="faq">
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Зависимости</div>
+                            <div class="faq-text">
+                                <h5>bash</h5>
+                                <h5>ss</h5>
+                                <h5>tcpdump</h5>
+                                <h5>iptables</h5>
+                                <h5>ip6tables</h5>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Что делать во время DDoS атаки</div>
+                            <div class="faq-text">
+                                <h5>Основное</h5>
+                                <p>
+                                    <b>1.</b> Включите AntiDdos мониторинг (при необходимости измените базовые настройки)<br />
+                                    <b>2.</b> В <a href="/settings" target="_blank">настройках</a> временно отключите <b>журнал запросов</b> <br />
+                                    <b>3.</b> В <a href="/settings" target="_blank">настройках</a> в поле "<b>Количество потоков в 'Parallel.ForEach'</b>", укажите количество CPU*2<br />
+                                    <b>4.</b> Включите глобально для всех доменов "<a href="/security/antibot" target="_blank">Защита от ботов</a>" и "<a href="/security/antibot" target="_blank">Лимит запросов</a>"<br />
+                                </p>
+                                <br />
+                                <h5>Дополнительно</h5>
+                                <p>
+                                    <b>1.</b>Рекомендуем отключить <b>Журнал заблокированных</b> IP в настройках AntiDdos<br />
+                                    <b>2.</b> В <a href="/settings" target="_blank">настройках</a> добавить в белый список ваш IP
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Список проверяемых портов</div>
+                            <div class="faq-text">
+                                <p>По умолчанию проверяется только web 80,443 и dns 53, если у вас есть дополнительные открытые порты, их так-же следует добавить для проверки трафика</p>
+                                <p><b>P.S</b>: для проверки SSH,FTP/SFTP трафика рекомендуем поставить и настроить fail2ban</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Журнал заблокированных IP</div>
+                            <div class="faq-text">
+                                <p>Все IP попавшие под фильтр Anti-DDoS будут записаны в журнал для дальнейшего анализа</p>
+                                <p><b>P.S</b>: Во время крупной DDoS атаки рекомендуем отключить запись в журнал</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Данные 'Geo IP' для заблокированных IP</div>
+                            <div class="faq-text">
+                                <p>Для каждого IP попавшие под фильтр Anti-DDoS будет получена информация "Страна/Город/Регион" и записана в журнал</p>
+                                <p><b>P.S</b>: Во время крупной DDoS атаки рекомендуем отключить получение 'Geo IP' данных</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Время блокировки в минутах</div>
+                            <div class="faq-text">
+                                <p>Все IP попавшие под фильтр Anti-DDoS будут заблокированы в "iptables/ip6tables" на указанное количество минут</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Режим активной блокировки</div>
+                            <div class="faq-text">
+                                <p>Режим активной блокировки позволяет продлить время блокировки заблокированных IP в "iptables/ip6tables"</p><br />
+                                <h5>Режим работы:</h5>
+                                <p>1) IP 127.0.0.1 был заблокирован в 15:00 на 3 минуты</p>
+                                <p>2) В 15:03 счетчик запросов для 127.0.0.1 обнуляется</p>
+                                <p>3) В 15:04 для 127.0.0.1 будет проверен счетчик запросов</p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I. Если между 15:03-15:04 от 127.0.0.1 был выполнен хотя-бы один запрос, то начнется цикл с пункта "2"</p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;II. Если между 15:03-15:04 от 127.0.0.1 не было не одного запроса, IP будет удален с "iptables/ip6tables" </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Максимальное количиство 'tcp/udp' за 120 секунд</div>
+                            <div class="faq-text">
+                                <h5>Указывает максимальное количество запросов для каждого IP адреса</h5>
+                                <p>Если количество запросов от IP превысит заданные параметры, то IP адрес будет заблокирован на указанное количество минут</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Максимальный размер допустимого всплеска</div>
+                            <div class="faq-text">
+                                <h5>Указывает максимальное количество открытых соединений для каждого IP адреса</h5>
+                                <p>Если количество открытых соединений от IP превысит заданные параметры, то IP адрес будет заблокирован на указанное количество минут</p>
+                                <p></p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-title"><span class="fa fa-angle-down"></span>Проверять PTR</div>
+                            <div class="faq-text">
+                                <p>Проверка PTR позволяет не блокировать IP адреса поисковых ботов занося такие IP в белый список, так как все поисковые боты имеют обратную PTR запись для проверки подлинности</p>
+                                <p><b>P.S</b>: Во время крупной DDoS атаки рекомендуем отключить проверку PTR записей либо указать максимальное значение для 'Parallel.ForEach' в настройках</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        function showFiled(self, name) {
+            var type = $(self).val();
+            $('.' + name).hide();
+            if (type == 'true') $('.' + name).show()
+            $(window).trigger('resize');
+        }
+
+        showFiled($('.showJurnal'), 'FiledGeoIP');
+    </script>
+    
+}
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

@@ -1,0 +1,391 @@
+﻿@{
+    Layout = null;
+}
+
+<h2><i class="fa fa-globe"></i>Домен</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Список доменов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/requests-filter/domains</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.RequestsFilter_Domains</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Данные домена</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/requests-filter/domain</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.RequestsFilter_Domain</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить домен</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/requests-filter/domain</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>host</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>typeBlockIP=(global|domain), Protect=(on|off), bruteForceType=(Not|CMS), Auth2faToAccess=(AccessTo2FA|FullAccess)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, Id=int</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить домен</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/domain</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить алиас</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/requests-filter/aliases</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>aliases[id].host, aliases[id].Folder</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, Models.UpdateToIds</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить алиас</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/alias</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId, Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td> result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить шаблон</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/requests-filter/domain/template</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>templates[id].Template</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>Models.UpdateToIds</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить шаблон</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/domain/template</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId, Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить правило для игнорирования логов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/requests-filter/domain/ignore</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>IgnoreToLogs[id].rule</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>Models.UpdateToIds</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить правило для игнорирования логов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/domain/ignore</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId, Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / Основное</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/domain/base</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>host</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>typeBlockIP=(global|domain), Protect=(on|off), bruteForceType=(Not|CMS), Auth2faToAccess=(AccessTo2FA|FullAccess)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / Настройки журнала</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/domain/log</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>IsActive, EnableGeoIP, EnableCountRequest</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>Jurn303=(off|File|SQL|all), Jurn403=(off|File|SQL|all), Jurn401=(off|File|SQL|all), Jurn500=(off|File|SQL|all), Jurn200=(off|File|SQL|all), Jurn2FA=(off|File|SQL|all)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / Антивирус</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/domain/av</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id, CheckEveryToMinute, mode, memory, size, delay</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>php, path, skip, scan</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>JobStatus=(on|off)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / Защита от ботов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/domain/antibot</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>UseGlobalConf, FirstSkipToBot, RewriteToOriginalDomain, BackgroundCheck</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id, HourCacheToBot, HourCacheToUser, WaitUser, CountBackgroundRequest, BackgroundHourCacheToIP</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>AddCodeToHtml, BackgroundCheckToAddExtensions</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>type=(Off|SignalR|CookieAndJS|reCAPTCHA)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / Лимит запросов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/domain/limit/request</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>UseGlobalConf</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id, MinuteLimit, HourLimit, DayLimit</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

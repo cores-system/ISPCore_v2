@@ -1,0 +1,162 @@
+﻿@using ISPCore.Models.RequestsFilter.Domains
+
+@{
+    int Id = (int)ViewData["Id"];
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <h3>FAQ</h3>
+    </div>
+
+    @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", Id }, { "NavigationTab", NavigationTab.Faq } })
+
+    <div class="wrapper wrapper-white">
+        <div class="row">
+            <div class="tabs">
+
+                <div class="tab-pane row" id="tab-faq">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-3">
+
+                                <div id="dev-faq-form">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                            <div class="input-group-btn">
+                                                <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p id="dev-faq-search-result"></p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="faq">
+                            <h2><i class="fa fa-cubes"></i>Основное</h2>
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Режим блокировки</div>
+                                <div class="faq-text">
+                                    <h5>Глобально</h5>
+                                    <p>Все IP попавшие под лимит запросов или другую блокировку, будут заблокированы на всех сайтах</p>
+                                    <br />
+                                    <h5>По домену</h5>
+                                    <p>Все IP попавшие под лимит запросов или другую блокировку, будут заблокированы только на том сайте, на котором попали в фильтр</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Защита от Brute Force</div>
+                                <div class="faq-text">
+                                    <p>
+                                        Данная опция защищает от перебора пользовательских паролей на популярных CMS.<br />
+                                        Настройки лимитов можно установить в <a href="/settings" target="_blank">настройках</a>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Шаблоны правил</div>
+                                <div class="faq-text">
+                                    <h5>Создание шаблона</h5>
+                                    <p>Создайте шаблон правил на странице <a href="/requests-filter/template" target="_blank">создания шаблонов</a></p>
+                                    <br />
+                                    <h5>Использование</h5>
+                                    <p>Вводите имена шаблонов в поле шаблонов и выбирайте нужный</p>
+                                </div>
+                            </div>
+
+                            <h2><i class="fa fa-cubes"></i>Журнал</h2>
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Игнорировать логи</div>
+                                <div class="faq-text">
+                                    <h5>Игнорирует все запросы подходящие под правила</h5><br />
+                                    <h5>Regex</h5>
+                                    <p>Для правил поддерживается стандартный <a href="https://msdn.microsoft.com/ru-ru/library/az24scfc(v=vs.110).aspx" target="_blank">Regex</a></p>
+                                    <br />
+                                    <h5>Пример использования</h5>
+                                    <p>1) Любой запрос:&nbsp; <b>.*</b></p>
+                                    <p>2) Запрос для "/news/25":&nbsp; <b>^/news/[0-9]+$</b></p>
+                                    <p>3) Любой запрос который начинается с "/admin/":&nbsp; <b>^/admin/.*$</b></p>
+                                    <p>4) Любой запрос который содержит в url "/user":&nbsp; <b>/user</b></p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Данные 'Geo IP' для всех запросов</div>
+                                <div class="faq-text">
+                                    <p>Для каждого IP будет получена информация "Страна/Город/Регион" и записана в журнал</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Статистика запросов в сутки</div>
+                                <div class="faq-text">
+                                    <p>Записывает общее количество запросов для каждого сайта в ISPCore, которая доступна для просмотра в 'Статистика и журнал'</p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Запись данных</div>
+                                <div class="faq-text">
+                                    <h5>SQL</h5>
+                                    <p>Записывает всю информацию о запросе в базу, которая доступна для просмотра в 'Статистика и журнал'</p><br />
+
+                                    <h5>Файл</h5>
+                                    <p>Записывает всю информацию о запросе в файл 'Log/Requests/*.log', данные не записываются в SQL и не доступны в 'Статистика и журнал'</p>
+                                </div>
+                            </div>
+
+                            <h2><i class="fa fa-cubes"></i>Правила</h2>
+                            @Html.Partial("../Common/FaqToRule.cshtml")
+
+                            <h2><i class="fa fa-cubes"></i>Антивирус</h2>
+                            @Html.Partial("~/Views/Security/AntiVirus/Common/FAQ.cshtml")
+
+                            <h2><i class="fa fa-cubes"></i>Защита от ботов</h2>
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Использовать глобальные настройки</div>
+                                <div class="faq-text">
+                                    <p>Позволяет включить AntiBot и при этом использовать <a href="/security/antibot" target="_blank">глобальные настройки</a></p>
+                                </div>
+                            </div>
+
+                            @Html.Partial("~/Views/Security/AntiBot/Common/FAQ.cshtml")
+
+                            <h2><i class="fa fa-cubes"></i>Лимит запросов</h2>
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Использовать глобальные настройки</div>
+                                <div class="faq-text">
+                                    <p>Позволяет включить лимит запросов и при этом использовать настройки указанные в <a href="/security/antibot" target="_blank">глобальном лимите запросов</a></p>
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Максимальное количество запросов</div>
+                                <div class="faq-text">
+                                    <h5>Указывает максимальное количество запросов для каждого IP адреса за определенный период</h5>
+                                    <p>Если количество запросов от IP превысит заданные параметры, то IP адрес будет заблокирован на указанное количество минут</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

@@ -1,0 +1,57 @@
+﻿@using ISPCore.Models.SyncBackup.Operation
+@model ISPCore.Models.Common.Views.PageToView<Notation>
+
+@{
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    @if (!Model.Page.GetItems().Any() && ViewBag.WorkNote == null)
+    {
+        <div class="page-subtitle">
+            <h3>Операции</h3>
+            <p>Список выполняющихся/выполненных операций за неделю</p>
+        </div>
+        <p>Отсутствует список операций</p>
+    }
+    else
+    {
+        <div class="tabs">
+            <div class="panel-body tab-content">
+
+
+                <div class="tab-pane active">
+                    <div class="page-subtitle">
+                        <h3>Операции</h3>
+                        <p>Список выполняющихся/выполненных операций за неделю</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-jornal">
+                            @if (ViewBag.WorkNote != null)
+                            {
+                                @Html.Partial("Common/OperationNote.cshtml", (IEnumerable<Notation>)ViewBag.WorkNote)
+                            }
+
+                            @Html.Partial("Common/OperationNote.cshtml", Model.Page.GetItems())
+                        </table>
+                    </div>
+
+                    <script>
+                        $("html, body").animate({ scrollTop: 0 }, 0);
+                    </script>
+
+                </div>
+
+                @Html.Raw(Model.Page.Nav())
+            </div>
+        </div>
+    }
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

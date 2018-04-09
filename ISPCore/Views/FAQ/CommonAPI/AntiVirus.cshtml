@@ -1,0 +1,123 @@
+﻿@{
+    Layout = null;
+}
+
+<h2><i class="fa fa-list"></i>Антивирус</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/antivirus</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>mode, memory, size, delay</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>php, path, skip, scan</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Отчеты</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/security/av/report</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>search</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.ReportsAV</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить отчет</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/security/antivirus</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>FileName</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Запустить проверку</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/common/av/start</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>mode, memory, size, delay</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>php, path, skip, scan</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Остановить проверку</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/common/av/stop</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

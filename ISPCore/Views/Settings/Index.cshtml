@@ -1,0 +1,440 @@
+﻿@using ISPCore.Engine.Common.Views
+@using Newtonsoft.Json
+@using ISPCore.Models.Base.WhiteList
+@model ISPCore.Models.Databases.json.JsonDB
+
+@{
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right" onclick="saveEditSite(this, '/settings/save/base')">Сохранить изменения</button>
+        <h3>Настройки</h3>
+    </div>
+
+    <form id="form" method="POST">
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-base" role="tab" data-toggle="tab">Основное</a></li>
+                            <li><a href="#tab-security" role="tab" data-toggle="tab">Безопасность</a></li>
+                            <li><a href="#tab-whitelist" role="tab" data-toggle="tab">Белый список</a></li>
+                            <li><a href="#tab-StopBruteForce" role="tab" data-toggle="tab">Brute Force</a></li>
+                            <li><a href="#tab-TelegramBot" role="tab" data-toggle="tab">Telegram Bot</a></li>
+                            <li><a href="#tab-api" role="tab" data-toggle="tab">API</a></li>
+                            <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-base">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Автоматическое<span>обновление ISPCore</span></label>
+                                        <select class="form-control selectpicker" name="bs.AutoUpdate">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.Base.AutoUpdate, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Адрес<span>Core API</span></label>
+                                        <input type="text" name="bs.CoreAPI"
+                                               @if (Model.Base.CoreAPI != "/core") { <text> value="@Model.Base.CoreAPI" </text> }
+                                               class="form-control" placeholder="/core" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Количество<span>потоков в 'Parallel.ForEach'</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="bs.CountParallel"
+                                               @if (Model.Base.CountParallel != 1) { <text> value="@Model.Base.CountParallel" </text> }
+                                               class="form-control" placeholder="По умолчанию: 1" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>reCAPTCHA<span>Secret</span></label>
+                                        <input type="text" name="bs.reCAPTCHASecret" class="form-control" value="@Model.Base.reCAPTCHASecret" placeholder="Секретный ключ reCAPTCHA" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>reCAPTCHA<span>Sitekey</span></label>
+                                        <input type="text" name="bs.reCAPTCHASitekey" class="form-control" value="@Model.Base.reCAPTCHASitekey" placeholder="data-sitekey" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-md-offset-1">
+                                    <div class="form-group">
+                                        <label>Режим<span>дебага</span></label>
+                                        <select class="form-control selectpicker" name="bs.DebugEnabled">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.Base.DebugEnabled, "Включен", "Отключить", "Выключен", "Включить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Заглушка<span>для незакрепленных доменов</span></label>
+                                        <select class="form-control selectpicker" name="bs.EnableToDomainNotFound">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.Base.EnableToDomainNotFound, "Включена", "Отключить", "Выключена", "Включить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Отключить<span>журнал запросов</span></label>
+                                        <select class="form-control selectpicker" name="bs.DisableWriteLog">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.Base.DisableWriteLog, "Да", "Нет", "Нет", "Да"))
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-security">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Количество<span>попыток авторизации за 10 минут</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="sc.CountAccess"
+                                               @if (Model.Security.CountAccess != 5) { <text> value="@Model.Security.CountAccess" </text> }
+                                               class="form-control" placeholder="По умолчанию: 5" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Время<span>блокировки в минутах</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="sc.BlockingTime"
+                                               @if (Model.Security.BlockingTime != 40) { <text> value="@Model.Security.BlockingTime" </text> }
+                                               class="form-control" placeholder="По умолчанию: 40 минут" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Соль<span>криптография</span></label>
+                                        <input type="text" name="salt" value="@ViewData["salt"]" class="form-control" placeholder="Введите рандомные символы" />
+                                    </div>
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Смена пароля<span>root</span></label>
+                                        <input type="text" name="PasswdRoot" class="form-control" placeholder="Введите новый пароль" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Смена пароля<span>2FA</span></label>
+                                        <input type="text" name="Passwd2FA" class="form-control" placeholder="Введите новый пароль" />
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-whitelist">
+                                <div class="add-gray-table">
+                                    <div class="panel-heading clearfix">
+                                        <div class="page-subtitle">
+                                            <a class="btn btn-warning t_right" onclick="addWhiteList();" style="margin-top: 10px;">Добавить</a>
+                                            <div class="t_over">
+                                                <h3>Белый список</h3>
+                                                <p>Список IP-адресов и ботов которые не блокируются в AntiBot/Anti-DDos и других проверках</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="table-responsive table-visible">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 160px;">Тип</th>
+                                                        <th style="width: 200px;">Описание</th>
+                                                        <th style="min-width: 250px;">Правило / Regex</th>
+                                                        <th style="width: 40px;"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="site-whitelist"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-TelegramBot">
+                                <div class="col-md-4">
+
+                                    <div class="form-group">
+                                        <label>Авторизация<span>через Telegram</span></label>
+                                        <select class="form-control selectpicker" name="tlg.EnabledToAuth">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.EnabledToAuth, "Включена", "Отключить", "Выключена", "Включить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Уведомления<span>через Telegram</span></label>
+                                        <select class="form-control selectpicker" name="tlg.IsNotification">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.IsNotification, "Включены", "Отключить", "Выключены", "Включить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Token<span>to access the HTTP API</span></label>
+                                        <input name="tlg.Token"
+                                               @if (!string.IsNullOrWhiteSpace(Model.TelegramBot.Token)) { <text> value="@Model.TelegramBot.Token" </text> }
+                                               class="form-control" placeholder="id:key" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Id<span>для отправки уведомлений</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="tlg.ClietnId" value="@Model.TelegramBot.ClietnId" class="form-control" />
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-StopBruteForce">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Максимальное<span>количество авторизаций в минуту</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="BrutConf.MinuteLimit"
+                                               @if (Model.BruteForceConf.MinuteLimit != 10) { <text> value="@Model.BruteForceConf.MinuteLimit" </text> }
+                                               class="form-control" placeholder="По умолчанию: 10" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Максимальное<span>количество авторизаций в час</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="BrutConf.HourLimit"
+                                               @if (Model.BruteForceConf.HourLimit != 30) { <text> value="@Model.BruteForceConf.HourLimit" </text> }
+                                               class="form-control" placeholder="По умолчанию: 30" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Максимальное<span>количество авторизаций в сутки</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="BrutConf.DayLimit"
+                                               @if (Model.BruteForceConf.DayLimit != 120) { <text> value="@Model.BruteForceConf.DayLimit" </text> }
+                                               class="form-control" placeholder="По умолчанию: 120" />
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-api">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Доступ<span>к API</span></label>
+                                        <select class="form-control selectpicker changeTypeAPI" onchange="changeTypeAPI(this)" name="api.Enabled">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.API.Enabled, "Включен", "Отключить", "Выключен", "Включить"))
+                                        </select>
+                                    </div>
+                                    <div class="form-group typeAPI">
+                                        <label>IP<span>для которого не нужна авторизация</span></label>
+                                        <input type="text" name="api.WhiteIP" value="@Model.API.WhiteIP" class="form-control" placeholder="IPv4/6" />
+                                    </div>
+                                    <div class="form-group typeAPI">
+                                        <label>Логин<span>к API</span></label>
+                                        <input type="text" name="api.Login" value="@Model.API.Login" class="form-control" placeholder="Введите логин для доступа к API" />
+                                    </div>
+                                    <div class="form-group typeAPI">
+                                        <label>Пароль<span>к API</span></label>
+                                        <input type="text" name="api.Password" value="@Model.API.Password" class="form-control" placeholder="Введите пароль для доступа к API" />
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        <h2><i class="fa fa-cubes"></i>Основное</h2>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Количество потоков в 'Parallel.ForEach'</div>
+                                            <div class="faq-text">
+                                                <h5>Используется в операциях с длительным ожиданием</h5>
+                                                <p>Рекомендуем указывать число равное количеству процессоров, либо (количество процессоров)*2 если у вас выделенный сервер</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Адрес Core API</div>
+                                            <div class="faq-text">
+                                                <h5>Используется для внешнего API, к примеру авторизация 2FA</h5>
+                                                <p>Вы можете заменить адрес API, если по каким-то причинам не можете использовать "^/core/*" в качестве API на своих сайтах</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>reCAPTCHA</div>
+                                            <div class="faq-text">
+                                                <h5>Используется в AntiBot</h5>
+                                                <p>Добавить домен и получить ключи можно тут https://www.google.com/recaptcha/admin</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Режим дебага</div>
+                                            <div class="faq-text">
+                                                <h5>Используется на страницах проверки запросов</h5>
+                                                <p>Выводит в исходном коде данные запроса а так-же список правил доступных для домена</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Заглушка для незакрепленных доменов</div>
+                                            <div class="faq-text">
+                                                <h5>Ошибка 500</h5>
+                                                <p>Выводит заглушку "Ошибка 500" для доменов у которых не настроен фильтр запросов</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Отключить журнал запросов</div>
+                                            <div class="faq-text">
+                                                <h5>Глобально отключает запись всех запросов в журналы</h5>
+                                                <p>Рекомендуется использовать во время DDoS атак, что-бы снизить нагрузку на систему и диски, исключая запись вредного трафика в журналы запросов и ошибок</p>
+                                            </div>
+                                        </div>
+
+                                        <h2><i class="fa fa-cubes"></i>Безопасность</h2>
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Смена пароля root</div>
+                                            <div class="faq-text">
+                                                <h5>Пароль для авторизации в панели управления IPSCore</h5>
+                                                <p>Укажите новый пароль для авторизации в панели управления, либо оставьте поле пустым что-бы оставить текущий пароль без изменений</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Смена пароля 2FA</div>
+                                            <div class="faq-text">
+                                                <h5>Пароль для авторизации на страницах с двухфакторной аутентификацией</h5>
+                                                <p>Укажите новый пароль для авторизации на страницах с двухфакторной аутентификацией, либо оставьте поле пустым что-бы оставить текущий пароль без изменений</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Количество попыток авторизации за 10 минут</div>
+                                            <div class="faq-text">
+                                                <h5>Учитывается для панели и 2FA</h5>
+                                                <p>Если количество неудачных авторизаций превысит указанный лимит, IP адрес пользователя будет заблокирован на указанное количество минут</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Время блокировки в минутах</div>
+                                            <div class="faq-text">
+                                                <h5>Учитывается для панели и 2FA</h5>
+                                                <p>Если количество неудачных авторизаций превысит указанный лимит, IP адрес пользователя будет заблокирован на указанное количество минут</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Соль криптография</div>
+                                            <div class="faq-text">
+                                                <p>Генерируемое уникальное значение, которое используется для проверки авторизации, рекомендуем не менять без надобности</p>
+                                            </div>
+                                        </div>
+
+                                        <h2><i class="fa fa-cubes"></i>Telegram Bot</h2>
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Авторизация через Telegram</div>
+                                            <div class="faq-text">
+                                                <h5>Учитывается для панели и 2FA</h5>
+                                                <p>После успешного ввода пароля, потребуется подтвердить авторизацию в Telegram</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Уведомления через Telegram</div>
+                                            <div class="faq-text">
+                                                <p>Уведомления об успешной авторизации и другие настроенные параметры</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Id для отправки уведомлений</div>
+                                            <div class="faq-text">
+                                                <p>Ваш Id в Telegram</p>
+                                            </div>
+                                        </div>
+
+                                        <h2><i class="fa fa-cubes"></i>Дополнительно</h2>
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Brute Force</div>
+                                            <div class="faq-text">
+                                                <h5>Максимальное количество запросов</h5>
+                                                <p>Указывает максимальное количество запросов для каждого IP адреса за определенный период</p>
+                                            </div>
+                                        </div>
+
+                                        <h2><i class="fa fa-cubes"></i>API</h2>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Работа с API</div>
+                                            <div class="faq-text">
+                                                <h5>Документация</h5>
+                                                <p><a href="/api/faq">/api/faq</a></p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+
+<script>
+    var WhiteList = @Html.Raw(JsonConvert.SerializeObject(Model.WhiteList.Values ?? new List<WhiteListModel>())) ;
+    for (var i = 0; i < WhiteList.length; i++) {
+        addWhiteList(WhiteList[i])
+    }
+</script>
+
+
+<script>
+    function changeTypeAPI(self) {
+        var type = $(self).val();
+        $('.typeAPI').hide();
+
+        if (type == 'true') {
+            $('.typeAPI').show()
+        }
+
+        $(window).trigger('resize')
+    }
+    changeTypeAPI($('.changeTypeAPI'));
+</script>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

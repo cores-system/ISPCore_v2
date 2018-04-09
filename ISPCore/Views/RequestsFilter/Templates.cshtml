@@ -1,0 +1,86 @@
+﻿@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.RequestsFilter.Templates.Template>
+
+@{
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="page-title">
+    <a href="/requests-filter/template" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10 margin-bottom-10">Создать</a>
+    <a onclick="$('#file').click(); return false;" class="btn btn-primary t_right margin-bottom-10">Импорт</a>
+
+    <h1>Шаблоны</h1>
+    <p>Список шаблонов с правилами для сайтов</p>
+</div>
+
+
+<div class="wrapper" style="padding: 0px 21px 20px;">
+    <div class="table-responsive">
+        @if (Model.Page.GetItems().Any())
+        {
+            <table class="table table-bordered table-striped table-hover text-center">
+                <tbody>
+                    <tr>
+                        <th class="text-left">Имя шаблона</th>
+                        <th style="width: 100px;">Настройки</th>
+                    </tr>
+
+                    @foreach (var tpl in Model.Page.GetItems())
+                    {
+                        <tr class="elemDelete">
+                            <td class="text-left table-products">
+                                <strong>@tpl.Name</strong>
+                            </td>
+
+                            <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                <a href="/requests-filter/template?Id=@tpl.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
+                                <a onclick="return deleteElement(this,'/requests-filter/template/remove',{Id:'@tpl.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>У вас еще нет шаблонов</p>
+        }
+    </div>
+
+    @Html.Raw(Model.Page.Nav())
+</div>
+
+
+
+<input type="file" id="file" name="file" style="display: none">
+
+<script>
+    $(function () {
+        $('#file').change(function () {
+
+            $(this).simpleUpload("/requests-filter/template/import", {
+
+                start: function (file) {
+                    //upload started
+                },
+                progress: function (progress) {
+                    //received progress
+                },
+                success: function (data) {
+                    //upload successful
+                    loadPage(null, '/requests-filter/templates')
+                },
+                error: function (error) {
+                    //upload failed
+                }
+
+            });
+        });
+    });
+</script>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

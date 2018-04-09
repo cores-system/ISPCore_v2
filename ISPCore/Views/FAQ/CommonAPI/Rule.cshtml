@@ -1,0 +1,133 @@
+﻿@{
+    Layout = null;
+}
+
+
+<h2><i class="fa fa-globe"></i>Правила</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить / Редактировать</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 190px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/requests-filter/domain/rule<br />/api/add/requests-filter/template/rule</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Rules:</strong></td>
+                <td>rules[id].Id=int, rules[id].IsActive=bool, rules[id].order=(allow|deny|Is2FA), rules[id].rule=string, rules[id].Method=(all|POST|GET)</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры RuleReplaces:</strong></td>
+                <td>RuleReplaces[id].Id=int, RuleReplaces[id].IsActive=bool, RuleReplaces[id].uri=string, RuleReplaces[id].GetArgs=string, RuleReplaces[id].PostArgs=string, RuleReplaces[id].RegexWhite=string, RuleReplaces[id].TypeResponse=(0|1), RuleReplaces[id].ResponceUri=string, RuleReplaces[id].ContentType=string, RuleReplaces[id].kode=string</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры RuleOverrides:</strong></td>
+                <td>RuleOverrides[id].Id=int, RuleOverrides[id].IsActive=bool, RuleOverrides[id].order=(allow|deny|Is2FA), RuleOverrides[id].rule=string, RuleOverrides[id].Method=(all|POST|GET)</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры RuleArg:</strong></td>
+                <td>RuleArgs[id].Id=int, RuleArgs[id].Name=string, RuleArgs[id].rule=string, RuleArgs[id].Method=(all|POST|GET)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, Models.UpdateToIds</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить Rule</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/rules/base</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId, TemplateId, Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить RuleReplaces</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/rules/replace</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId, TemplateId, Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить RuleOverrides</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/rules/override</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId, TemplateId, Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить RuleArg</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/rules/arg</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>DomainId, TemplateId, Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

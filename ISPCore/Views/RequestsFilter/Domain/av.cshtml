@@ -1,0 +1,74 @@
+﻿@using ISPCore.Models.Base
+@using ISPCore.Models.RequestsFilter.Domains
+@using ISPCore.Engine.Common.Views
+@model Domain
+
+@{
+    int Id = (int)ViewData["Id"];
+
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right" onclick="saveEditSite(this, '/requests-filter/domain/save/av')">Сохранить изменения</button>
+        <h3>Домен: @Model.host</h3>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="domain.Id" value="@Id" />
+
+        @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", Id }, { "NavigationTab", NavigationTab.av } })
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="col-md-5">
+                    @Html.Partial("~/Views/Security/AntiVirus/Common/Settings.cshtml", Model.av)
+                </div>
+
+                <div class="col-md-6 col-md-offset-1">
+                    <div class="faq">
+                        <div class="form-group">
+                            <label>Проверка<span>домена антивирусом</span></label>
+                            <select class="form-control selectpicker changeIntervalAV" onchange="changeIntervalAV(this)" name="av.JobStatus">
+                                @Html.Raw(SelectPickerTo.Int(Model.av.JobStatus == JobStatus.on, "Включена", "Отключить", "Выключена", "Включить"))
+                            </select>
+                        </div>
+
+                        <div class="form-group typeIntervalAV">
+                            <label>Интервал<span>проверки в минутах</span></label>
+                            <input type="number" pattern="^[0-9]+$" name="av.CheckEveryToMinute"
+                                   @if (Model.av.CheckEveryToMinute != 2880) { <text> value="@Model.av.CheckEveryToMinute" </text> }
+                                   class="form-control" placeholder="По умолчанию: 48 часов" />
+                        </div>
+
+                        @Html.Partial("~/Views/Security/AntiVirus/Common/FAQ.cshtml", Model.av)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+    function changeIntervalAV(self) {
+        var type = $(self).val();
+        $('.typeIntervalAV').hide();
+
+        if (type == '1') {
+            $('.typeIntervalAV').show()
+        }
+
+        $(window).trigger('resize')
+    }
+    changeIntervalAV($('.changeIntervalAV'));
+</script>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

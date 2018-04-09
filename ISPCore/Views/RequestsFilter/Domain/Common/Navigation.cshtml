@@ -1,0 +1,37 @@
+﻿@using ISPCore.Models.RequestsFilter.Domains
+@using ISPCore.Engine.Middleware
+@{
+    Layout = null;
+    int Id = (int)ViewData["DomainId"];
+    var nav = (NavigationTab)ViewData["NavigationTab"];
+    string PatchUrl = "/requests-filter/domain";
+
+    var mass = new List<(NavigationTab nav, string href, string Name)>()
+    {
+        (NavigationTab.IsBase, $"{PatchUrl}/base?Id={Id}", "<i class=\"fa fa-th-large\"></i>"),
+        (NavigationTab.Aliases, $"{PatchUrl}/aliases?Id={Id}", "<strong>Алиасы</strong>"),
+        (NavigationTab.LogSettings, $"{PatchUrl}/logsettings?Id={Id}", "<strong>Настройки журнала</strong>"),
+        (NavigationTab.Rules, $"{PatchUrl}/rules?Id={Id}", "<strong>Правила</strong>"),
+        (NavigationTab.av, $"{PatchUrl}/av?Id={Id}", "<strong>Антивирус</strong>"),
+        (NavigationTab.AntiBot, $"{PatchUrl}/antibot?Id={Id}", "<strong>Защита от ботов</strong>"),
+        (NavigationTab.LimitRequest, $"{PatchUrl}/limitrequest?Id={Id}", "<strong>Лимит запросов</strong>"),
+        (NavigationTab.Faq, $"{PatchUrl}/faq?Id={Id}", "<strong>FAQ</strong>"),
+    };
+}
+
+
+<div class="container-tabbed">
+    <ul class="container-tabs">
+        @foreach (var item in mass)
+        {
+            if (item.nav == nav)
+            {
+                <li><a href="#" class="active">@Html.Raw(item.Name)</a></li>
+            }
+            else
+            {
+                <li><a href="@Html.Raw(item.href)" onclick="return loadPage(this)">@Html.Raw(item.Name)</a></li>
+            }
+        }
+    </ul>
+</div>

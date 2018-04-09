@@ -1,0 +1,415 @@
+﻿@using Newtonsoft.Json;
+@using ISPCore.Models.RequestsFilter.Base;
+@using ISPCore.Models.RequestsFilter.Base.Rules;
+
+@{
+    int DomainId = (int)ViewData["DomainId"];
+    int TemplateId = (int)ViewData["TemplateId"];
+    var Rules = ViewData["Rules"] as IEnumerable<Rule>;
+    var RuleReplaces = ViewData["RuleReplaces"] as IEnumerable<RuleReplace>;
+    var RuleOverrides = ViewData["RuleOverrides"] as IEnumerable<Rule>;
+    var RuleArgs = ViewData["RuleArgs"] as IEnumerable<RuleArg>;
+    Layout = null;
+}
+
+
+<div class="tab-pane @ViewData["Active"]" id="tab-ruls-replace">
+    <div class="add-gray-table">
+        <div class="panel-heading clearfix">
+            <div class="page-subtitle">
+                <a class="btn btn-warning t_right" onclick="addNewRullReplace(@DomainId, @TemplateId);" style="margin-top: 10px;">Добавить правило</a>
+                <div class="t_over">
+                    <h3>Замена ответа</h3>
+                    <p>Правила обрабатываются первыми, отдельно от основных правил</p>
+                </div>
+                <div class="form-group margin-bottom-0 margin-top-10">
+                    <input type="text" class="form-control" placeholder="Поиск правил" onkeyup="searchToRules($(this).val(), 'site-ruls-replace')" />
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive table-visible">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">on/off</th>
+                            <th style="min-width: 250px;">URL</th>
+                            <th style="width: 65px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="site-ruls-replace"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="tab-pane" id="tab-ruls-allow">
+    <div class="add-gray-table">
+        <div class="panel-heading clearfix">
+            <div class="page-subtitle">
+                <a class="btn btn-warning t_right" onclick="addNewRull(@DomainId, @TemplateId, 'ruls-allow', {order: 0});" style="margin-top: 10px;">Добавить правило</a>
+                <div class="t_over">
+                    <h3>Разрешенные запросы</h3>
+                    <p>Правила обрабатываются после переопределенных, все запросы подходящие под правила, попадают в Backend</p>
+                </div>
+                <div class="form-group margin-bottom-0 margin-top-10">
+                    <input type="text" class="form-control" placeholder="Поиск правил" onkeyup="searchToRules($(this).val(), 'site-ruls-allow')" />
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive table-visible">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px;">on/off</th>
+                            <th style="width: 130px;">Тип запроса</th>
+                            <th style="min-width: 250px;">Правило / Regex</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="site-ruls-allow"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="tab-pane" id="tab-ruls-2fa">
+    <div class="add-gray-table">
+        <div class="panel-heading clearfix">
+            <div class="page-subtitle">
+                <a class="btn btn-warning t_right" onclick="addNewRull(@DomainId, @TemplateId, 'ruls-2fa', {order: 2});" style="margin-top: 10px;">Добавить правило</a>
+                <div class="t_over">
+                    <h3>Двухфакторная аутентификация</h3>
+                    <p>Правила обрабатываются после разрешенных, выводится страница 2FA на запросы подходящие под правила</p>
+                </div>
+                <div class="form-group margin-bottom-0 margin-top-10">
+                    <input type="text" class="form-control" placeholder="Поиск правил" onkeyup="searchToRules($(this).val(), 'site-ruls-2fa')" />
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive table-visible">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px;">on/off</th>
+                            <th style="width: 130px;">Тип запроса</th>
+                            <th style="min-width: 250px;">Правило / Regex</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="site-ruls-2fa"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="tab-pane" id="tab-ruls-deny">
+    <div class="add-gray-table">
+        <div class="panel-heading clearfix">
+            <div class="page-subtitle">
+                <a class="btn btn-warning t_right" onclick="addNewRull(@DomainId, @TemplateId, 'ruls-deny', {order:1});" style="margin-top: 10px;">Добавить правило</a>
+                <div class="t_over">
+                    <h3>Запрещенные запросы</h3>
+                    <p>Правила обрабатываются в последнюю очередь, блокируются все запросы подходящие под правила</p>
+                </div>
+                <div class="form-group margin-bottom-0 margin-top-10">
+                    <input type="text" class="form-control" placeholder="Поиск правил" onkeyup="searchToRules($(this).val(), 'site-ruls-deny')" />
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive table-visible">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px;">on/off</th>
+                            <th style="width: 130px;">Тип запроса</th>
+                            <th style="min-width: 250px;">Правило / Regex</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="site-ruls-deny"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="tab-pane" id="tab-ruls-args">
+    <div class="add-gray-table">
+        <div class="panel-heading clearfix">
+            <div class="page-subtitle">
+                <a class="btn btn-warning t_right" onclick="addNewRullArg(@DomainId, @TemplateId);" style="margin-top: 10px;">Добавить правило</a>
+                <div class="t_over">
+                    <h3>Возможные aргументы</h3>
+                    <p>Используйте {arg:name1,name2} в правилах что-бы указать возможные аргументы адресной строки</p>
+                </div>
+                <div class="form-group margin-bottom-0 margin-top-10">
+                    <input type="text" class="form-control" placeholder="Поиск аргументов по имени" onkeyup="searchToRules($(this).val(), 'site-ruls-args')" />
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive table-visible">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 130px;">Тип проверки</th>
+                            <th style="min-width: 100px; width: 200px;">Имя</th>
+                            <th style="min-width: 250px;">Правило / Regex</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="site-ruls-args"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="tab-pane" id="tab-ruls-override">
+    <div class="add-gray-table">
+        <div class="panel-heading clearfix">
+            <div class="page-subtitle">
+                <a class="btn btn-warning t_right" onclick="addNewRullOverride(@DomainId);" style="margin-top: 10px;">Добавить правило</a>
+                <div class="t_over">
+                    <h3>Переопределенные</h3>
+                    <p>Правила обрабатываются после правил "Замена ответа"</p>
+                </div>
+                <div class="form-group margin-bottom-0 margin-top-10">
+                    <input type="text" class="form-control" placeholder="Поиск правил" onkeyup="searchToRules($(this).val(), 'site-ruls-override')" />
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-responsive table-visible">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px;">on/off</th>
+                            <th style="width: 130px;">Тип запроса</th>
+                            <th style="width: 130px;">Тип ответа</th>
+                            <th style="min-width: 250px;">Правило / Regex</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="site-ruls-override"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    var Rules = @if (Rules == null) { <text>[]</text> } else { @Html.Raw(JsonConvert.SerializeObject(Rules.OrderBy(i => i.rule))); } ;
+    var RuleReplace = @if (RuleReplaces == null) { <text>[]</text> } else { @Html.Raw(JsonConvert.SerializeObject(RuleReplaces.OrderBy(i => i.uri))); } ;
+    var RuleOverrides = @if (RuleOverrides == null) { <text>[]</text> } else { @Html.Raw(JsonConvert.SerializeObject(RuleOverrides.OrderBy(i => i.rule))); } ;
+    var RuleArgs      = @if (RuleArgs == null) { <text>[]</text> } else { @Html.Raw(JsonConvert.SerializeObject(RuleArgs.OrderBy(i => i.Name))); } ;
+
+    var activatedRule = {};
+
+    function ActivateTabRules(name)
+    {
+        if (activatedRule[name]) {
+            ResizeWindow();
+            return;
+        }
+        activatedRule[name] = true;
+
+        for (var i = 0; i < Rules.length; i++) {
+            var row = Rules[i];
+
+            var orderName = row.order == 0 ? 'allow' : row.order == 1 ? 'deny' : '2fa';
+            if (orderName == name)
+                addNewRull(@DomainId, @TemplateId, 'ruls-' + orderName, row);
+        }
+
+        ResizeWindow();
+    }
+
+    function ActivateTabRuleReplace()
+    {
+        if (activatedRule.RuleReplace) {
+            ResizeWindow();
+            return;
+        }
+        activatedRule.RuleReplace = true;
+
+        for (var i = 0; i < RuleReplace.length; i++) {
+            addNewRullReplace(@DomainId, @TemplateId, RuleReplace[i]);
+        }
+
+        setTimeout(function () {
+            $(window).trigger('resize');
+        }, 100);
+    }
+
+    function ActivateTabRuleOverrides()
+    {
+        if (activatedRule.RuleOverrides) {
+            ResizeWindow();
+            return;
+        }
+        activatedRule.RuleOverrides = true;
+
+        for (var i = 0; i < RuleOverrides.length; i++) {
+            addNewRullOverride(@DomainId, @TemplateId, RuleOverrides[i]);
+        }
+
+        ResizeWindow();
+    }
+
+    function ActivateTabRuleArgs()
+    {
+        if (activatedRule.RuleArgs) {
+            ResizeWindow();
+            return;
+        }
+        activatedRule.RuleArgs = true;
+
+        for (var i = 0; i < RuleArgs.length; i++) {
+            addNewRullArg(@DomainId, @TemplateId, RuleArgs[i]);
+        }
+
+        ResizeWindow();
+    }
+
+
+    function ResizeWindow()
+    {
+        setTimeout(function () {
+            $(window).trigger('resize');
+        }, 100);
+    }
+
+
+    @if (!string.IsNullOrWhiteSpace(ViewData["Active"].ToString()))
+    {
+        <text>ActivateTabRuleReplace();</text>
+    }
+</script>
+
+<script>
+    function searchToRules(value, name)
+    {
+        var all = $('#' + name + ' tr').show();
+
+        if (value)
+        {
+            value = value.toLowerCase()
+            all.each(function ()
+            {
+                var tr = $(this);
+                var inp = $('textarea.name', tr);
+
+                var v = inp.length ? inp.val() : $('td.name', tr).text();
+                    v = v.toLowerCase()
+
+                if (v.indexOf(value) == -1) {
+                    tr.hide();
+                }
+                else {
+                    tr.show();
+                }
+            })
+        }
+    }
+</script>
+
+
+
+<div class="modal fade" id="settings-ruls-replace-some" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Замена ответа</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>GET<span>аргументы</span></label>
+                            <input type="text" class="form-control" placeholder="search,page" value="" id="sb-rulrpc-GetArgs"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>POST<span>аргументы</span></label>
+                            <input type="text" class="form-control" placeholder="login,passwd" value="" id="sb-rulrpc-PostArgs" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Разрешенные<span>символы regex</span></label>
+                            <input type="text" class="form-control" placeholder="[^\w0-9-, ]+" value="" id="sb-rulrpc-RegexWhite" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Тип<span>ответа</span></label>
+                            <select class="form-control selectpicker" id="sb-rulrpc-TypeResponse">
+                                <option value="0" selected>302</option>
+                                <option value="1">200</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" id="sb-rulrpc-id-ResponceUri">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Response<span>Uri</span></label>
+                            <input type="text" class="form-control" placeholder="/{arg}" value="" id="sb-rulrpc-ResponceUri"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" id="sb-rulrpc-id-ContentType">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Content<span>Type</span></label>
+                            <textarea type="text" class="form-control" placeholder="text/html" value="" id="sb-rulrpc-ContentType"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row" id="sb-rulrpc-id-kode">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Пользовательский<span>код</span></label>
+                            <textarea type="text" class="form-control" placeholder="Нужный ответ в json/html и т.д" value="" id="sb-rulrpc-kode"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-bottom: 0px">Закрыть</button>
+                <button type="button" class="btn btn-primary" id="sb-ruls-replace-btn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>

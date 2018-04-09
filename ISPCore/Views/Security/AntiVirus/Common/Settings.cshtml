@@ -1,0 +1,54 @@
+﻿@model ISPCore.Models.Security.AntiVirus
+
+@{
+    Layout = null;
+}
+
+
+<div class="form-group">
+    <label>PHP<span>5.3 и выше</span></label>
+    <input type="text" name="av.php" @if (Model.php != "/usr/bin/php") { <text> value="@Model.php" </text> } class="form-control" placeholder="По умолчанию: /usr/bin/php" />
+</div>
+
+<div class="form-group">
+    <label>Сканировать<span>директорию</span></label>
+    <input type="text" name="av.path" value="@Model.path" class="form-control" placeholder="Укажите каталог для сканирования" />
+</div>
+
+<div class="form-group">
+    <label>Исключить<span>из сканирования</span></label>
+    <input type="text" name="av.skip" @if (!string.IsNullOrWhiteSpace(Model.skip)) { <text> value="@Model.skip" </text> } class="form-control" placeholder="По умолчанию: не исключать" />
+</div>
+
+<div class="form-group">
+    <label>Сканировать<span>только определенные расширения</span></label>
+    <input type="text" name="av.scan" @if (!string.IsNullOrWhiteSpace(Model.scan)) { <text> value="@Model.scan" </text> } class="form-control" placeholder="По умолчанию: все" />
+</div>
+
+<div class="form-group">
+    <label>Режим<span>проверки (обычный = 1 / параноидальный = 2)</span></label>
+    <input type="number" pattern="^[0-9]+$" name="av.mode"
+           @if (Model.mode != 1) { <text> value="@Model.mode" </text> }
+           class="form-control" placeholder="По умолчанию: 1" />
+</div>
+
+<div class="form-group">
+    <label>Размер<span>памяти в MB</span></label>
+    <input type="number" pattern="^[0-9]+$" name="av.memory"
+           @if (Model.memory != 512) { <text> value="@Model.memory" </text> }
+           class="form-control" placeholder="По умолчанию: 512MB" />
+</div>
+
+<div class="form-group">
+    <label>Максимальный<span>размер проверяемого файла в Kb</span></label>
+    <input type="number" pattern="^[0-9]+$" name="av.size"
+           @if (Model.size != 3000) { <text> value="@Model.size" </text> }
+           class="form-control" placeholder="По умолчанию: 3000Kb / 3MB" />
+</div>
+
+<div class="form-group">
+    <label>Делать<span>паузу между файлами при сканировании</span></label>
+    <input type="number" pattern="^[0-9]+$" name="av.delay"
+           @if (Model.delay != 0) { <text> value="@Model.delay" </text> }
+           class="form-control" placeholder="По умолчанию: 0ms" />
+</div>

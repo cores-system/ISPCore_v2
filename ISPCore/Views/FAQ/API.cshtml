@@ -1,0 +1,123 @@
+﻿@{
+}
+
+<style>
+    .faq .faq-item .faq-text {
+        max-height: 0px;
+        height: 0px;
+        float: left;
+        width: 100%;
+        padding-right: 0px;
+        padding-left: 0px;
+        -webkit-transition: all 200ms ease;
+        -moz-transition: all 200ms ease;
+        -ms-transition: all 200ms ease;
+        -o-transition: all 200ms ease;
+        transition: all 200ms ease;
+        overflow: hidden;
+    }
+
+    .faq .faq-item.active .faq-text {
+        margin-top: 0px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        display: block;
+        max-height: 900px;
+        height: auto;
+    }
+</style>
+
+
+<div class="wrapper">
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+                    <div class="tab-pane row" id="tab-faq">
+
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-3">
+                                <div id="dev-faq-form">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                            <div class="input-group-btn">
+                                                <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p id="dev-faq-search-result"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq">
+
+                            <h2><i class="fa fa-desktop"></i>Главная</h2>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Журнал посещений</div>
+                                <div class="faq-text">
+                                    <table class="table margin-bottom-0 table-bordered text-left">
+                                        <tr>
+                                            <td style="width: 150px;">
+                                                <strong>url:</strong>
+                                            </td>
+                                            <td>/api/list/home/jurnal</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Параметры Int:</strong></td>
+                                            <td>page, pageSize</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ответ:</strong></td>
+                                            <td>Models.Home_Jurnals</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            @Html.Partial("CommonAPI/Settings.cshtml")
+                            @Html.Partial("CommonAPI/Iptables.cshtml")
+                            @Html.Partial("CommonAPI/AntiDDoS.cshtml")
+                            @Html.Partial("CommonAPI/AntiBot.cshtml")
+                            @Html.Partial("CommonAPI/AntiVirus.cshtml")
+                            @Html.Partial("CommonAPI/Domain.cshtml")
+                            @Html.Partial("CommonAPI/Template.cshtml")
+                            @Html.Partial("CommonAPI/Rule.cshtml")
+                            @Html.Partial("CommonAPI/Monitoring.cshtml")
+                            @Html.Partial("CommonAPI/Access.cshtml")
+                            @Html.Partial("CommonAPI/SyncBackup.cshtml")
+
+
+                            <h2><i class="fa fa-bell"></i>Уведомления</h2>
+
+                            <div class="faq-item">
+                                <div class="faq-title"><span class="fa fa-angle-down"></span>Журнал</div>
+                                <div class="faq-text">
+                                    <table class="table margin-bottom-0 table-bordered text-left">
+                                        <tr>
+                                            <td style="width: 150px;">
+                                                <strong>url:</strong>
+                                            </td>
+                                            <td>/api/list/notifications</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Параметры Int:</strong></td>
+                                            <td>page, pageSize</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ответ:</strong></td>
+                                            <td>Models.Notations</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>

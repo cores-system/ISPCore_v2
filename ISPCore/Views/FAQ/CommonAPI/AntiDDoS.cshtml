@@ -1,0 +1,94 @@
+﻿@{
+    Layout = null;
+}
+
+
+<h2><i class="fa fa-list"></i>Anti-DDoS</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Статистика за день</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/security/anti-ddos/stats/day</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.NumberOfRequestDays</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Статистика за месяц</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/security/anti-ddos/stats/month</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.NumberOfRequestMonths</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Журнал</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/security/anti-ddos/jurnal</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.AntiDdos_Jurnals</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/anti-ddos</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>IsActive, Jurnal, GeoIP, DNSLookupEnabled, ActiveLockMode</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>BlockingTime, NumberOfRequestsIn120Second, MaximumBurstSize</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>CheckPorts, DNSLookupWhite</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

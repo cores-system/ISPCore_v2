@@ -1,0 +1,83 @@
+﻿@{
+    Layout = null;
+}
+
+<h2><i class="fa fa-list"></i>Брандмауэр</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Список заблокированных IP/UserAgent</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/security/iptables/blockedip</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>search</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.BlockedsIP</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить значение</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/security/iptables</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>BlockingTimeDay</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>value, Description</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>typeBlockIP=(domain|UserAgent)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить значение</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/security/iptables</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

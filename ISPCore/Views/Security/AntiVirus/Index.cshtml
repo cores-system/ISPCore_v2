@@ -1,0 +1,189 @@
+﻿@using System.IO;
+@using System.Text.RegularExpressions;
+@using ISPCore.Engine.Base;
+@using ISPCore.Models.Security
+@model ISPCore.Models.Common.Views.PageToView<string>
+
+@{
+    bool IsRunAV = AntiVirus.IsRun(0);
+    
+     if (Model.ajax) {
+        Layout = null;
+    }
+}
+
+
+<script>
+    $(function () {
+        $('#search-ReportToFolderPath').on('keydown', function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+
+                var val = $(this).val();
+
+                if (val) {
+                    loadPage(false, '/security/antivirus?ShowReportToFolderPath=' + val);
+                }
+
+                $(this).val();
+            }
+        })
+    });
+</script>
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right margin-left-10 margin-bottom-10" onclick="saveEditSite(this, '/security/antivirus/save')">Сохранить изменения</button>
+        @if (IsRunAV) {
+            <button class="btn btn-danger t_right margin-bottom-10" onclick="saveAndRedirect(this,'/security/antivirus/stop', '/security/antivirus')">Остановить проверку</button>
+        }
+        else {
+            <button class="btn btn-success t_right margin-bottom-10" onclick="cmdToAV(this,'start')">Запустить проверку</button>
+        }
+        <h3>Антивирус</h3>
+    </div>
+
+    <form id="form" method="POST">
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-reports" role="tab" data-toggle="tab">Отчеты</a></li>
+                            <li><a href="#tab-settings" role="tab" data-toggle="tab">Настройки</a></li>
+                            @*<li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>*@
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-reports">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="search-ReportToFolderPath" placeholder="Поиск отчетов">
+                                    </div> 
+                                    <div class="table-responsive">
+                                        <table class="table table-jornal">
+                                            <thead>
+                                                <tr>
+                                                    <th>Отчет</th>
+                                                    <th width="110" class="text-center">Антивирус</th>
+                                                    <th width="110" class="text-center">Версия</th>
+                                                    <th width="80" class="text-center">Время</th>
+                                                    <th width="110" class="text-center">Дата</th>
+                                                    <th width="30"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (ViewBag.ShowProgres)
+                                                {
+                                                    if (IsRunAV && !File.Exists($"{Folders.AV}/progress_id-0.json"))
+                                                    {
+                                                        <tr style="background: #f7f7f7;">
+                                                            <td>progress_id-0 - 0.0 %</td>
+                                                            <td class="text-center">@AntiVirus.name</td>
+                                                            <td class="text-center">@AntiVirus.vers.Replace("-", "/")</td>
+                                                            <td class="text-center">-</td>
+                                                            <td class="text-center">-</td>
+
+                                                            <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                                                <a onclick="saveAndRedirect(this,'/security/antivirus/stop', '/security/antivirus')" class="btn nopadding-nomargin"><i class="fa fa-times"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                    foreach (var intFile in Directory.GetFiles(Folders.AV, "progress_id-*.json", SearchOption.TopDirectoryOnly))
+                                                    {
+                                                        var gr = new Regex(@"progress_id-([0-9]+)", RegexOptions.IgnoreCase).Match(System.IO.Path.GetFileNameWithoutExtension(intFile)).Groups;
+
+                                                        <tr style="background: #f7f7f7;">
+                                                            <td>@System.IO.Path.GetFileNameWithoutExtension(intFile) - @(new Regex("\"progress\":\"([0-9\\.]+)\"").Match(File.ReadAllText(intFile)).Groups[1].Value + " %")</td>
+                                                            <td class="text-center">@AntiVirus.name</td>
+                                                            <td class="text-center">@AntiVirus.vers.Replace("-", "/")</td>
+                                                            <td class="text-center">-</td>
+                                                            <td class="text-center">-</td>
+                                                            
+                                                            <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                                                <a onclick="saveAndRedirect(this,'/security/antivirus/stop?Id=@gr[1].Value', '/security/antivirus')" class="btn nopadding-nomargin"><i class="fa fa-times"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+
+                                                @foreach (var FileName in Model.Page.GetItems())
+                                                {
+                                                    var gr = new Regex(@"([^_]+)_([0-9\-]+)_([0-9\-]+)_([0-9\-]+)(_.*)\.html$", RegexOptions.IgnoreCase).Match(FileName).Groups;
+                                                    <tr style="background: #f7f7f7;" class="elemDelete">
+                                                        <td><a href="/reports/av/@FileName" target="_blank">@gr[5].Value.Replace("_-_", "/")</a></td>
+                                                        <td class="text-center">@gr[1].Value</td>
+                                                        <td class="text-center">@gr[2].Value.Replace("-", "/")</td>
+                                                        <td class="text-center">@gr[3].Value.Replace("-", ":")</td>
+                                                        <td class="text-center">@gr[4].Value.Replace("-", ".")</td>
+
+                                                        <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                                            <a onclick="return deleteElement(this,'/security/antivirus/remove',{FileName:'@FileName'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+
+                                        @Html.Raw(Model.Page.Nav())
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane row" id="tab-settings">
+                                <div class="col-md-5">
+                                    @Html.Partial("Common/Settings.cshtml", Model.jsonDB.AntiVirus)
+                                </div>
+
+                                <div class="col-md-6 col-md-offset-1">
+                                    <div class="faq margin-top-10">
+                                        @Html.Partial("Common/FAQ.cshtml")
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        @Html.Partial("Common/FAQ.cshtml")
+                                    </div>
+                                </div>
+                            </div>*@
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

@@ -1,0 +1,176 @@
+﻿@using ISPCore.Models.RequestsFilter.Domains
+@using ISPCore.Engine.Common.Views
+@using ISPCore.Models.RequestsFilter.Base
+@model Domain
+
+@{
+    int Id = (int)ViewData["Id"];
+
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right" onclick="saveEditSite(this, '/requests-filter/domain/save/antibot')">Сохранить изменения</button>
+        <h3>Домен: @Model.host</h3>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="domain.Id" value="@Id" />
+
+        @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", Id }, { "NavigationTab", NavigationTab.AntiBot } })
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+
+                <div class="col-md-5">
+
+                    <div class="form-group">
+                        <label>Использовать<span>глобальные настройки</span></label>
+                        <select class="form-control selectpicker changeGlobalConf" onchange="changeGlobalConf(this)" name="domain.AntiBot.UseGlobalConf">
+                            @Html.Raw(SelectPickerTo.Bool(Model.AntiBot.UseGlobalConf, "Да", "Нет"))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeGlobalConf">
+                        <label>Способ<span>проверки пользователей</span></label>
+                        <select class="form-control selectpicker changeLocalConf" onchange="changeLocalConf(this)" name="domain.AntiBot.type">
+                            @Html.Raw(SelectPickerTo.Enum(Model == null ? AntiBotType.Off : Model.AntiBot.type,
+                                           (AntiBotType.Off, "Нет"),
+                                           (AntiBotType.SignalR, "SignalR + JavaScript"),
+                                           (AntiBotType.CookieAndJS, "JavaScript"),
+                                           (AntiBotType.reCAPTCHA, "reCAPTCHA")
+                                     ))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>Использовать<span>редирект при использовании анонимайзера</span></label>
+                        <select class="form-control selectpicker" name="domain.AntiBot.RewriteToOriginalDomain">
+                            @Html.Raw(SelectPickerTo.Bool(Model.AntiBot.RewriteToOriginalDomain, "Да", "Нет"))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>Таймаут<span>перед установкой Cookie</span></label>
+                        <input type="number" pattern="^[0-9]+$" name="domain.AntiBot.WaitUser"
+                               @if (Model.AntiBot.WaitUser != 2800) { <text> value="@Model.AntiBot.WaitUser" </text> }
+                               class="form-control" placeholder="По умолчанию: 2800 ms" />
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>Сколько<span>часов валидны Cookie</span></label>
+                        <input type="number" pattern="^[0-9]+$" name="domain.AntiBot.HourCacheToUser"
+                               @if (Model.AntiBot.HourCacheToUser != 12) { <text> value="@Model.AntiBot.HourCacheToUser" </text> }
+                               class="form-control" placeholder="По умолчанию: 12" />
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>Режим<span>проверки поисковых ботов</span></label>
+                        <select class="form-control selectpicker" name="domain.AntiBot.FirstSkipToBot">
+                            @Html.Raw(SelectPickerTo.Bool(Model.AntiBot.FirstSkipToBot, "Сначала пропустить, затем проверить", "Сначала проверить, затем пропустить"))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>На<span>сколько часов кэшировать IP валидного бота</span></label>
+                        <input type="number" pattern="^[0-9]+$" name="domain.AntiBot.HourCacheToBot"
+                               @if (Model.AntiBot.HourCacheToBot != 216) { <text> value="@Model.AntiBot.HourCacheToBot" </text> }
+                               class="form-control" placeholder="По умолчанию: 216" />
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-md-offset-1">
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>Выполнять<span>проверку пользователей в фоновом режиме</span></label>
+                        <select class="form-control selectpicker changeAntiBotToBackgroundConf" name="domain.AntiBot.BackgroundCheck" onchange="changeAntiBotToBackgroundConf(this)">
+                            @Html.Raw(SelectPickerTo.Bool(Model.AntiBot.BackgroundCheck, "Да", "Нет"))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf typeAntiBotToBackgroundConf">
+                        <label>Максимальное<span>количество  запросов в фоновом режиме</span></label>
+                        <input type="number" pattern="^[0-9]+$" name="domain.AntiBot.CountBackgroundRequest"
+                               @if (Model.AntiBot.CountBackgroundRequest != 2) { <text> value="@Model.AntiBot.CountBackgroundRequest" </text> }
+                               class="form-control" placeholder="По умолчанию: 2" />
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf typeAntiBotToBackgroundConf">
+                        <label>Сколько<span>часов хранить IP для обязательной проверки Cookie</span></label>
+                        <input type="number" pattern="^[0-9]+$" name="domain.AntiBot.BackgroundHourCacheToIP"
+                               @if (Model.AntiBot.BackgroundHourCacheToIP != 36) { <text> value="@Model.AntiBot.BackgroundHourCacheToIP" </text> }
+                               class="form-control" placeholder="По умолчанию: 36" />
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf typeAntiBotToBackgroundConf">
+                        <label>Дополнительные<span>расширения для проверки в фоновом режиме</span></label>
+                        <input type="text" name="domain.AntiBot.BackgroundCheckToAddExtensions" class="form-control" placeholder="php,html" value="@Model.AntiBot.BackgroundCheckToAddExtensions" />
+                    </div>
+
+                    <div class="form-group has-success typeGlobalConf typeLocalConf typeAntiBotToBackgroundConf">
+                        <label>Добавьте<span>на сайте перед тегом &#x3C;/body&#x3E;</span></label>
+                        <textarea class="form-control" disabled rows="2">&lt;script type=&quot;text/javascript&quot; src=&quot;/statics/signalr-clientES5-1.0.0-alpha2-final.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/core/gen/antibot.js?time&gt;&lt;/script&gt;</textarea>
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>Пользовательский<span>код для вывода в AntiBot</span></label>
+                        <textarea class="form-control" placeholder="Например код аналитики" style="height: 205px" name="domain.AntiBot.AddCodeToHtml">@Model.AntiBot.AddCodeToHtml</textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+    function changeGlobalConf(self) {
+        var type = $(self).val();
+        $('.typeGlobalConf').hide();
+
+        if (type == 'false') {
+            $('.typeGlobalConf').show()
+            changeLocalConf($('.changeLocalConf'))
+        }
+
+        $(window).trigger('resize');
+    }
+
+    function changeLocalConf(self) {
+        var type = $(self).val();
+        $('.typeLocalConf').hide();
+
+        if (type != 'Off') {
+            $('.typeLocalConf').show()
+            changeAntiBotToBackgroundConf($('.changeAntiBotToBackgroundConf'))
+        }
+
+        $(window).trigger('resize')
+    }
+
+    function changeAntiBotToBackgroundConf(self) {
+        var type = $(self).val();
+        $('.typeAntiBotToBackgroundConf').hide();
+
+        if (type == 'true') {
+            $('.typeAntiBotToBackgroundConf').show()
+        }
+
+        $(window).trigger('resize');
+    }
+
+    changeGlobalConf($('.changeGlobalConf'));
+</script>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

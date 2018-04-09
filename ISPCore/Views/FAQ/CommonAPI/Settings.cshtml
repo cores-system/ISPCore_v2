@@ -1,0 +1,227 @@
+﻿@{
+    Layout = null;
+}
+
+
+<h2><i class="fa fa-gear"></i>Белый список</h2>
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить значение</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/whitelist</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>value</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>type=(PTR|IPv4Or6|UserAgent)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить значение</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/whitelist</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<h2><i class="fa fa-gear"></i>Настройки</h2>
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Получить настройки</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/jsondb</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.JsonDB</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Основное</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/base</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>AutoUpdate, DebugEnabled, DisableWriteLog, EnableToDomainNotFound</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>CountParallel, CountNotification</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>CoreAPI, reCAPTCHASecret</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Безопасность</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/security</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>CountAccess, BlockingTime</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Brute Force</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/brute-force</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>MinuteLimit, HourLimit, DayLimit</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Telegram Bot</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/telegrambot</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>EnabledToAuth, IsNotification</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>Token</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>ClietnId</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>API</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/api</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>Enabled</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>Login, Password, WhiteIP</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Смена пароля</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/passwd</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>PasswdRoot, Passwd2FA, salt</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+

@@ -1,0 +1,270 @@
+﻿@using ISPCore.Engine.Common.Views
+@using ISPCore.Models.RequestsFilter.Base
+@model ISPCore.Models.Databases.json.AntiBot
+
+@{
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right margin-top-5" onclick="saveEditSite(this, '/security/antibot/save')">Сохранить изменения</button>
+        <h3>Защита от ботов</h3>
+        <p>Избавьте ваш сайт от клонирования и парсеров</p>
+    </div>
+
+    <form id="form" method="POST">
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-base" role="tab" data-toggle="tab">Основное</a></li>
+                            <li><a href="#tab-more" role="tab" data-toggle="tab">Дополнительно</a></li>
+                            <li><a href="#tab-limit" role="tab" data-toggle="tab">Лимит запросов</a></li>
+                            <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-base">
+
+                                <div class="col-md-5">
+
+                                    <div class="form-group">
+                                        <label>Режим<span>проверки поисковых ботов</span></label>
+                                        <select class="form-control selectpicker" name="antiBot.FirstSkipToBot">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.FirstSkipToBot, "Сначала пропустить, затем проверить", "Сначала проверить, затем пропустить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>На<span>сколько часов кэшировать IP валидного бота</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="antiBot.HourCacheToBot"
+                                               @if (Model.HourCacheToBot != 216) { <text> value="@Model.HourCacheToBot" </text> }
+                                               class="form-control" placeholder="По умолчанию: 216" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Способ<span>проверки пользователей</span></label>
+                                        <select class="form-control selectpicker" name="antiBot.type">
+                                            @Html.Raw(SelectPickerTo.Enum(Model == null ? AntiBotType.Off : Model.type,
+                                                          (AntiBotType.Off, "Не выбран"),
+                                                          (AntiBotType.SignalR, "SignalR + JavaScript"),
+                                                          (AntiBotType.CookieAndJS, "JavaScript"),
+                                                          (AntiBotType.reCAPTCHA, "reCAPTCHA")
+                                                 ))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Использовать<span>редирект при использовании анонимайзера</span></label>
+                                        <select class="form-control selectpicker" name="antiBot.RewriteToOriginalDomain">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.RewriteToOriginalDomain, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Таймаут<span>перед установкой Cookie</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="antiBot.WaitUser"
+                                               @if (Model.WaitUser != 2800) { <text> value="@Model.WaitUser" </text> }
+                                               class="form-control" placeholder="По умолчанию: 2800 ms" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Сколько<span>часов валидны Cookie</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="antiBot.HourCacheToUser"
+                                               @if (Model.HourCacheToUser != 12) { <text> value="@Model.HourCacheToUser" </text> }
+                                               class="form-control" placeholder="По умолчанию: 12" />
+                                    </div>
+
+                                </div>
+
+
+                                <div class="col-md-6 col-md-offset-1">
+
+                                    <div class="form-group">
+                                        <label>Глобальная<span>проверка пользователей</span></label>
+                                        <select class="form-control selectpicker" name="antiBot.Enabled">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.Enabled, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Выполнять<span>проверку пользователей в фоновом режиме</span></label>
+                                        <select class="form-control selectpicker changeAntiBotToBackgroundConf" name="antiBot.BackgroundCheck" onchange="changeAntiBotToBackgroundConf(this)">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.BackgroundCheck, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group typeAntiBotToBackgroundConf">
+                                        <label>Максимальное<span>количество  запросов в фоновом режиме</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="antiBot.CountBackgroundRequest"
+                                               @if (Model.CountBackgroundRequest != 2) { <text> value="@Model.CountBackgroundRequest" </text> }
+                                               class="form-control" placeholder="По умолчанию: 2" />
+                                    </div>
+
+                                    <div class="form-group typeAntiBotToBackgroundConf">
+                                        <label>Сколько<span>часов хранить IP для обязательной проверки Cookie</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="antiBot.BackgroundHourCacheToIP"
+                                               @if (Model.BackgroundHourCacheToIP != 36) { <text> value="@Model.BackgroundHourCacheToIP" </text> }
+                                               class="form-control" placeholder="По умолчанию: 36" />
+                                    </div>
+
+                                    <div class="form-group typeAntiBotToBackgroundConf">
+                                        <label>Дополнительные<span>расширения для проверки в фоновом режиме</span></label>
+                                        <input type="text" name="antiBot.BackgroundCheckToAddExtensions" class="form-control" placeholder="php,html" value="@Model.BackgroundCheckToAddExtensions" />
+                                    </div>
+
+                                    <div class="form-group has-success typeAntiBotToBackgroundConf">
+                                        <label>Добавьте<span>на сайте перед тегом &#x3C;/body&#x3E;</span></label>
+                                        <textarea class="form-control" disabled rows="2">&lt;script type=&quot;text/javascript&quot; src=&quot;/statics/signalr-clientES5-1.0.0-alpha2-final.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/core/gen/antibot.js?time&gt;&lt;/script&gt;</textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="tab-pane row" id="tab-more">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Домены<span>для отображения reCAPTCHA (по одному в строке)</span></label>
+                                        <textarea class="form-control" placeholder=".*\.core-system.org" style="height: 220px" name="antiBot.DomainsToreCAPTCHA">@Model.DomainsToreCAPTCHA</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-md-offset-1">
+                                    <div class="form-group">
+                                        <label>Пользовательский<span>код для вывода в AntiBot</span></label>
+                                        <textarea class="form-control" placeholder="Например код аналитики" style="height: 220px" name="antiBot.AddCodeToHtml">@Model.AddCodeToHtml</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane row" id="tab-limit">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Глобальный<span>лимит запросов</span></label>
+                                        <select class="form-control selectpicker" name="limit.IsEnabled">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.limitRequest.IsEnabled, "Включен", "Отключить", "Выключен", "Включить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Максимальное<span>количество запросов в минуту</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="limit.MinuteLimit"
+                                               @if (Model.limitRequest.MinuteLimit != 0) { <text> value="@Model.limitRequest.MinuteLimit" </text> }
+                                               class="form-control" placeholder="По умолчанию: Неограниченно" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Максимальное<span>количество запросов в час</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="limit.HourLimit"
+                                               @if (Model.limitRequest.HourLimit != 0) { <text> value="@Model.limitRequest.HourLimit" </text> }
+                                               class="form-control" placeholder="По умолчанию: Неограниченно" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Максимальное<span>количество запросов в сутки</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="limit.DayLimit"
+                                               @if (Model.limitRequest.DayLimit != 0) { <text> value="@Model.limitRequest.DayLimit" </text> }
+                                               class="form-control" placeholder="По умолчанию: Неограниченно" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        <h2><i class="fa fa-cubes"></i>Основное</h2>
+
+                                        @Html.Partial("Common/FAQ.cshtml")
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Домены для отображения reCAPTCHA</div>
+                                            <div class="faq-text">
+                                                <p>
+                                                    Список доменов на которых будет выведена reCAPTCHA для проверки пользователя.<br />
+                                                    <b>Внимание</b>: reCAPTCHA Secret указанный в настройках должен подходить для указанных доменов.
+                                                </p>
+                                            </div>
+                                        </div>
+
+
+                                        <h2><i class="fa fa-cubes"></i>Лимит запросов</h2>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Глобальный лимит запросов</div>
+                                            <div class="faq-text">
+                                                <p>Активирует лимит  запросов всем доменам, даже если в настройках домена лимит запросов отключен</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Максимальное количество запросов</div>
+                                            <div class="faq-text">
+                                                <h5>Указывает максимальное количество запросов для каждого IP адреса за определенный период</h5>
+                                                <p>Если количество запросов от IP превысит заданные параметры, то IP адрес будет заблокирован на указанное количество минут</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+
+<script>
+    function changeAntiBotToBackgroundConf(self) {
+        var type = $(self).val();
+        $('.typeAntiBotToBackgroundConf').hide();
+
+        if (type == 'true') {
+            $('.typeAntiBotToBackgroundConf').show()
+        }
+
+        $(window).trigger('resize');
+    }
+
+    changeAntiBotToBackgroundConf($('.changeAntiBotToBackgroundConf'));
+</script>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

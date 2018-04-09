@@ -1,0 +1,204 @@
+﻿@using ISPCore.Engine
+@using ISPCore.Engine.Base
+@using ISPCore.Models.Base
+@using ISPCore.Models.Databases.json;
+@{
+    var JsonDB = Service.Get<JsonDB>();
+}
+
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+    @*<title>@ViewBag.Title</title>*@
+    <title>ISPCore - @string.Format("v{0}", Startup.version.ToString())</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="icon" href="/img/ico.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="/style/generate/@Generate.Style(ActionStyle.css)">
+    <script type="text/javascript" src="/style/generate/@Generate.Style(ActionStyle.jsLib)"></script>
+    <script type="text/javascript" src="/style/jquery.knob.min.js"></script>
+    <script type="text/javascript" src="/style/generate/@Generate.Style(ActionStyle.js)"></script>
+
+    <style>
+        .dev-page {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- set loading layer -->
+    <div class="dev-page-loading preloader"></div>
+    <!-- ./set loading layer -->
+    <!-- page wrapper -->
+    <div class="dev-page">
+
+        <!-- page header -->
+        <div class="dev-page-header">
+
+            <div class="dph-logo">
+                <a href="/">Intuitive</a>
+                <a class="dev-page-sidebar-collapse">
+                    <div class="dev-page-sidebar-collapse-icon">
+                        <span class="line-one"></span>
+                        <span class="line-two"></span>
+                        <span class="line-three"></span>
+                    </div>
+                </a>
+            </div>
+
+            <ul class="dph-buttons pull-right">
+
+
+                <li class="dph-button-stuck lic-info" style="width: 150px;">
+
+                    <a class="dev-page-rightbar-toggle" style="width: 150px; padding: 10px 0 0 20px !important">
+                        ISPCore: &nbsp;<span class="text-success">@string.Format("v{0}", Startup.version.ToString())</span><br />
+                        <small>© Core System 2018</small>
+                        @*Лицензия: <span class="text-success">@(Platform.IsDemo ? "demo" : License.Type.ToString())</span><br />
+                        <small>
+                            @EndOfText.get("Остался", "Осталось", "Осталось", (int)License.Expires)
+                            @((int)License.Expires)
+                            @EndOfText.get("день", "дня", "дней", (int)License.Expires)
+                        </small>*@
+                    </a>
+                </li>
+            </ul>
+
+
+        </div>
+        <!-- ./page header -->
+        <!-- page container -->
+        <div class="dev-page-container">
+
+            <!-- page sidebar -->
+            <div class="dev-page-sidebar">
+
+
+
+
+                <ul class="dev-page-navigation">
+                    <li>
+                        <a href="/" onclick="return loadPage(this)"><i class="fa fa-desktop"></i> <span>Главная</span></a>
+                    </li>
+                    <li>
+                        <a href="/settings" onclick="return loadPage(this)"><i class="fa fa-gear"></i> <span>Настройки</span></a>
+                    </li>
+
+                    <li>
+                        <a><i class="fa fa-list"></i> <span>Безопасность системы</span></a>
+                        <ul>
+                            <li><a href="/security/iptables" onclick="return loadPage(this)">Брандмауэр</a></li>
+                            @if (Platform.Get == PlatformOS.Unix) {
+                                <li><a href="/security/anti-ddos" onclick="return loadPage(this)">Anti-DDoS</a></li>
+                            }
+
+                            <li><a href="/security/antibot" onclick="return loadPage(this)">Защита от ботов</a></li>
+                            <li><a href="/security/antivirus" onclick="return loadPage(this)">Антивирус</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a><i class="fa fa-globe"></i> <span>Фильтрация запросов</span></a>
+                        <ul>
+                            <li><a href="/requests-filter/domains" onclick="return loadPage(this)">Домены</a></li>
+                            <li><a href="/requests-filter/templates" onclick="return loadPage(this)">Шаблоны правил</a></li>
+                            <li><a href="/requests-filter/monitoring" onclick="return loadPage(this)">Статистика и журнал</a></li>
+                            <li><a href="/requests-filter/access" onclick="return loadPage(this)">Разрешенные доступы</a></li>
+                        </ul>
+                    </li>
+
+                     <li>
+                        <a><i class="fa fa-cloud"></i> <span>Sync Backup</span></a>
+                        <ul>
+                            <li><a href="/backup/tasks" onclick="return loadPage(this)">Задания</a></li>
+                            <li><a href="/backup/tools" onclick="return loadPage(this)">Улиты</a></li>
+                            <li><a href="/backup/operation" onclick="return loadPage(this)">Выполнено / Выполняется</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="/notifications" onclick="return loadPage(this)">
+                            <i class="fa fa-bell"></i> <span>Уведомления</span>
+                            @if (JsonDB.Base.CountNotification > 0)
+                            {
+                                <span class="label label-danger notice-label">+@JsonDB.Base.CountNotification</span>
+                            }
+                        </a>
+                    </li>
+
+                    @*<li>
+                                            <a href="/api" onclick="return loadPage(this)"><i class="fa fa-question"></i> <span>Public API</span></a>
+                                        </li>
+
+
+                                       <li>
+
+                            <div class="add-server-shart">
+                                <div class="dev-informer">
+                                    <div class="dev-informer-value">
+                                        <span class="server_stat__loaded">0</span>%
+                                    </div>
+                                    <div class="dev-informer-description">
+                                        Server <b class="text-success">balabol</b> &nbsp;&nbsp; Online: <b class="text-success online server_stat__online">0</b>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="progress progress-bar-xs"><div class="progress-bar progress-bar-success server_stat__loaded" progress-bar="true"></div></div>
+                            </div>
+                        </li>
+                                        <li class="title"></li>
+
+                                        <li class="title">Другая статистика</li>
+                                        <li class="add-profile-bill clearfix t_point add-mini-help" onclick="window.location = '/pages/show/faq'">
+
+                                            <p class="says">Ну мужык, фонтазия!</p>
+                                            <p> - Шо це за панель в которой нечерта нету? да накой оно меня здалась! для понта нужно накидать всякого говна))</p>
+                                        </li>*@
+
+                </ul>
+
+            </div>
+            <!-- ./page sidebar -->
+            <!-- page content -->
+            <div class="dev-page-content">
+                <!-- page content container -->
+                <div class="container" id="page-content">
+                    @RenderBody()
+                </div>
+                <!-- ./page content container -->
+
+            </div>
+            <!-- ./page content -->
+        </div>
+        <!-- ./page container -->
+        <!-- page footer -->
+        <div class="dev-page-footer dev-page-footer-fixed">
+            <!-- dev-page-footer-closed dev-page-footer-fixed -->
+            <!-- page footer container -->
+            <div class="dev-page-footer-container">
+
+            </div>
+            <!-- ./page footer container -->
+
+            <ul class="dev-page-footer-controls dev-page-footer-controls-auto pull-right">
+                <li><a class="dev-page-footer-fix tip" title="Fixed footer"><i class="fa fa-thumb-tack"></i></a></li>
+                <li><a class="dev-page-footer-collapse dev-page-footer-control-stuck"><i class="fa fa-dot-circle-o"></i></a></li>
+            </ul>
+        </div>
+        <!-- ./page footer -->
+
+
+
+    </div>
+
+
+    <script>
+        $(function () {
+            $(".dev-page-footer-collapse").click();
+        })
+    </script>
+</body>
+</html>

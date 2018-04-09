@@ -1,0 +1,248 @@
+﻿@using ISPCore.Models.Databases;
+@using Microsoft.EntityFrameworkCore
+@using ISPCore.Engine.Common.Views
+@using ISPCore.Models.RequestsFilter.Monitoring
+@model CoreDB
+
+@{
+    int pageSize = 20;
+    int page = (int)ViewData["page"];
+    string ShowHost = ViewBag.ShowHost;
+
+    var mdJurn200 = Model.RequestsFilter_Jurnals200.AsNoTracking().Where(i => ShowHost == null || i.Host == ShowHost);
+    var mdJurn303 = Model.RequestsFilter_Jurnals303.AsNoTracking().Where(i => ShowHost == null || i.Host == ShowHost);
+    var mdJurn403 = Model.RequestsFilter_Jurnals403.AsNoTracking().Where(i => ShowHost == null || i.Host == ShowHost);
+    var mdJurn401 = Model.RequestsFilter_Jurnals401.AsNoTracking().Where(i => ShowHost == null || i.Host == ShowHost);
+    var mdJurn500 = Model.RequestsFilter_Jurnals500.AsNoTracking().Where(i => ShowHost == null || i.Host == ShowHost);
+    var mdJurn2FA = Model.RequestsFilter_Jurnals2FA.AsNoTracking().Where(i => ShowHost == null || i.Host == ShowHost);
+
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+@if ((bool)ViewData["IsJurnal303"])
+{
+    <div class="wrapper">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+                @{
+                    var navPage = new NavPage<Jurnal303>(mdJurn303, Context, pageSize, page);
+                }
+                @Html.Partial("Common/Jurnal303.cshtml", navPage.GetItems())
+                @Html.Raw(navPage.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+else if ((bool)ViewData["IsJurnal200"])
+{
+    <div class="wrapper">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+                @{
+                    var navPage = new NavPage<Jurnal200>(mdJurn200, Context, pageSize, page);
+                }
+                @Html.Partial("Common/Jurnal200.cshtml", navPage.GetItems())
+                @Html.Raw(navPage.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+else if ((bool)ViewData["IsJurnal403"])
+{
+    <div class="wrapper">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+                @{
+                    var navPage = new NavPage<Jurnal403>(mdJurn403, Context, pageSize, page);
+                }
+                @Html.Partial("Common/Jurnal403.cshtml", navPage.GetItems())
+                @Html.Raw(navPage.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+else if ((bool)ViewData["IsJurnal401"])
+{
+    <div class="wrapper">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+                @{
+                    var navPage = new NavPage<Jurnal401>(mdJurn401, Context, pageSize, page);
+                }
+                @Html.Partial("Common/Jurnal401.cshtml", navPage.GetItems())
+                @Html.Raw(navPage.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+else if ((bool)ViewData["IsJurnal2FA"])
+{
+    <div class="wrapper">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+                @{
+                    var navPage = new NavPage<Jurnal2FA>(mdJurn2FA, Context, pageSize, page);
+                }
+                @Html.Partial("Common/Jurnal2FA.cshtml", navPage.GetItems())
+                @Html.Raw(navPage.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+
+else if ((bool)ViewData["IsJurnal500"])
+{
+    <div class="wrapper">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+                @{
+                    var navPage = new NavPage<Jurnal500>(mdJurn500, Context, pageSize, page);
+                }
+                @Html.Partial("Common/Jurnal500.cshtml", navPage.GetItems())
+                @Html.Raw(navPage.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+
+else
+{
+    <div class="wrapper">
+        <div class="page-subtitle">
+            <h3>Статистика</h3>
+            <p>Количество запросов за текущие сутки</p>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="stat-reguest-24-hours" class="chart-holder with-3d-shadow with-transitions">
+                    <svg style="overflow: initial;"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var data = [@Html.Raw(ViewBag.StatReguestToHours)];
+        $(function () { dashboard.init("#stat-reguest-24-hours svg", data, "stat-reguest-24-hours"); });
+    </script>
+
+
+
+    <div class="wrapper">
+
+        <div class="tabs">
+            <ul class="nav nav-tabs nav-tabs-arrowed" role="tablist">
+                <li class="active"><a href="#tab-stats" role="tab" data-toggle="tab">Статистика за месяц</a></li>
+                <li><a href="#tab-jurn200" role="tab" data-toggle="tab">Журнал 200</a></li>
+                <li><a href="#tab-jurn303" role="tab" data-toggle="tab">Журнал 303</a></li>
+                <li><a href="#tab-jurn403" role="tab" data-toggle="tab">Журнал 403</a></li>
+                <li><a href="#tab-jurn401" role="tab" data-toggle="tab">Журнал 401</a></li>
+                <li><a href="#tab-jurn500" role="tab" data-toggle="tab">Журнал 500</a></li>
+                <li><a href="#tab-jurn2fa" role="tab" data-toggle="tab">Журнал 2FA</a></li>
+            </ul>
+            <div class="panel-body tab-content">
+
+                <div class="tab-pane active" id="tab-stats">
+                    <div class="page-subtitle">
+                        <h3>Статистика</h3>
+                        <p>Общая статистика всех запросов в сутки</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="200">Всего Запросов</th>
+                                    <th>Ответов 200</th>
+                                    <th>Ответов 303</th>
+                                    <th>Ошибок 403</th>
+                                    <th>Блокировок</th>
+                                    <th>Ошибок 500</th>
+                                    <th>Авторизаций 2FA</th>
+                                    <th width="110" class="text-center">Дата</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.RequestsFilter_NumberOfRequestMonth.AsNoTracking().AsEnumerable().Reverse())
+                                {
+                                    <tr>
+                                        <td>@item.allRequests</td>
+                                        <td>@item.Count200</td>
+                                        <td>@item.Count303</td>
+                                        <td>@item.Count403</td>
+                                        <td>@item.Count401</td>
+                                        <td>@item.Count500</td>
+                                        <td>@item.Count2FA</td>
+                                        <td class="text-center">@item.Time.ToString("dd.MM.yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab-jurn200">
+                    @{
+                        var navPage200 = new NavPage<Jurnal200>(mdJurn200, Context, pageSize, page);
+                    }
+                    @Html.Partial("Common/Jurnal200.cshtml", navPage200.GetItems())
+                    @Html.Raw(navPage200.Nav($"&IsJurnal200=true"))
+                </div>
+
+                <div class="tab-pane" id="tab-jurn2fa">
+                    @{
+                        var navPage2FA = new NavPage<Jurnal2FA>(mdJurn2FA, Context, pageSize, page);
+                    }
+                    @Html.Partial("Common/Jurnal2FA.cshtml", navPage2FA.GetItems())
+                    @Html.Raw(navPage2FA.Nav($"&IsJurnal2FA=true"))
+                </div>
+
+                <div class="tab-pane" id="tab-jurn303">
+                    @{
+                        var navPage303 = new NavPage<Jurnal303>(mdJurn303, Context, pageSize, page);
+                    }
+                    @Html.Partial("Common/Jurnal303.cshtml", navPage303.GetItems())
+                    @Html.Raw(navPage303.Nav($"&IsJurnal303=true"))
+                </div>
+
+                <div class="tab-pane" id="tab-jurn403">
+                    @{
+                        var navPage403 = new NavPage<Jurnal403>(mdJurn403, Context, pageSize, page);
+                    }
+                    @Html.Partial("Common/Jurnal403.cshtml", navPage403.GetItems())
+                    @Html.Raw(navPage403.Nav($"&IsJurnal403=true"))
+                </div>
+
+                <div class="tab-pane" id="tab-jurn401">
+                    @{
+                        var navPage401 = new NavPage<Jurnal401>(mdJurn401, Context, pageSize, page);
+                    }
+                    @Html.Partial("Common/Jurnal401.cshtml", navPage401.GetItems())
+                    @Html.Raw(navPage401.Nav($"&IsJurnal401=true"))
+                </div>
+
+                <div class="tab-pane" id="tab-jurn500">
+                    @{
+                        var navPage500 = new NavPage<Jurnal500>(mdJurn500, Context, pageSize, page);
+                    }
+                    @Html.Partial("Common/Jurnal500.cshtml", navPage500.GetItems())
+                    @Html.Raw(navPage500.Nav($"&IsJurnal500=true"))
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

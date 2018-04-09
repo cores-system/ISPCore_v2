@@ -1,0 +1,355 @@
+﻿@{
+    Layout = null;
+}
+
+<h2><i class="fa fa-cloud"></i>Sync Backup</h2>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Список заданий</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/backup/tasks</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.SyncBackup_Tasks</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Список операций</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/backup/operations</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize, TaskId</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.SyncBackup_Notations</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Данные задания</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/backup/task</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.SyncBackup_Task</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить задание</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/backup/task</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>tk.EncryptionAES</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>tk.CountActiveBackup, tk.CountActiveDayBackup, tk.SuncTime, ftp.port, ftp.ActiveConnections</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>tk.PasswdAES, tk.Description, tk.Whence, tk.Where, ftp.HostOrIP, ftp.Login, ftp.Passwd, webDav.url, webDav.Login, webDav.Passwd, oneDrive.ApplicationId, oneDrive.RefreshToken</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>tk.JobStatus=(on|off), tk.TypeSunc=(FTP|WebDav|SFTP|OneDrive)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, Id=int</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Очистка кеша</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/common/backup/clearing/cache</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>TaskId</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Восстановление данных</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/common/backup/recovery</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>tk.EncryptionAES</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>tk.CountActiveBackup, tk.SuncTime, tk.FTP.port, tk.FTP.ActiveConnections</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>tk.PasswdAES, tk.Description, tk.Whence, tk.Where, value[TypeRecoveryToDate], tk.FTP.HostOrIP, tk.FTP.Login, tk.FTP.Passwd, tk.WebDav.url, tk.WebDav.Login, tk.WebDav.Passwd, tk.OneDrive.ApplicationId, tk.OneDrive.RefreshToken</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>tk.JobStatus=(on|off), tk.TypeSunc=(FTP|WebDav|SFTP|OneDrive), type=(Topical|Date|all)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить задание</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/backup/task</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить правило для игнорирования каталогов/файлов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/backup/ignore</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>TaskId</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>ignr[id].Patch</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>Models.UpdateToIds</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить правило для игнорирования каталогов/файлов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/backup/ignore</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / Основное</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/backup/task</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>EncryptionAES</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>CountActiveBackup, CountActiveDayBackup, SuncTime</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>PasswdAES, Description, Whence, Where</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>JobStatus=(on|off), TypeSunc=(FTP|WebDav|SFTP|OneDrive)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / FTP / SFTP</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/backup/ftp</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id, port, ActiveConnections</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>HostOrIP, Login, Passwd</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / WebDav</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/backup/webdav</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>url, Login, Passwd</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / OneDrive</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/backup/onedrive</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>ApplicationId, RefreshToken</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

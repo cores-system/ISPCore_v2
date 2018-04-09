@@ -1,0 +1,74 @@
+﻿@{
+    Layout = null;
+}
+
+
+<h2><i class="fa fa-globe"></i>Статистика и журнал</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Статистика за день</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/requests-filter/monitoring/stats/day</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.NumberOfRequestMonth</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Статистика за месяц</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/requests-filter/monitoring/stats/month</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>SearchHost</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.NumberOfRequestDay</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Журнал</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/requests-filter/monitoring/jurnal</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>search, code=(200|303|403|401|500|2FA)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.RequestsFilter_Jurnals</td>
+            </tr>
+        </table>
+    </div>
+</div>

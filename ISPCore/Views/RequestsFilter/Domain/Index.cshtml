@@ -1,0 +1,113 @@
+﻿@using Newtonsoft.Json;
+@using Microsoft.EntityFrameworkCore
+@using ISPCore.Models.RequestsFilter.Domains
+@using ISPCore.Engine.Common.Views
+@using ISPCore.Models.RequestsFilter.Base
+@model Domain
+
+@{
+    int Id = (int)ViewData["Id"];
+    var mdTemplates = (DbSet<ISPCore.Models.RequestsFilter.Templates.Template>)ViewData["RequestsFilter_Templates"];
+
+    if ((bool)ViewData["ajax"]) {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        @if (Id == 0 || Model?.host == null)
+        {
+            <button class="btn btn-success t_right" onclick="saveAndRedirect(this, '/requests-filter/domain/save/base', '/requests-filter/domain/base')">Создать домен</button>
+        }
+        else
+        { 
+            <button class="btn btn-success t_right margin-bottom-10 margin-left-10" onclick="saveEditSite(this, '/requests-filter/domain/save/base')">Сохранить изменения</button>
+            <a class="btn btn-primary t_right margin-bottom-10" href="/requests-filter/domain/export?Id=@Id" target="_blank">Экспорт</a>
+            <h3>Домен: @Model.host</h3>
+        }
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="domain.Id" value="@Id" />
+
+        @if (Id != 0 && Model?.host != null) {
+            @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", Id }, { "NavigationTab", NavigationTab.IsBase } })
+        }
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="tab-pane active row" id="tab-site">
+
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label>Домен<span>без url и протокола, пример google.com</span></label>
+                            <input type="text" name="domain.host" value="@Model?.host" class="form-control" placeholder="Имя домена" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Защита<span>домена</span></label>
+                            <select class="form-control selectpicker" name="domain.Protect" id="domain-p1">
+                                @Html.Raw(SelectPickerTo.Int(Model == null || Model.Protect == Protection.on, "Включена", "Отключить", "Выключена", "Включить"))
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Режим<span>блокировки IP в брандмауэр</span></label>
+                            <select class="form-control selectpicker" name="domain.typeBlockIP">
+                                @Html.Raw(SelectPickerTo.Int(Model?.typeBlockIP == TypeBlockIP.domain, "По домену", "Глобально"))
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Шаблоны<span>правил, вводите имена шаблонов</span></label>
+                            <input type="text" class="tags-df" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-md-offset-1">
+                        <div class="form-group">
+                            <label>Защита<span>от Brute Force (перебор паролей)</span></label>
+                            <select class="form-control selectpicker" name="domain.StopBruteForce">
+                                @Html.Raw(SelectPickerTo.Enum(Model == null ? BruteForceType.Not : Model.StopBruteForce,
+                                      (BruteForceType.Not, "Нет"),
+                                      (BruteForceType.DLE, "DLE"),
+                                      (BruteForceType.WordPress, "WordPress"),
+                                      (BruteForceType.OpenCart, "OpenCart")
+                                ))
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Авторизация<span>на страницах 2FA, дает</span></label>
+                            <select class="form-control selectpicker" name="domain.Auth2faToAccess">
+                                @Html.Raw(SelectPickerTo.Enum(Model == null ? Auth2faToAccess.AccessTo2FA : Model.Auth2faToAccess,
+                                      (Auth2faToAccess.AccessTo2FA, "Доступ к страницам 2FA"),
+                                      (Auth2faToAccess.FullAccess, "Полный доступ к сайту")
+                                ))
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+    $(function ()
+    {
+        addTemplateToId({
+            selector: '.tags-df',
+            tagsAll: @Html.Raw(JsonConvert.SerializeObject(mdTemplates)),
+            tagsSelect: @Html.Raw("[" + string.Join(',', Model?.Templates.Select(i => $"'{mdTemplates.GetTemplateName(i.Template)}'") ?? new List<string>()) + "]")
+        })
+    });
+</script>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

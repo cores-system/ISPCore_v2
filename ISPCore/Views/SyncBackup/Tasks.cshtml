@@ -1,0 +1,93 @@
+﻿@using ISPCore.Models.Base
+@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.SyncBackup.Tasks.Task>
+
+@{
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+<div class="page-title">
+    <a href="/backup/task" onclick="return loadPage(this)" class="btn btn-success t_right">Добавить задание</a>
+
+    <h1>Задания</h1>
+    <p>Список заданий для синхронизации</p>
+</div>
+
+
+<div class="wrapper" style="padding: 0px 21px 20px;">
+    <div class="table-responsive">
+        @if (Model.Page.GetItems().Any())
+        {
+            <table class="table table-bordered table-striped table-hover text-center">
+                <tbody>
+                    <tr>
+                        <th style="width: 100px;">Синхронизация</th>
+                        <th class="text-left">Описание</th>
+                        <th style="width: 100px;">Тип</th>
+                        <th style="width: 100px;">Шифрование</th>
+                        <th style="width: 220px;">Время синхронизации</th>
+                        <th style="width: 100px;">Настройки</th>
+                    </tr>
+
+                    @foreach (var task in Model.Page.GetItems())
+                    {
+                        <tr class="elemDelete">
+                            <td class="text-left table-products">
+                                @switch (@task.JobStatus)
+                                {
+                                    case JobStatus.on:
+                                        {
+                                            <span class="label label-success">включена</span>
+                                            break;
+                                        }
+                                    case JobStatus.off:
+                                        {
+                                            <span class="label label-warning">отключена</span>
+                                            break;
+                                        }
+                                    case JobStatus.error:
+                                        {
+                                            <span class="label label-danger">ошибка</span>
+                                            break;
+                                        }
+                                }
+                            </td>
+                            <td class="text-left table-products">
+                                <strong>@task.Description</strong>
+                            </td>
+
+                            <td class="table-products">
+                                <strong>@task.TypeSunc.ToString()</strong>
+                            </td>
+
+                            <td class="table-products">
+                                <strong>@(task.EncryptionAES ? "AES 256" : "нету")</strong>
+                            </td>
+
+                            <td class="table-products">
+                                <strong>@task.LastSync.ToString("dd.MM.yyyy в H:mm")</strong>
+                            </td>
+
+                            <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                <a href="/backup/operation?TaskId=@task.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-history"></i></a>
+                                <a href="/backup/task?Id=@task.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
+                                <a onclick="return deleteElement(this,'/backup/task/remove',{Id:'@task.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>У вас еще нет добавленных заданий</p>
+        }
+    </div>
+
+    @Html.Raw(Model.Page.Nav())
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

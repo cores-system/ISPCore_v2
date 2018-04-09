@@ -1,0 +1,80 @@
+﻿@model IEnumerable<ISPCore.Models.RequestsFilter.Monitoring.Jurnal303>
+
+@{
+    Layout = null;
+}
+
+
+<div class="page-subtitle">
+    <h3>Разрешенные запросы</h3>
+    <p>Лог всех пользователей выполнившие разрешенные запросы за последний месяц</p>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-jornal">
+        @foreach (var item in Model)
+        {
+            <thead>
+                <tr>
+                    <th width="130">IP</th>
+                    <th width="360">Geo IP</th>
+                    <th>Домен</th>
+                    <th width="80" class="text-center">Время</th>
+                    <th width="110" class="text-center">Дата</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr style="background: #f7f7f7;">
+                    <td>@item.IP</td>
+                    <td>@item.Country / @item.Region - @item.City</td>
+                    <td><a href="/requests-filter/monitoring?IsJurnal303=true&ShowHost=@item.Host" onclick="return loadPage(this)">@item.Host</a></td>
+                    <td class="text-center">@item.Time.ToString("H:mm")</td>
+                    <td class="text-center">@item.Time.ToString("dd.MM.yyyy")</td>
+                </tr>
+                <tr>
+                    <td colspan="1">
+                        <span class="text-warning">@item.Method:</span>
+                    </td>
+                    <td colspan="4">
+                        <span class="text-short"><a href="http://@item.Host@item.Uri" target="_blank"><textarea disabled class="text-overflowJurnalGet">@item.Uri</textarea></a></span>
+                    </td>
+                </tr>
+                @if (item.Method == "POST" && !string.IsNullOrEmpty(item.FormData))
+                {
+                    <tr>
+                        <td colspan="1">
+                            <span class="text-warning">FormData:</span>
+                        </td>
+                        <td colspan="4">
+                            <span class="text-info"><textarea disabled class="text-overflowJurnalPost">@item.FormData</textarea></span>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="1">
+                        <span class="text-warning">UserAgent:</span>
+                    </td>
+                    <td colspan="4">
+                        <span class="text-success">@(string.IsNullOrEmpty(item.UserAgent) ? "Отсутствует" : item.UserAgent)</span>
+                    </td>
+                </tr>
+                @if (!string.IsNullOrEmpty(item.Referer))
+                {
+                    <tr>
+                        <td colspan="1">
+                            <span class="text-warning">Referer:</span>
+                        </td>
+                        <td colspan="4">
+                            <span class="text-short"><textarea disabled class="text-overflowJurnalPost">@item.Referer</textarea></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+</div>
+
+<script>
+    $("html, body").animate({ scrollTop: 0 }, 0);
+</script>

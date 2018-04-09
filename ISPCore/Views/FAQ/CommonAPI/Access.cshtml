@@ -1,0 +1,90 @@
+﻿@{
+    Layout = null;
+}
+
+
+<h2><i class="fa fa-globe"></i>Разрешенные доступы</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Список IP адресов которым разрешен доступ</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/requests-filter/access</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>search</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.AccessIP</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить IP</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/add/requests-filter/access</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>AccessTimeToMinutes</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>host, IP</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>accessType=(all|Is2FA|allDomain)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить IP</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/requests-filter/access</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>host, IP</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>accessType=(all|Is2FA|allDomain)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

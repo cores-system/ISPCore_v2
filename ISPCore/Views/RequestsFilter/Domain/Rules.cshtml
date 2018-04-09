@@ -1,0 +1,45 @@
+﻿@using ISPCore.Models.RequestsFilter.Domains
+@model Domain
+
+@{
+    int Id = (int)ViewData["Id"];
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right" onclick="saveEditSite(this, '/requests-filter/domain/save/rules')">Сохранить изменения</button>
+        <h3>Домен: @Model.host</h3>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="domain.Id" value="@Id" />
+
+        @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", Id }, { "NavigationTab", NavigationTab.Rules } })
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="tabs">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="active"><a href="#tab-ruls-replace" onclick="ActivateTabRuleReplace()" role="tab" data-toggle="tab">Замена ответа</a></li>
+                        <li><a href="#tab-ruls-override" onclick="ActivateTabRuleOverrides()" role="tab" data-toggle="tab">Переопределенные</a></li>
+                        <li><a href="#tab-ruls-allow" onclick="ActivateTabRules('allow')" role="tab" data-toggle="tab">Разрешенные</a></li>
+                        <li><a href="#tab-ruls-2fa" onclick="ActivateTabRules('2fa')" role="tab" data-toggle="tab">2FA</a></li>
+                        <li><a href="#tab-ruls-deny" onclick="ActivateTabRules('deny')" role="tab" data-toggle="tab">Запрещенные</a></li>
+                        <li><a href="#tab-ruls-args" onclick="ActivateTabRuleArgs()" role="tab" data-toggle="tab">Аргументы</a></li>
+                    </ul>
+                    <div class="panel-body tab-content tab-div-content">
+                        @Html.Partial("../Common/TabsRule.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", Id }, { "TemplateId", 0 }, { "Active", "active" }, { "Rules", Model.Rules }, { "RuleReplaces", Model.RuleReplaces }, { "RuleOverrides", Model.RuleOverrides }, { "RuleArgs", Model.RuleArgs } })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

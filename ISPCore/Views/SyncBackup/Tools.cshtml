@@ -1,0 +1,245 @@
+﻿@using ISPCore.Engine.Common.Views
+@{
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+
+    <form id="form" method="POST">
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-base" role="tab" data-toggle="tab">Восстановление</a></li>
+                            <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-base">
+                                <div class="col-md-4">
+
+                                    <div class="form-group">
+                                        <label>Востановить<span>данные</span></label>
+                                        <select class="form-control selectpicker changeTypeRecovery" onchange="changeTypeRecovery(this)" name="typeRecovery">
+                                            <option value="0">Актуальные</option>
+                                            <option value="1">По дате</option>
+                                            <option value="2">Все</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group typeRecovery">
+                                        <label>Отметка<span>бэкапа</span></label>
+                                        <input type="text" name="nameAndValue[TypeRecoveryToDate]" class="form-control" placeholder="Пример: 25.02.2017 12:00" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Файлы<span>зашифрованы в AES-256</span></label>
+                                        <select class="form-control selectpicker showAESPassword" onchange="showAESPassword(this)" name="task.EncryptionAES">
+                                            @Html.Raw(SelectPickerTo.Bool(true, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group aesPassword">
+                                        <label>Пароль<span>шифрования для AES-256</span></label>
+                                        <input type="text" name="task.PasswdAES" class="form-control" placeholder="Пароль AES-256" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Удаленный<span>сервер</span></label>
+                                        <select class="form-control selectpicker changeTypeFTP" onchange="changeTypeFTP(this)" name="task.TypeSunc" id="TypeSuncSelect">
+                                            <option value="2">SFTP</option>
+                                            <option value="1">FTP/FTPS</option>
+                                            <option value="0">WebDav</option>
+                                            <option value="3">OneDrive</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Описание<span>задания</span></label>
+                                        <input type="text" name="task.Description" class="form-control" placeholder="Имя задания" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Удаленный<span>каталог</span></label>
+                                        <input type="text" name="task.Where" class="form-control" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Локальный<span>каталог</span></label>
+                                        <input type="text" name="task.Whence" class="form-control" />
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-7" style="float: right">
+                                    <div class="form-group typeDav">
+                                        <label>Адрес<span>WebDav</span></label>
+                                        <input type="text" name="task.WebDav.url" class="form-control" placeholder="HostOrIP" />
+                                    </div>
+
+                                    <div class="form-group typeDav">
+                                        <label>Логин<span>от WebDav</span></label>
+                                        <input type="text" name="task.WebDav.Login" class="form-control" placeholder="Логин" />
+                                    </div>
+
+                                    <div class="form-group typeDav">
+                                        <label>Пароль<span>от WebDav</span></label>
+                                        <input type="text" name="task.WebDav.Passwd" class="form-control" placeholder="Укажите пароль" />
+                                    </div>
+
+
+
+                                    <div class="form-group typeFtp">
+                                        <label>Адрес<span>FTP/SFTP сервера</span></label>
+                                        <input type="text" name="task.FTP.HostOrIP" class="form-control" placeholder="HostOrIP" />
+                                    </div>
+
+                                    <div class="form-group typeFtp">
+                                        <label>Логин<span>от FTP/SFTP</span></label>
+                                        <input type="text" name="task.FTP.Login" class="form-control" placeholder="Логин" />
+                                    </div>
+
+                                    <div class="form-group typeFtp">
+                                        <label>Пароль<span>от FTP/SFTP</span></label>
+                                        <input type="text" name="task.FTP.Passwd" class="form-control" placeholder="Укажите пароль" />
+                                    </div>
+
+                                    <div class="form-group typeFtp">
+                                        <label>Порт<span>FTP/SFTP сервера</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="task.FTP.port" class="form-control" placeholder="По умолчанию: FTP-21 / SFTP-22" />
+                                    </div>
+
+                                    <div class="form-group typeSftp">
+                                        <label>Количество<span>активных подключений к FTP/SFTP</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="task.FTP.ActiveConnections" class="form-control" placeholder="По умолчанию: 1" />
+                                    </div>
+
+
+
+                                    <div class="form-group typeOneDrive">
+                                        <label>Id<span>приложения</span></label>
+                                        <input type="text" name="task.OneDrive.ApplicationId" class="form-control" value="2c2720ef-7b64-4938-9b68-2a88bdd2a456" />
+                                    </div>
+
+                                    <div class="form-group typeOneDrive">
+                                        <label>Refresh<span>Token</span></label>
+                                        <input type="text" name="task.OneDrive.RefreshToken" class="form-control" placeholder="Refresh Token" />
+                                        <a href="/backup/authorize/onedrive" target="_blank">Получить RefreshToken</a>
+                                    </div>
+
+
+                                    <button class="btn btn-success t_left" style="margin-top: 10px;" onclick="saveEditSite(this, '/backup/tools/recover'); return false;">Выполнить задание</button>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        <h2><i class="fa fa-cubes"></i>Основное</h2>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Востановить данные</div>
+                                            <div class="faq-text">
+                                                <h5>Актуальные</h5>
+                                                <p>Будут восстановлены только самые последние бекапы файлов и папок</p>
+
+                                                <br /><h5>По дате</h5>
+                                                <p>Будут восстановлены все файлы и папки у которых дата изменений ниже указанной даты</p>
+
+                                                <br /><h5>Все</h5>
+                                                <p>Будут восстановлены все файлы и папки, включая активные бекапы '.sync'</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Шифрование AES-256</div>
+                                            <div class="faq-text">
+                                                <h5>Пароль шифрования</h5>
+                                                <p>Укажите пароль который использовался для шифрования файлов</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+    function changeTypeRecovery(self) {
+        var type = $(self).val();
+        $('.typeRecovery').hide();
+
+        if (type == '1') {
+            $('.typeRecovery').show()
+        }
+    }
+
+    function changeTypeFTP(self) {
+        var type = $(self).val();
+        $('.typeFtp, .typeDav, .typeSftp, .typeOneDrive').hide();
+
+        if (type == '0') {
+            $('.typeDav').show()
+        }
+        else if (type == '1') {
+            $('.typeFtp').show()
+        }
+        else if (type == '2') {
+            $('.typeFtp').show()
+            $('.typeSftp').show()
+        }
+        else if (type == '3') {
+            $('.typeOneDrive').show()
+        }
+    }
+
+    function showAESPassword(self) {
+        var type = $(self).val();
+        $('.aesPassword').hide();
+        if (type == 'true') $('.aesPassword').show()
+        $(window).trigger('resize');
+    }
+
+    changeTypeRecovery($('.changeTypeRecovery'));
+    changeTypeFTP($('.changeTypeFTP'));
+    showAESPassword($('.showAESPassword'));
+</script>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

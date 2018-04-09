@@ -1,0 +1,97 @@
+﻿@model ISPCore.Models.RequestsFilter.Templates.Template
+
+@{
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<!-- Tabs -->
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right margin-left-10 margin-bottom-10" onclick="saveEditSite(this, '/requests-filter/template/save')">Сохранить изменения</button>
+        @if (((int)ViewData["Id"]) != 0)
+        {
+            <a class="btn btn-primary t_right margin-bottom-10" href="/requests-filter/template/export?Id=@ViewData["Id"]" target="_blank">Экспорт</a>
+        }
+        <h3>Шаблон: @Model?.Name</h3>
+        <p>Настройка правил для шаблона</p>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="Id" id="itemID" value="@ViewData["Id"]" />
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-site" role="tab" data-toggle="tab">Основное</a></li>
+                            <li><a href="#tab-ruls-replace" onclick="ActivateTabRuleReplace()" role="tab" data-toggle="tab">Замена ответа</a></li>
+                            <li><a href="#tab-ruls-override" onclick="ActivateTabRuleOverrides()" role="tab" data-toggle="tab">Переопределенные</a></li>
+                            <li><a href="#tab-ruls-allow" onclick="ActivateTabRules('allow')" role="tab" data-toggle="tab">Разрешенные</a></li>
+                            <li><a href="#tab-ruls-2fa" onclick="ActivateTabRules('2fa')" role="tab" data-toggle="tab">2FA</a></li>
+                            <li><a href="#tab-ruls-deny" onclick="ActivateTabRules('deny')" role="tab" data-toggle="tab">Запрещенные</a></li>
+                            <li><a href="#tab-ruls-args" onclick="ActivateTabRuleArgs()" role="tab" data-toggle="tab">Аргументы</a></li>
+                            <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-site">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Название <span>описание</span></label>
+                                        <input type="text" name="Name" value="@Model?.Name" class="form-control" placeholder="Имя шаблона" />
+                                    </div>
+                                </div>
+                                <div class="col-md-8"></div>
+                            </div>
+
+
+                            @Html.Partial("Common/TabsRule.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", 0 }, { "TemplateId", (int)ViewData["Id"] }, { "Active", "" }, { "Rules", Model?.Rules }, { "RuleReplaces", Model?.RuleReplaces }, { "RuleOverrides", Model?.RuleOverrides }, { "RuleArgs", Model?.RuleArgs } })
+
+
+                            <div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        @Html.Partial("Common/FaqToRule.cshtml")
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

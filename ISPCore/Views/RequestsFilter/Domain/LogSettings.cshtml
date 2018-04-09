@@ -1,0 +1,178 @@
+﻿@using Newtonsoft.Json;
+@using ISPCore.Models.RequestsFilter.Domains
+@using ISPCore.Engine.Common.Views
+@using ISPCore.Models.RequestsFilter.Domains.Log
+@model Domain
+
+@{
+    int Id = (int)ViewData["Id"];
+
+    if ((bool)ViewData["ajax"]) {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right" onclick="saveEditSite(this, '/requests-filter/domain/save/logsettings')">Сохранить изменения</button>
+        <h3>Домен: @Model.host</h3>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="domain.Id" value="@Id" />
+
+        @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "DomainId", Id }, { "NavigationTab", NavigationTab.LogSettings } })
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label>Вести<span>журнал запросов</span></label>
+                        <select class="form-control selectpicker changeTypeLogs" onchange="changeTypeLogs(this)" name="domain.confToLog.IsActive">
+                            @Html.Raw(SelectPickerTo.Bool(Model.confToLog.IsActive, "Да", "Нет"))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Статистика<span>запросов в сутки</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.EnableCountRequest">
+                            @Html.Raw(SelectPickerTo.Bool(Model.confToLog.EnableCountRequest, "Включена", "Отключить", "Выключена", "Включить"))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Журнал<span>200 записывать в</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.Jurn200">
+                            @Html.Raw(SelectPickerTo.Enum(Model.confToLog.Jurn200,
+                                                         (WriteLogMode.off, "Не записывать"),
+                                                         (WriteLogMode.SQL, "SQL"),
+                                                         (WriteLogMode.File, "Файл"),
+                                                         (WriteLogMode.all, "SQL и Файл")))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Журнал<span>303 записывать в</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.Jurn303">
+                            @Html.Raw(SelectPickerTo.Enum(Model.confToLog.Jurn303,
+                                                         (WriteLogMode.off, "Не записывать"),
+                                                         (WriteLogMode.SQL, "SQL"),
+                                                         (WriteLogMode.File, "Файл"),
+                                                         (WriteLogMode.all, "SQL и Файл")))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Журнал<span>403 записывать в</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.Jurn403">
+                            @Html.Raw(SelectPickerTo.Enum(Model.confToLog.Jurn403,
+                                                         (WriteLogMode.off, "Не записывать"),
+                                                         (WriteLogMode.SQL, "SQL"),
+                                                         (WriteLogMode.File, "Файл"),
+                                                         (WriteLogMode.all, "SQL и Файл")))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Журнал<span>401 записывать в</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.Jurn401">
+                            @Html.Raw(SelectPickerTo.Enum(Model.confToLog.Jurn401,
+                                                         (WriteLogMode.off, "Не записывать"),
+                                                         (WriteLogMode.SQL, "SQL"),
+                                                         (WriteLogMode.File, "Файл"),
+                                                         (WriteLogMode.all, "SQL и Файл")))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Журнал<span>500 записывать в</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.Jurn500">
+                            @Html.Raw(SelectPickerTo.Enum(Model.confToLog.Jurn500,
+                                                         (WriteLogMode.off, "Не записывать"),
+                                                         (WriteLogMode.SQL, "SQL"),
+                                                         (WriteLogMode.File, "Файл"),
+                                                         (WriteLogMode.all, "SQL и Файл")))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Журнал<span>2FA записывать в</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.Jurn2FA">
+                            @Html.Raw(SelectPickerTo.Enum(Model.confToLog.Jurn2FA,
+                                                         (WriteLogMode.off, "Не записывать"),
+                                                         (WriteLogMode.SQL, "SQL"),
+                                                         (WriteLogMode.File, "Файл"),
+                                                         (WriteLogMode.all, "SQL и Файл")))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLogs">
+                        <label>Данные<span>'Geo IP' для всех запросов</span></label>
+                        <select class="form-control selectpicker" name="domain.confToLog.EnableGeoIP">
+                            @Html.Raw(SelectPickerTo.Bool(Model.confToLog.EnableGeoIP, "Да", "Нет"))
+                        </select>
+                    </div>
+                </div>
+
+                <br />
+                <div class="col-md-6" style="float: right">
+                    <div class="add-gray-table">
+                        <div class="panel-heading clearfix">
+                            <div class="page-subtitle">
+                                <a class="btn btn-warning t_right" onclick="addIgnoreToLog('');" style="margin-top: 10px;">Добавить</a>
+                                <div class="t_over">
+                                    <h3>Игнорировать логи</h3>
+                                    <p>Запросы подходящие под правила не будут записаны в журнал</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-responsive add-ads-code-table">
+                                <thead>
+                                    <tr>
+                                        <th>Правило / Regex</th>
+                                        <th style="width: 40px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tab-IgnoreToLog"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+
+<script>
+    $(function ()
+    {
+        var IgnoreToLog = @Html.Raw(JsonConvert.SerializeObject(Model?.IgnoreToLogs ?? new List<IgnoreToLog>()));
+        for (var i = 0; i < IgnoreToLog.length; i++) {
+            addIgnoreToLog(IgnoreToLog[i].rule);
+        }
+    });
+
+
+    function changeTypeLogs(self) {
+        var type = $(self).val();
+        $('.typeLogs').hide();
+
+        if (type == 'true') {
+            $('.typeLogs').show()
+        }
+
+        $(window).trigger('resize')
+    }
+    changeTypeLogs($('.changeTypeLogs'));
+</script>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

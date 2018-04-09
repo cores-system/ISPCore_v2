@@ -1,0 +1,149 @@
+ html{
+    -webkit-tap-highlight-color:transparent;
+}
+ html{
+    font-family:sans-serif;
+    -ms-text-size-adjust:100%;
+    -webkit-text-size-adjust:100%;
+}
+ @media print{
+     *,:after,:before{
+        background:0 0!important;
+        color:#000!important;
+        -webkit-box-shadow:none!important;
+        box-shadow:none!important;
+        text-shadow:none!important;
+    }
+     h3,p{
+        orphans:3;
+        widows:3;
+    }
+     h3{
+        page-break-after:avoid;
+    }
+}
+ body{
+    background-color:#fff;
+}
+ *,:after,:before{
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    box-sizing:border-box;
+}
+ html{
+    font-size:10px;
+}
+ h3{
+    font-family:inherit;
+    font-weight:500;
+    line-height:1.1;
+    color:inherit;
+}
+ h3{
+    margin-top:18px;
+    margin-bottom:9px;
+}
+ h3{
+    font-size:23px;
+}
+ p{
+    margin:0 0 9px;
+}
+ .text-center{
+    text-align:center;
+}
+
+ body{
+    overflow-x:hidden;
+}
+ body *{
+    outline:0!important;
+}
+ body,html{
+    height:100%;
+}
+ body{
+    padding:0;
+    margin:0;
+    color:#454545;
+    font-family:'Open Sans', sans-serif;
+    font-size:13px;
+    line-height:20px;
+    font-weight:400;
+    background:#EDEFF0;
+}
+ h3{
+    padding:0;
+    margin:0;
+    font-weight:400;
+    float:left;
+    width:100%;
+}
+ h3,p{
+    margin-bottom:10px;
+}
+ h3{
+    font-size:18px;
+    line-height:26px;
+}
+ p{
+    float:left;
+    width:100%;
+    margin-top:5px;
+}
+ p:last-child{
+    margin-bottom:0;
+}
+ .payment{
+    display:flex;
+    justify-content:center;
+    align-content:center;
+    flex-direction:column;
+}
+ .payment-title{
+    font-size:35px;
+}
+ .payment-text{
+    margin-bottom:0px;
+}
+ .payment-icon{
+    font-size:40px;
+    color:#76AB3C;
+    margin-bottom:30px;
+    display:inline-block;
+}
+ .payment-box{
+    margin-top:-90px;
+}
+
+.block {
+	width: 100%;
+	float: left;
+	margin-top: 25px;
+}
+
+.copyright {
+	margin: auto;
+    width: 390px;
+	border-top: 1px solid #e7ebf1;
+	padding: 20px 0px;
+	line-height: 20px;
+	font-size: 11px;
+	color: #999999;
+}
+
+.copyright a {
+	margin: 0px 10px;
+}
+
+a {
+    color: #5ab0ee;
+    text-decoration: none;
+}
+
+.captcha {
+	margin: auto;
+    width: 304px;
+	padding: 0px 0px 20px 0px;
+}
+			

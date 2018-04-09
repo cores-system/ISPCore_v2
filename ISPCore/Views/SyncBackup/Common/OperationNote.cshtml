@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ISPCore.Models.SyncBackup.Operation.Notation>
+
+@{
+    Layout = null;
+}
+
+@foreach (var note in Model)
+{
+    <thead>
+        <tr>
+            <th width="150">Категория</th>
+            <th>Сообщение</th>
+            <th width="80" class="text-center">Время</th>
+            <th width="110" class="text-center">Дата</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr style="background: #f7f7f7;">
+            <td>@note.Category</td>
+            <td>@note.Msg</td>
+            <td class="text-center">@note.Time.ToString("H:mm")</td>
+            <td class="text-center">@note.Time.ToString("dd.MM.yyyy")</td>
+        </tr>
+        @foreach (var item in note.More)
+        {
+            <tr>
+                <td colspan="1">
+                    <span class="text-warning">@item.Name:</span>
+                </td>
+                <td colspan="3">
+                    <span class="text-short">
+                        @if (item.Value.Contains(" href="))
+                        {
+                            @Html.Raw(item.Value) 
+                        }
+                        else
+                        { 
+                            @item.Value
+                        }
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+}

@@ -1,0 +1,186 @@
+﻿@using ISPCore.Models.RequestsFilter.Domains
+@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.Databases.BlockedIP>
+
+@{
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+<script>
+    $(function () {
+        $('#search-ip').on('keydown', function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+
+                var val = $(this).val();
+
+                if (val) {
+                    loadPage(false, '/security/iptables?ShowIP=' + val);
+                }
+
+                $(this).val();
+            }
+        })
+    });
+
+    function addNewBlockedIP() {
+        $.sl('load', '/security/iptables/add', { back: false, data: $('#form_add_ip').serializeArray(), dataType: 'json' }, function (j) {
+            if (j.msg) $.sl('info', j.msg)
+            else if (j.html) {
+                $('#modal_form_add_ip').modal('hide');
+                $('#ip_list').prepend(j.html)
+            }
+            else $.sl('info', 'Неизвестная ошибка')
+        })
+    }
+</script>
+
+
+<div class="wrapper">
+    <div class="tabs">
+        <div class="panel-body tab-content">
+
+
+            <div class="page-subtitle">
+                <button type="button" class="btn btn-success t_right margin-left-10 margin-bottom-10" data-toggle="modal" data-target="#modal_form_add_ip">Добавить</button>
+
+                <div class="form-group t_right" style="max-width: 400px">
+                    <input type="text" class="form-control" id="search-ip" placeholder="Поиск IP-адреса">
+                </div>
+
+                <h3>Брандмауэр</h3>
+                <p>Список IP адресов которым заблокирован доступ</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th width="150" class="text-left">IP / User-Agent</th>
+                            <th width="260">Блокировка</th>
+                            <th>Причина</th>
+                            <th width="170">До</th>
+                            <th width="25"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="ip_list">
+                        @{ bool PatchTable = false; }
+                        @foreach (var item in Model.Page.GetItems())
+                        {
+                            string patch = "";
+                            @if (PatchTable)
+                            {
+                                patch = "style=\"background: #f7f7f7;\"";
+                            }
+                            PatchTable = !PatchTable;
+
+                            <tr @Html.Raw(@patch) class="elemDelete">
+                                <td class="text-left table-products">
+                                    <strong>@item.IP</strong>
+                                </td>
+
+                                <td>
+                                    @switch (item.typeBlockIP)
+                                    {
+                                        case TypeBlockIP.global:
+                                            <text>IP-адрес</text>
+                                            break;
+                                        case TypeBlockIP.domain:
+                                            <text>@item.BlockedHost</text>
+                                            break;
+                                        case TypeBlockIP.UserAgent:
+                                            <text>User Agent</text>
+                                            break;
+                                    }
+                            </td>
+
+                            <td>@item.Description</td>
+                            <td>@item.BlockingTime.ToString("dd.MM.yyyy H:mm")</td>
+
+                            <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                <a onclick="return deleteElement(this,'/security/iptables/remove',{Id:'@item.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+
+                </table>
+            </div>
+
+            <script>
+                $("html, body").animate({ scrollTop: 0 }, 0);
+            </script>
+
+            @Html.Raw(Model.Page.Nav())
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="modal_form_add_ip" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Новая запись</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Адрес может быть как отдельным IP так и сетью, в формате: <br />
+                    IPv6: 2001:DB8:*<br />
+                    IPv4: 8.8.8.*
+                </p>
+                <form id="form_add_ip">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Значение<span>IP / User-Agent</span></label>
+                                <input type="text" class="form-control" name="value" placeholder="IPv4/6 или User-Agen" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Режим<span>блокировки</span></label>
+                                <select class="form-control selectpicker" name="typeBlockIP">
+                                    <option value="0" selected>IP-адрес</option>
+                                    <option value="2">User-Agent</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Время<span>блокировки в днях</span></label>
+                                <input type="number" pattern="^[0-9]+$" class="form-control" name="BlockingTimeDay" placeholder="1" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Причина<span>блокировки</span></label>
+                                <textarea class="form-control" name="Description" placeholder="Текст отсюда будет выведен пользователю"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-bottom: 0px">Закрыть</button>
+                <button type="button" class="btn btn-primary" onclick="addNewBlockedIP();">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

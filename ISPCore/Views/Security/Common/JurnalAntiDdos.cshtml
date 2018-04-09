@@ -1,0 +1,41 @@
+﻿@model IEnumerable<ISPCore.Models.Security.AntiDdos.Jurnal>
+
+@{
+    Layout = null;
+}
+
+
+<div class="page-subtitle">
+    <h3>Журнал</h3>
+    <p>IP адреса попавшие под фильтр Anti-DDoS за последнюю неделю</p>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-jornal">
+        <thead>
+            <tr>
+                <th width="130">IP</th>
+                <th width="360">Geo IP</th>
+                <th>DNS lookup</th>
+                <th width="80" class="text-center">Время</th>
+                <th width="110" class="text-center">Дата</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr style="background: #f7f7f7;">
+                    <td>@item.IP</td>
+                    <td>@item.Country / @item.Region - @item.City</td>
+                    <td>@(string.IsNullOrWhiteSpace(item.HostName) ? "-" : item.HostName)</td>
+                    <td class="text-center">@item.Time.ToString("H:mm")</td>
+                    <td class="text-center">@item.Time.ToString("dd.MM.yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $("html, body").animate({ scrollTop: 0 }, 0);
+</script>

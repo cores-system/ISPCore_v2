@@ -1,0 +1,172 @@
+﻿@using ISPCore.Models.RequestsFilter.Access
+@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.RequestsFilter.Access.AccessIPModel>
+
+@{
+    string PatchUrl = "/requests-filter/access";
+
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+<script>
+    $(function () {
+        $('#search-ip').on('keydown', function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+
+                var val = $(this).val();
+
+                if (val) {
+                    loadPage(false, '@Html.Raw($"{PatchUrl}?search=")' + val);
+                }
+
+                $(this).val();
+            }
+        })
+    });
+</script>
+
+
+<div class="wrapper">
+    <div class="tabs">
+        <div class="panel-body tab-content">
+
+
+            <div class="page-subtitle">
+                <div class="form-group t_right flex" style="max-width: 400px;">
+                    <input type="text" class="form-control" id="search-ip" placeholder="Поиск IP/Домен">
+                    <a data-toggle="modal" data-target="#modal_form_AccessIP_to_site" class="btn btn-success t_right margin-left-10">Добавить</a>
+                </div>
+
+                <h3>Разрешенные доступы</h3>
+                <p>Список IP адресов которым разрешен доступ к доменам в обход ISPCore</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th width="150" class="text-left">IP</th>
+                            <th width="180">Режим</th>
+                            <th>Домен</th>
+                            <th width="170">До</th>
+                            <th width="25"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="ip_list">
+                        @{ bool PatchTable = false; }
+                        @foreach (var item in Model.Page.GetItems())
+                        {
+                            string patch = "";
+                            @if (PatchTable)
+                            {
+                                patch = "style=\"background: #f7f7f7;\"";
+                            }
+                            PatchTable = !PatchTable;
+
+                            <tr @Html.Raw(patch) class="elemDelete">
+                                <td class="text-left table-products">
+                                    <strong>@item.IP</strong>
+                                </td>
+
+                                <td>
+                                    @switch (item.accessType)
+                                    {
+                                        case AccessType.all:
+                                            @Html.Raw("Полный доступ")
+                                            break;
+                                        case AccessType.Is2FA:
+                                            @Html.Raw("Доступ к страницам 2FA");
+                                            break;
+                                        case AccessType.allDomain:
+                                            @Html.Raw("Доступ ко всем сайтам");
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-left">@item.host</td>
+                                <td>@item.Expires.ToString("dd.MM.yyyy H:mm")</td>
+
+                                <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                    <a onclick="return deleteElement(this,'@Html.Raw($"{PatchUrl}/remove")',{IP:'@item.IP', host:'@item.host', accessType:'@((int)item.accessType)'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+            <script>
+                $("html, body").animate({ scrollTop: 0 }, 0);
+            </script>
+
+            @Html.Raw(Model.Page.Nav())
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="modal_form_AccessIP_to_site" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Полный доступ к сайту</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form_AccessIP_to_site">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>IP<span>адрес</span></label>
+                                <input type="text" class="form-control" name="IP" placeholder="IPv4/6" value="@Context.Connection.RemoteIpAddress.ToString()" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Время<span>доступа в минутах</span></label>
+                                <input type="number" pattern="^[0-9]+$" class="form-control" name="AccessTimeToMinutes" placeholder="По умолчанию: 36 часов" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Домен<span>для которого будет открыт доступ</span></label>
+                                <input type="text" class="form-control" name="host" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Режим<span>доступа</span></label>
+                                <select class="form-control selectpicker" name="accessType">
+                                    <option value="1" selected>Доступ к страницам 2FA</option>
+                                    <option value="0">Полный доступ</option>
+                                    <option value="2">Доступ ко всем сайтам</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-bottom: 0px">Закрыть</button>
+                <button type="button" class="btn btn-primary" onclick="addAccessIpToSite();">Разрешить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

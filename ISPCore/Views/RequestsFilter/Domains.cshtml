@@ -1,0 +1,211 @@
+﻿@using System.Text
+@using System.Text.RegularExpressions
+@using ISPCore.Models.RequestsFilter.Domains
+@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.RequestsFilter.Domains.Domain>
+
+@{
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+<script>
+    function setIpHost(host) {
+        $('#modal-access-ip-host').val(host)
+    }
+</script>
+
+<script>
+    $(function () {
+        $('#search-form').on('keydown', function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+
+                var val = $(this).val();
+
+                if (val) {
+                    loadPage(false, '@Html.Raw("/requests-filter/domains?search=")' + val);
+                }
+
+                $(this).val();
+            }
+        })
+    });
+</script>
+
+<div class="modal fade" id="modal_form_AccessIP_to_site" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Полный доступ к сайту</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form_AccessIP_to_site">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>IP<span>адрес</span></label>
+                                <input type="text" class="form-control" name="IP" placeholder="IPv4/6" value="@Context.Connection.RemoteIpAddress.ToString()" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Время<span>доступа в минутах</span></label>
+                                <input type="number" pattern="^[0-9]+$" class="form-control" name="AccessTimeToMinutes" placeholder="По умолчанию: 120 минут" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Домен<span>для которого будет открыт доступ</span></label>
+                                <input type="text" class="form-control" name="host" id="modal-access-ip-host" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Режим<span>доступа</span></label>
+                                <select class="form-control selectpicker" name="accessType">
+                                    <option value="1" selected>Доступ к страницам 2FA</option>
+                                    <option value="0">Полный доступ</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-bottom: 0px">Закрыть</button>
+                <button type="button" class="btn btn-primary" onclick="addAccessIpToSite();">Разрешить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="page-title">
+    <div class="form-group t_right flex" style="max-width: 400px;">
+        <input type="text" class="form-control form-search margin-bottom-10" id="search-form" placeholder="Поиск домена">
+        <a onclick="$('#file').click(); return false;" class="btn btn-primary t_right margin-left-10 margin-bottom-10">Импорт</a>
+        <a href="/requests-filter/domain/base" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10 margin-bottom-10">Добавить сайт</a>
+    </div>
+
+    <h1>Сайты</h1>
+    <p>Список защищенных сайтов</p>
+</div>
+
+
+<div class="wrapper" style="padding: 0px 21px 20px;">
+    <div class="table-responsive">
+        @if (Model.Page.GetItems().Any())
+        {
+            <table class="table table-bordered table-striped table-hover text-center">
+                <tbody>
+                    <tr>
+                        <th style="width: 100px;">Защита</th>
+                        <th class="text-left">Домен</th>
+                        <th class="text-left">Шаблоны правил</th>
+                        <th style="width: 130px;">Настройки</th>
+                    </tr>
+
+                    @foreach (var domain in Model.Page.GetItems())
+                    {
+                        <tr class="elemDelete">
+                            <td class="text-left table-products">
+                                @switch (@domain.Protect)
+                                {
+                                    case Protection.on:
+                                        {
+                                            <span class="label label-success">включена</span>
+                                            break;
+                                        }
+                                    case Protection.off:
+                                        {
+                                            <span class="label label-warning">отключена</span>
+                                            break;
+                                        }
+                                    case Protection.error:
+                                        {
+                                            <span class="label label-danger">ошибка</span>
+                                            break;
+                                        }
+                                }
+                            </td>
+                            <td class="text-left table-products">
+                                <strong>@domain.host</strong>
+                            </td>
+
+                            <td class="text-left table-products">
+                                <strong>
+                                    @{
+                                        StringBuilder TemplateName = new StringBuilder();
+                                        foreach (var tpl in domain.Templates)
+                                        {
+                                            TemplateName.Append(Model.coreDB.RequestsFilter_Templates.GetTemplateName(tpl.Template, "") + ", ");
+                                        }
+                                    }
+                                    @Regex.Replace(TemplateName.ToString(), ",([ ]+)?$", "")
+                                </strong>
+                            </td>
+
+                            <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                <a href="/requests-filter/monitoring?ShowHost=@domain.host" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-bar-chart"></i></a>
+                                <a data-toggle="modal" data-target="#modal_form_AccessIP_to_site" onclick="setIpHost('@domain.host')" class="btn nopadding-nomargin"><i class="fa fa-unlock-alt"></i></a>
+                                <a href="/requests-filter/domain/base?Id=@domain.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
+                                <a onclick="return deleteElement(this,'/requests-filter/domain/remove',{Id:'@domain.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>У вас еще нет добавленных доменов</p>
+        }
+    </div>
+
+    @Html.Raw(Model.Page.Nav())
+</div>
+
+
+
+<input type="file" id="file" name="file" style="display: none">
+
+<script>
+    $(function () {
+        $('#file').change(function () {
+
+            $(this).simpleUpload("/requests-filter/domain/import", {
+
+                start: function (file) {
+                    //upload started
+                },
+                progress: function (progress) {
+                    //received progress
+                },
+                success: function (data) {
+                    //upload successful
+                    loadPage(null, '/requests-filter/domains')
+                },
+                error: function (error) {
+                    //upload failed
+                }
+
+            });
+        });
+    });
+</script>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

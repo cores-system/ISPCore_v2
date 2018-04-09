@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+	<ServerGarbageCollection>false</ServerGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="core\Log\**" />
+    <Compile Remove="core\passwd\**" />
+    <Compile Remove="core\sync\**" />
+    <Compile Remove="core\tmp\**" />
+    <Content Remove="core\Log\**" />
+    <Content Remove="core\passwd\**" />
+    <Content Remove="core\sync\**" />
+    <Content Remove="core\tmp\**" />
+    <EmbeddedResource Remove="core\Log\**" />
+    <EmbeddedResource Remove="core\passwd\**" />
+    <EmbeddedResource Remove="core\sync\**" />
+    <EmbeddedResource Remove="core\tmp\**" />
+    <None Remove="core\Log\**" />
+    <None Remove="core\passwd\**" />
+    <None Remove="core\sync\**" />
+    <None Remove="core\tmp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="core\av\progress_id-1.json" />
+    <Content Remove="core\av\progress_id-2.json" />
+    <Content Remove="core\Databases\ISPCore.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="cert.pfx" />
+    <None Remove="core\Databases\ISPCore.db" />
+    <None Remove="RunBash.sh" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentFTP" Version="19.1.3" />
+    <PackageReference Include="MaxMind.GeoIP2" Version="2.10.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Https" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.0-alpha2-final" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.1" />
+    <PackageReference Include="SSH.NET" Version="2016.1.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+    <PackageReference Include="Telegram.Bot.Core">
+      <Version>13.2.1</Version>
+    </PackageReference>
+    <PackageReference Include="WebDav.Client" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Common\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,329 @@
+﻿@using Newtonsoft.Json;
+@using ISPCore.Models.Base
+@using ISPCore.Engine.Common.Views
+@model ISPCore.Models.SyncBackup.Tasks.Task
+
+@{
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right margin-left-10 margin-bottom-10" onclick="saveEditSite(this, '/backup/task/save')">Сохранить изменения</button>
+        @if (((int)ViewData["Id"]) > 0)
+        {
+            <button class="btn btn-danger t_right margin-bottom-10" onclick="saveEditSite(this, '/backup/task/clearing-cache')">Очистить кеш</button>
+        }
+        <h3>Задание: @Model?.Description</h3>
+        <p>Настройка задания для синхронизации</p>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="task.Id" id="itemID" value="@ViewData["Id"]" />
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-base" role="tab" data-toggle="tab">Основное</a></li>
+                            <li><a href="#tab-ignr" role="tab" data-toggle="tab">Игнорируемые каталоги и файлы</a></li>
+                            <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-base">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Описание<span>задания</span></label>
+                                        <input type="text" name="task.Description" value="@Model?.Description" class="form-control" placeholder="Имя задания" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Синхронизация<span>файлов</span></label>
+                                        <select class="form-control selectpicker" name="task.JobStatus">
+                                            @Html.Raw(SelectPickerTo.Int(Model == null || Model.JobStatus == JobStatus.on, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Использовать<span>шифрование AES-256</span></label>
+                                        <select class="form-control selectpicker showAESPassword" onchange="showAESPassword(this)" name="task.EncryptionAES">
+                                            @Html.Raw(SelectPickerTo.Bool(Model == null || Model.EncryptionAES, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group aesPassword">
+                                        <label>Пароль<span>шифрования для AES-256</span></label>
+                                        <input type="text" name="task.PasswdAES" class="form-control" placeholder="Пароль AES-256" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Количиство<span>активных бекапов .sync</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="task.CountActiveBackup"
+                                               value="@(Model != null && Model.CountActiveBackup > 0 ? Model.CountActiveBackup.ToString() : "")"
+                                               class="form-control" placeholder="По умолчанию: неограниченно" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Сколько<span>дней хранить активный бекап .sync</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="task.CountActiveDayBackup"
+                                               value="@(Model != null && Model.CountActiveDayBackup > 0 ? Model.CountActiveDayBackup.ToString() : "")"
+                                               class="form-control" placeholder="По умолчанию: неограниченно" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Интервал<span>синхронизации в минутах</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="task.SuncTime"
+                                               value="@(Model != null && Model.SuncTime != 60 ? Model.SuncTime.ToString() : "")"
+                                               class="form-control" placeholder="По умолчанию: 60 минут" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Удаленный<span>сервер</span></label>
+                                        <select class="form-control selectpicker changeTypeFTP" onchange="changeTypeFTP(this)" name="task.TypeSunc" id="TypeSuncSelect">
+                                            <option value="1">FTP/FTPS</option>
+                                            <option value="2">SFTP</option>
+                                            <option value="0">WebDav</option>
+                                            <option value="3">OneDrive</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-7" style="float: right">
+                                    <div class="form-group">
+                                        <label>Локальный<span>каталог</span></label>
+                                        <input type="text" name="task.Whence" value="@Model?.Whence" class="form-control" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Удаленный<span>каталог</span></label>
+                                        <input type="text" name="task.Where" value="@Model?.Where" class="form-control" />
+                                    </div>
+
+                                    <div class="form-group typeDav">
+                                        <label>Адрес<span>WebDav</span></label>
+                                        <input type="text" name="webDav.url" value="@Model?.WebDav.url" class="form-control" placeholder="HostOrIP" />
+                                    </div>
+
+                                    <div class="form-group typeDav">
+                                        <label>Логин<span>от WebDav</span></label>
+                                        <input type="text" name="webDav.Login" value="@Model?.WebDav.Login" class="form-control" placeholder="Логин" />
+                                    </div>
+
+                                    <div class="form-group typeDav">
+                                        <label>Пароль<span>от WebDav</span></label>
+                                        <input type="text" name="webDav.Passwd" class="form-control" placeholder="Укажите пароль" />
+                                    </div>
+
+
+
+                                    <div class="form-group typeFtp">
+                                        <label>Адрес<span>FTP/SFTP сервера</span></label>
+                                        <input type="text" name="ftp.HostOrIP" value="@Model?.FTP.HostOrIP" class="form-control" placeholder="HostOrIP" />
+                                    </div>
+
+                                    <div class="form-group typeFtp">
+                                        <label>Логин<span>от FTP/SFTP</span></label>
+                                        <input type="text" name="ftp.Login" value="@Model?.FTP.Login" class="form-control" placeholder="Логин" />
+                                    </div>
+
+                                    <div class="form-group typeFtp">
+                                        <label>Пароль<span>от FTP/SFTP</span></label>
+                                        <input type="text" name="ftp.Passwd" class="form-control" placeholder="Укажите пароль" />
+                                    </div>
+
+                                    <div class="form-group typeFtp">
+                                        <label>Порт<span>FTP/SFTP сервера</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="ftp.port"
+                                               @if (Model != null && Model.FTP.port != 0) { <text> value="@Model.FTP.port" </text> }
+                                               class="form-control" placeholder="По умолчанию: FTP-21 / SFTP-22" />
+                                    </div>
+
+                                    <div class="form-group typeSftp">
+                                        <label>Количество<span>активных подключений к FTP/SFTP</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="ftp.ActiveConnections"
+                                               @if (Model != null && Model.FTP.ActiveConnections != 1) { <text> value="@Model.FTP.ActiveConnections" </text> }
+                                               class="form-control" placeholder="По умолчанию: 1" />
+                                    </div>
+
+
+
+                                    <div class="form-group typeOneDrive">
+                                        <label>Id<span>приложения</span></label>
+                                        <input type="text" name="oneDrive.ApplicationId" value="@(Model == null ? "2c2720ef-7b64-4938-9b68-2a88bdd2a456" : Model.OneDrive.ApplicationId)" class="form-control" />
+                                    </div>
+
+                                    <div class="form-group typeOneDrive">
+                                        <label>Refresh<span>Token</span></label>
+                                        <input type="text" name="oneDrive.RefreshToken" class="form-control" placeholder="Refresh Token" />
+                                        <a href="/backup/authorize/onedrive" target="_blank">Получить RefreshToken</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="tab-ignr">
+                                <div class="add-gray-table">
+                                    <div class="panel-heading clearfix">
+                                        <div class="page-subtitle">
+                                            <a class="btn btn-warning t_right" onclick="addIgnoreToFileOrFolders('');" style="margin-top: 10px;">Добавить</a>
+                                            <div class="t_over">
+                                                <h3>Список правил</h3>
+                                                <p>Можно использовать Regex для игнорирования файлов и каталогов, пример '^.*\.tmp$'</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table table-responsive add-ads-code-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Правило / Regex</th>
+                                                    <th style="width: 60px;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tab-IgnoreToFileOrFolders"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        <h2><i class="fa fa-cubes"></i>Основное</h2>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Шифрование AES-256</div>
+                                            <div class="faq-text">
+                                                <h5>Пароль шифрования</h5>
+                                                <p>Укажите пароль для шифрования файлов по стандарту AES-256</p>
+                                                <p>Пароль сохраните в надежном месте, он понадобится для восстановления файлов</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Количиство активных бекапов .sync</div>
+                                            <div class="faq-text">
+                                                <h5>Что такое активные бекапы .sync ?</h5>
+                                                <p>Активные бекапы '.sync', это файлы с расширением '.sync', которые создаются на удаленном сервере при изменении файла на локальном</p>
+
+                                                <br /><h5>Например, 3 активных бекапа .sync</h5>
+                                                <p>
+                                                    <b>I</b>. При удалении локальной папки '<b>test</b>', на удавленном сервере папка будет переименована в '<b>test.SyncRemove.время</b>'<br />
+                                                    <b>II</b>. При изменении локального файла '<b>test.txt</b>', на удаленном сервере будет создан файл '<b>test.txt.sync.время.размер</b>', если файл '<b>test.txt</b>' изменить 8 раз, то на удаленном сервере будет только три файла '<b>test.txt.sync.время.размер</b>', актуальный и две последние копии
+                                                </p>
+
+                                                <br /><h5>Как оставлять только актуальный файлы и папки ?</h5>
+                                                <p>Установить количество активных бекапов '<b>.sync</b>' в '<b>1</b>', тогда при удалении или изменении данных на локальном сервере, все данные на удаленном сервере будет так-же изменены без создания дополнительных копий '<b>.sync</b>'</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Сколько дней хранить активный бекап .sync</div>
+                                            <div class="faq-text">
+                                                <h5>Что такое активные бекапы .sync ?</h5>
+                                                <p>Активные бекапы '.sync', это файлы с расширением '.sync', которые создаются на удаленном сервере при изменении файла на локальном</p>
+
+                                                <br /><h5>Например, 3 дня</h5>
+                                                <p>
+                                                    <b>I</b>. При изменении локального файла '<b>test.txt</b>', на удаленном сервере будет создан файл '<b>test.txt.sync.время.размер</b>', и через 3 дня файл будет удален
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Интервал синхронизации в минутах</div>
+                                            <div class="faq-text">
+                                                <h5>Время через которое задание будет повторно отправлено на синхронизацию с удаленным сервером</h5>
+                                                <p>Указанное время считается после окончания операции, это значит даже если задание выполнялось несколько часов, следующая синхронизация будет через указанное время</p>
+
+                                                <br /><h5>Кеш</h5>
+                                                <p>При синхронизации используется кеш и метеоданные файлов и папок, что позволяет максимально быстро проверить сотни тысяч файлов и папок не запрашивая данные с удаленного сервера</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+    function changeTypeFTP(self) {
+        var type = $(self).val();
+        $('.typeFtp, .typeDav, .typeSftp, .typeOneDrive').hide();
+
+        if (type == '0') {
+            $('.typeDav').show()
+        }
+        else if (type == '1') {
+            $('.typeFtp').show()
+        }
+        else if (type == '2') {
+            $('.typeFtp').show()
+            $('.typeSftp').show()
+        }
+        else if (type == '3') {
+            $('.typeOneDrive').show()
+        }
+    }
+
+    function showAESPassword(self) {
+        var type = $(self).val();
+        $('.aesPassword').hide();
+        if (type == 'true') $('.aesPassword').show()
+        $(window).trigger('resize');
+    }
+
+    $(function () {
+        data = @if (Model == null || Model.IgnoreFileOrFolders.Count == 0) { <text>[]</text> } else { @Html.Raw(JsonConvert.SerializeObject(Model.IgnoreFileOrFolders)); };
+        for (var i = 0; i < data.length; i++) {
+            addIgnoreToFileOrFolders(data[i].Patch);
+        }
+    });
+
+    $('#TypeSuncSelect').val('@(Model == null ? "1" : ((int)Model.TypeSunc).ToString())');
+    changeTypeFTP($('.changeTypeFTP'));
+    showAESPassword($('.showAESPassword'));
+</script>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

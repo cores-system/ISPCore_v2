@@ -1,0 +1,74 @@
+﻿@{
+    Layout = null;
+}
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Пользовательский шаблон tpl</div>
+    <div class="faq-text">
+        <h5>Изменение шаблона</h5>
+        <p>
+            1) Скопируйте файл /core/Templates/AntiBot/default/**.tpl в папку /core/Templates/AntiBot/ <br />
+            2) Измените шаблон файла **.tpl на своем усмотрение
+        </p>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Использовать редирект при использовании анонимайзера</div>
+    <div class="faq-text">
+        <p>Если на ваш сайт "original.ru" зашли через аноминайзер/клонировщик "anon.io", пользователь средствами JavaScript будет перенаправлен на "original.ru"</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Таймаут перед установкой Cookie</div>
+    <div class="faq-text">
+        <p>Перед установкой валидных cookie, JavaScript будет ожидать указанное время в миллисекундах</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>На сколько часов кэшировать IP валидного бота</div>
+    <div class="faq-text">
+        <h5>Кеш для поисковых ботов</h5>
+        <p>На указанный период времени IP поискового бота будет помешен в память для быстрой проверки бота без дополнительной проверки ptr записи.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Сколько часов валидны Cookie</div>
+    <div class="faq-text">
+        <p>Пользователю устанавливаются дополнительные cookie на указанный период времени, в течении которого пользователю не нужно проходить проверку браузера.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Пользовательский код для вывода в AntiBot</div>
+    <div class="faq-text">
+        <p>Вставьте сюда код аналитики/счетчика для отслеживания поисковых запросов</p>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Выполнять проверку пользователей в фоновом режиме</div>
+    <div class="faq-text">
+        <p>Функция позволяет не выводить заглушку AntiBot для первых запросов пользователя, при этом валидные cookie ставятся через дополнительный JavaScript установленный на сайте</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Максимальное количество запросов в фоновом режиме</div>
+    <div class="faq-text">
+        <p>Количество GET запросов, которые пользователь может выполнить без вывода заглушки AntiBot. <br />В случаи если количество запросов выше лимита и у пользователя установлены валидные cookie, то заглушка AntiBot не выводится.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Дополнительные расширения для проверки в фоновом режиме</div>
+    <div class="faq-text">
+        <p>По умолчанию проверяются GET запросы без расширения, например "/", "/news".<br />Добавьте расширения "html,php", если вам нужно проверять дополнительные страницы, например "news.html", "index.php"</p>
+    </div>
+</div>

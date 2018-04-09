@@ -1,0 +1,210 @@
+﻿* {
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+a {
+	color: #5ab0ee;
+	text-decoration: none;
+}
+
+body {
+	background: #eef1f7;
+	font-family: Arial;
+}
+
+.copyright {
+	float: left;
+	width: 100%;
+	border-top: 1px solid #e7ebf1;
+	padding: 25px 20px;
+	line-height: 20px;
+	font-size: 11px;
+	color: #999999;
+}
+
+.copyright a {
+	margin: 0px 10px;
+}
+
+.form-group {
+	width: 70%;
+	margin: 0 auto;
+}
+
+.input-group {
+	position: relative;
+	display: table;
+	border-collapse: separate;
+	margin-bottom: 20px;
+}
+
+.input-group-addon {
+	display: table-cell;
+	width: 1%;
+	white-space: nowrap;
+	vertical-align: middle;
+	padding: 6px 10px;
+	font-size: 14px;
+	font-weight: normal;
+	line-height: 1;
+	color: #555555;
+	text-align: center;
+	background-color: #eeeeee;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	border-bottom-right-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.input-group-addon {
+	background: #fff;
+	border: 0px;
+	color: #FFF;
+}
+
+.input-group-addon i {
+	opacity: 0.2;
+	display: block;
+	width: 18px;
+	height: 18px;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAMAAABhEH5lAAAAeFBMVEUAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaev+0AAAAJ3RSTlMAAAIVFyMkKCszN0NKUlNXWFxvdYiMpKeoq7Cytba9vsXi6PLz/P1TCP4IAAAAZ0lEQVR4AcXIZxYBMRSA0WeYUYzeC1ES3/536Ekh52QB7s8rnYKWqP4eDgNRqZbgHKx+NYa5yPRF+60rE1Ett1RdHuLd6cUacgp1ZBRrxqWqm6auzixCbcnsfBky5k+1xj4jy+ZThTfW7Re4SXaYjwAAAABJRU5ErkJggg==);
+}
+
+.form-control {
+	outline: none;
+	border: none;
+	border-radius: 3px;
+	background: #fff;
+	position: relative;
+	z-index: 2;
+	float: left;
+	width: 100%;
+	display: table-cell;
+	height: 35px;
+	line-height: 23px;
+	padding: 5px 10px;
+	font-size: 12px;
+	margin-bottom: 0;
+	-webkit-transition: background-color 200ms linear;
+	-moz-transition: background-color 200ms linear;
+	-o-transition: background-color 200ms linear;
+	-ms-transition: background-color 200ms linear;
+	transition: background-color 200ms linear;
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+}
+
+.btn-unlock {
+	border: 1px solid transparent;
+	border-radius: 4px;
+	white-space: nowrap;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	color: #ffffff;
+	display: block;
+	width: 100%;
+	height: auto;
+	line-height: 23px;
+	padding: 5px 15px;
+	font-size: 12px;
+	-webkit-transition: all 200ms ease;
+	-moz-transition: all 200ms ease;
+	-ms-transition: all 200ms ease;
+	-o-transition: all 200ms ease;
+	transition: all 200ms ease;
+	outline: none !important;
+	font-weight: 400;
+	text-transform: uppercase;
+	margin-bottom: 30px;
+	border-color: #e74e40;
+	background: #e74e40;
+}
+
+.errorMsg {
+	color: #e74e40;
+	text-align: center;
+	margin-bottom: 30px;
+	display: none;
+}
+
+.error {
+	float: left;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.error .error-block {
+	width: 370px;
+	position: absolute;
+	top: 100px;
+	left: 50%;
+	margin-left: -185px;
+	-webkit-animation: appear 500ms;
+	animation: appear 500ms;
+}
+
+.error .error-block:before,
+.error .error-block:after {
+	content: " ";
+	display: table;
+}
+
+.error .error-block:after {
+	clear: both;
+}
+
+.error .error-block:before,
+.error .error-block:after {
+	content: " ";
+	display: table;
+}
+
+.error .error-block:after {
+	clear: both;
+}
+
+.error .error-block .code {
+	float: left;
+	width: 100%;
+	font-size: 160px;
+	color: #364760;
+	text-align: center;
+	line-height: 150px;
+}
+
+.error .error-block .title {
+	float: left;
+	width: 100%;
+	font-size: 18px;
+	color: #555555;
+	text-transform: uppercase;
+	text-align: center;
+	margin-top: 10px;
+	margin-bottom: 50px;
+}
+
+.error .error-block .copyright {
+	float: left;
+	width: 100%;
+}
+
+.error .error-block .copyright > div {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+pre {
+	float: left;
+	width: 100%;
+	white-space: pre-wrap;
+	color: #999999;
+	text-align: center;
+	margin-top: -30px;
+}
+
+

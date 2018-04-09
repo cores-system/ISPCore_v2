@@ -1,0 +1,43 @@
+﻿@{
+    Layout = null;
+}
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Работа с Regex</div>
+    <div class="faq-text">
+        <h5>Regex</h5>
+        <p>Для правил поддерживается стандартный <a href="https://msdn.microsoft.com/ru-ru/library/az24scfc(v=vs.110).aspx" target="_blank">Regex</a></p>
+        <br />
+        <h5>Пример использования</h5>
+        <p>1) Любой запрос:&nbsp; <b>.*</b></p>
+        <p>2) Запрос для "/news/25":&nbsp; <b>/news/[0-9]+</b></p>
+        <p>3) Любой запрос который начинается с "/admin/":&nbsp; <b>/admin/.*</b></p>
+        <p>4) Ник пользователя который может содержать символы и числа "/user/wp-01":&nbsp; <b>/user/[a-z0-9-]+</b></p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Аргументы</div>
+    <div class="faq-text">
+        <h5>Использование аргументов</h5>
+        <p>1) Создайте аргумент с именем "sort" и правилом "sort=(true|false)"</p>
+        <p>2) Создайте разрешенный запрос:&nbsp; <b>/news/[0-9]+/?{arg:sort}</b></p>
+        <br />
+        <h5>Запросы подходящие под правила</h5>
+        <p>/news/5</p>
+        <p>/news/5/</p>
+        <p>/news/5?sort=true</p>
+        <p>/news/5?sort=false</p>
+    </div>
+</div>
+
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Запрещено использовать</div>
+    <div class="faq-text">
+        <h5>Данные аргументы нарушают целостность правила</h5>
+        <p>1) Символы "^" и "$" запрещены в аргументах и правилах, они уже используются внутри проверочного правила</p>
+        <p>2) Regex ".*" запрещен в аргументах, вместо него используйте "[^&]+"</p>
+    </div>
+</div>
+

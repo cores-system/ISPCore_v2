@@ -1,0 +1,66 @@
+﻿@{
+    Layout = null;
+}
+
+
+<h2><i class="fa fa-list"></i>Защита от ботов</h2>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Основное</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/antibot/base</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>Enabled, FirstSkipToBot, RewriteToOriginalDomain, BackgroundCheck</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>HourCacheToBot, HourCacheToUser, WaitUser, CountBackgroundRequest, BackgroundHourCacheToIP</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>DomainsToreCAPTCHA, AddCodeToHtml, BackgroundCheckToAddExtensions</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Enum:</strong></td>
+                <td>type=(Off|SignalR|CookieAndJS|reCAPTCHA)</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Лимит запросов</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/antibot/limit</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>IsEnabled</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>MinuteLimit, HourLimit, DayLimit</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+﻿@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.Home.Jurnal>
+
+@{
+
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="row row-condensed">
+
+    <div class="col-lg-9 col-md-6">
+        <div class="wrapper">
+            <div class="page-subtitle">
+                <h2>Журнал посещений</h2>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button class="btn btn-default btn-rounded btn-icon"><i class="fa fa-calendar pull-left"></i> @DateTime.Now.ToString("dd\\/MM\\/yyyy")</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover text-center">
+                    <tr>
+                        <th width="150" class="text-left">IP</th>
+                        <th>Действие</th>
+                        <th width="260">Geo IP</th>
+                        <th width="90">Время</th>
+                        <th width="120">Дата</th>
+                    </tr>
+
+                    @foreach (var item in Model.Page.GetItems())
+                    {
+                        <tr>
+                            <td class="text-left table-products">
+                                <strong>@item.IP</strong>
+                            </td>
+
+                            <td class="text-left">@item.Msg</td>
+                            <td>@item.Country / @item.Region - @item.City</td>
+
+                            <td><strong><i class="fa fa-clock-o"></i> @item.Time.ToString("H:mm")</strong></td>
+                            <td><i class="fa fa-calendar"></i> @item.Time.ToString("dd.MM.yyyy")</td>
+                        </tr>
+                    }
+
+                </table>
+            </div>
+
+            @Html.Raw(Model.Page.Nav())
+
+        </div>
+    </div>
+
+
+    <div class="col-lg-3 col-md-6">
+        <div class="widget-tabbed margin-top-30">
+            <ul class="widget-tabs widget-tabs-three">
+                <li class="active"><a href="#tasks">Новости</a></li>
+                <li><a href="#changes">Изменения</a></li>
+            </ul>
+            <div class="widget-tab list-tasks active" id="tasks">
+
+                @foreach (var item in Model.jsonDB.ProjectNews)
+                {
+                    <div class="list-tasks-item danger" onclick="window.open('@item.Link','_blank')">
+                        <div class="task">
+                            <a>@item.Title</a>
+                            <div class="user"> <strong>@item.Category</strong></div>
+                            <div class="date">@item.Time.ToString("dd.MM.yyyy")</div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+            <div class="widget-tab" id="changes">
+                <ul class="timeline-simple">
+
+                    @foreach (var item in Model.jsonDB.ProjectChange)
+                    {
+                        <li class="@item.Type">
+                            <span class="timeline-simple-date">@($"v{item.vers}") / @item.Time.ToString("dd.MM.yyyy")</span>
+                            @item.Msg
+                        </li>
+                    }
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+
