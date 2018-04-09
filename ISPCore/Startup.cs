@@ -29,7 +29,7 @@ using ISPCore.Engine.Base.SqlAndCache;
 namespace ISPCore
 {
     public class Startup
-    { 
+    {
         #region Startup
         public Startup(IHostingEnvironment env)
         {
