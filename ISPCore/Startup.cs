@@ -238,7 +238,6 @@ namespace ISPCore
                 routes.MapRoute(null, "core/check/cookie", new { controller = "CoreCheckCookie", action = "Index" });
                 routes.MapRoute(null, "core/check/recaptcha", new { controller = "CoreCheckRecaptcha", action = "Base" });
                 routes.MapRoute(null, "core/check/recaptcha/limitrequest", new { controller = "CoreCheckRecaptcha", action = "LimitRequest" });
-                routes.MapRoute(null, "core/base/myip", new { controller = "CoreBase", action = "MyIP" });
             });
 
             // AntiBotHub
