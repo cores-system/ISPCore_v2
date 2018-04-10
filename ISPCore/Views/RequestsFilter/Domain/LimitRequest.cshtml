@@ -1,5 +1,6 @@
 ﻿@using ISPCore.Models.RequestsFilter.Domains
 @using ISPCore.Engine.Common.Views
+@using ISPCore.Models.RequestsFilter.Base.Enums
 @model Domain
 
 @{
@@ -32,6 +33,23 @@
                         <select class="form-control selectpicker changeGlobalConf" onchange="changeGlobalConf(this)" name="domain.limitRequest.UseGlobalConf">
                             @Html.Raw(SelectPickerTo.Bool(Model.limitRequest.UseGlobalConf, "Да", "Нет"))
                         </select>
+                    </div>
+
+                    <div class="form-group typeLocalConf">
+                        <label>Метод<span>блокировки при достижении лимита запросов</span></label>
+                        <select class="form-control selectpicker changeLimitRequestToBlockType" name="domain.limitRequest.BlockType" onchange="changeLimitRequestToBlockType(this)">
+                            @Html.Raw(SelectPickerTo.Enum(Model.limitRequest.BlockType,
+                                        (LimitToBlockType._403, "403"),
+                                        (LimitToBlockType.reCAPTCHA, "reCAPTCHA")
+                            ))
+                        </select>
+                    </div>
+
+                    <div class="form-group typeLimitRequestToBlockType typeLocalConf">
+                        <label>Количество<span>запросов перед повторной проверкой reCAPTCHA</span></label>
+                        <input type="number" pattern="^[0-9]+$" name="domain.limitRequest.MaxRequestToAgainСheckingreCAPTCHA"
+                                @if (Model.limitRequest.MaxRequestToAgainСheckingreCAPTCHA != 300) { <text> value="@Model.limitRequest.MaxRequestToAgainСheckingreCAPTCHA" </text> }
+                                class="form-control" placeholder="По умолчанию: 300" />
                     </div>
 
                     <div class="form-group typeLocalConf">
@@ -93,6 +111,20 @@
 
         $(window).trigger('resize')
     }
+
+    function changeLimitRequestToBlockType(self) {
+        var type = $(self).val();
+        $('.typeLimitRequestToBlockType').hide();
+
+        if (type == 'reCAPTCHA') {
+            $('.typeLimitRequestToBlockType').show()
+        }
+
+        $(window).trigger('resize');
+    }
+
+
+    changeLimitRequestToBlockType($('.changeLimitRequestToBlockType'));
     changeGlobalConf($('.changeGlobalConf'));
 </script>
 

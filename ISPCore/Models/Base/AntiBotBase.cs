@@ -1,4 +1,4 @@
-﻿using ISPCore.Models.RequestsFilter.Base;
+﻿using ISPCore.Models.RequestsFilter.Base.Enums;
 
 namespace ISPCore.Models.Base
 {

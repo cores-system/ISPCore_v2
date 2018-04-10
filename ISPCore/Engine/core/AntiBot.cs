@@ -3,7 +3,7 @@ using ISPCore.Engine.Base;
 using ISPCore.Engine.Hash;
 using ISPCore.Models.core.Cache;
 using ISPCore.Models.Databases.json;
-using ISPCore.Models.RequestsFilter.Base;
+using ISPCore.Models.RequestsFilter.Base.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using System;
@@ -388,7 +388,7 @@ namespace ISPCore.Engine.core
         static string Html(string tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey)
         {
             #region Кеш шаблона
-            // Путь к файлу
+            // Путь к шаблону
             string SourceFile = $"{Folders.Tpl.AntiBot}/{tplName}.tpl";
             if (!File.Exists(SourceFile))
                 SourceFile = $"{Folders.Tpl.AntiBot}/default/{tplName}.tpl";

@@ -78,14 +78,14 @@ namespace ISPCore.Models.RequestsFilter.Domains
         /// <summary>
         /// Защита сайта от Brute Force
         /// </summary>
-        public Base.BruteForceType StopBruteForce { get; set; } = Base.BruteForceType.Not;
+        public Base.Enums.BruteForceType StopBruteForce { get; set; } = Base.Enums.BruteForceType.Not;
 
         /// <summary>
         /// Авторизация на страницы 2FA дает:
         /// AccessTo2FA - Доступ к страницам 2FA
         /// FullAccess  - Полный доступ к сайту
         /// </summary>
-        public Base.Auth2faToAccess Auth2faToAccess { get; set; } = Base.Auth2faToAccess.AccessTo2FA;
+        public Base.Enums.Auth2faToAccess Auth2faToAccess { get; set; } = Base.Enums.Auth2faToAccess.AccessTo2FA;
 
         /// <summary>
         /// Защита сайта от ботов

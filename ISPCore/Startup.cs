@@ -48,13 +48,13 @@ namespace ISPCore
         public static LatestVersion version => new LatestVersion()
         {
             Version = 2.1,
-            Patch = 2
+            Patch = 5
         };
 
         public static LatestVersion vSql => new LatestVersion()
         {
             Version = 0.1,
-            Patch = 1
+            Patch = 2
         };
         #endregion
 
@@ -236,7 +236,8 @@ namespace ISPCore
             app.UseMvc(routes => {
                 routes.MapRoute(null, "core/unlock/2fa", new { controller = "CoreUnlock2FA", action = "Index" });
                 routes.MapRoute(null, "core/check/cookie", new { controller = "CoreCheckCookie", action = "Index" });
-                routes.MapRoute(null, "core/check/recaptcha", new { controller = "CoreCheckRecaptcha", action = "Index" });
+                routes.MapRoute(null, "core/check/recaptcha", new { controller = "CoreCheckRecaptcha", action = "Base" });
+                routes.MapRoute(null, "core/check/recaptcha/limitrequest", new { controller = "CoreCheckRecaptcha", action = "LimitRequest" });
                 routes.MapRoute(null, "core/base/myip", new { controller = "CoreBase", action = "MyIP" });
             });
 

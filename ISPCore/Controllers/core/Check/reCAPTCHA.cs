@@ -1,28 +1,27 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using ISPCore.Engine;
-using ISPCore.Models.Databases.json;
 using ISPCore.Engine.Base;
 using System.Threading.Tasks;
 using ISPCore.Models.Response;
 using ISPCore.Engine.Hash;
 using ISPCore.Engine.Auth;
+using ISPCore.Models.Databases;
+using Microsoft.Extensions.Caching.Memory;
+using ISPCore.Engine.Base.SqlAndCache;
 
 namespace ISPCore.Controllers.core
 {
-    public class CoreCheckRecaptchaController : Controller
+    public class CoreCheckRecaptchaController : ControllerToDB
     {
+        #region Base
         [HttpPost]
-        async public Task<JsonResult> Index(string recaptchaKey, int HourCacheToUser, string hash)
+        async public Task<JsonResult> Base(string recaptchaKey, int HourCacheToUser, string hash)
         {
             if (string.IsNullOrWhiteSpace(recaptchaKey))
                 return Json(new Text("recaptchaKey == null"));
 
             if (hash != md5.text($"{HourCacheToUser}:{PasswdToMD5.salt}"))
                 return Json(new Text("hash error"));
-
-            // База
-            var jsonDB = Service.Get<JsonDB>();
 
             // Проверяем reCAPTCHA
             if (await Recaptcha.Verify(recaptchaKey, jsonDB.Base.reCAPTCHASecret))
@@ -37,5 +36,31 @@ namespace ISPCore.Controllers.core
             // Ошибка
             return Json(new Text("Verify == false"));
         }
+        #endregion
+
+        #region LimitRequest
+        [HttpPost]
+        async public Task<JsonResult> LimitRequest(string recaptchaKey, string IP, int ExpiresToMinute, string hash)
+        {
+            if (string.IsNullOrWhiteSpace(recaptchaKey))
+                return Json(new Text("recaptchaKey == null"));
+
+            if (hash != md5.text($"{IP}{ExpiresToMinute}:{PasswdToMD5.salt}"))
+                return Json(new Text("hash error"));
+
+            // Проверяем reCAPTCHA
+            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Base.reCAPTCHASecret))
+            {
+                // Создаем кеш
+                memoryCache.Set(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), (0, ExpiresToMinute), TimeSpan.FromMinutes(ExpiresToMinute));
+
+                // Отдаем ответ
+                return Json(new TrueOrFalse(true));
+            }
+
+            // Ошибка
+            return Json(new Text("Verify == false"));
+        }
+        #endregion
     }
 }

@@ -284,8 +284,15 @@ namespace ISPCore.Engine.Databases
 
                                     case 1:
                                         {
-                                            // Миграция на 2
-                                            //goto case 2;
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_Domain_LimitRequest] ADD [BlockType] BIGINT DEFAULT 0 NOT NULL ;");
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_Domain_LimitRequest] ADD [MaxRequestToAgainСheckingreCAPTCHA] BIGINT DEFAULT 300 NOT NULL ;");
+                                            goto case 2;
+                                        }
+
+                                    case 2:
+                                        {
+                                            // Миграция на 3
+                                            //goto case 3;
                                             break;
                                         }
                                 }

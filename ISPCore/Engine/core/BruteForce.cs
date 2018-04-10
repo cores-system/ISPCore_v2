@@ -1,16 +1,4 @@
-﻿using ISPCore.Engine.Base;
-using ISPCore.Models.core.Cache;
-using ISPCore.Models.core.Cache.CheckLink.Common;
-using ISPCore.Models.Databases;
-using ISPCore.Models.Databases.json;
-using ISPCore.Models.RequestsFilter.Base;
-using ISPCore.Models.RequestsFilter.Domains;
-using ISPCore.Models.RequestsFilter.Monitoring;
-using ISPCore.Models.Security;
-using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using ISPCore.Models.RequestsFilter.Base.Enums;
 using System.Text.RegularExpressions;
 
 namespace ISPCore.Engine.core

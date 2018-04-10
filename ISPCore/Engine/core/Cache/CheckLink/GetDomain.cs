@@ -4,6 +4,7 @@ using ISPCore.Engine.Databases;
 using ISPCore.Models.Base;
 using ISPCore.Models.Databases;
 using ISPCore.Models.RequestsFilter.Base;
+using ISPCore.Models.RequestsFilter.Base.Enums;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -91,11 +92,13 @@ namespace ISPCore.Engine.core.Cache.CheckLink
                 #region Настройки лимитирования запросов
                 if (domain.limitRequest.UseGlobalConf || domain.limitRequest.MinuteLimit > 0 || domain.limitRequest.HourLimit > 0 || domain.limitRequest.DayLimit > 0)
                 {
-                    cache.limitRequest.IsEnabled = true;                                                                  // Режим лимитирования запросов включен
-                    cache.limitRequest.UseGlobalConf = domain.limitRequest.UseGlobalConf;                                 // Использовать глобальные или локальные настройки
-                    cache.limitRequest.MinuteLimit = domain.limitRequest.MinuteLimit;                                     // Минутный лимит запросов
-                    cache.limitRequest.HourLimit = domain.limitRequest.HourLimit;                                         // Часовой лимит запросов
-                    cache.limitRequest.DayLimit = domain.limitRequest.DayLimit;                                           // Суточный лимит запросов
+                    cache.limitRequest.IsEnabled = true;                                                                              // Режим лимитирования запросов включен
+                    cache.limitRequest.UseGlobalConf = domain.limitRequest.UseGlobalConf;                                             // Использовать глобальные или локальные настройки
+                    cache.limitRequest.MinuteLimit = domain.limitRequest.MinuteLimit;                                                 // Минутный лимит запросов
+                    cache.limitRequest.HourLimit = domain.limitRequest.HourLimit;                                                     // Часовой лимит запросов
+                    cache.limitRequest.DayLimit = domain.limitRequest.DayLimit;                                                       // Метод блокировки при достижении лимита запросов
+                    cache.limitRequest.BlockType = domain.limitRequest.BlockType;                                                     // Суточный лимит запросов
+                    cache.limitRequest.MaxRequestToAgainСheckingreCAPTCHA = domain.limitRequest.MaxRequestToAgainСheckingreCAPTCHA;   // Количество запросов перед повторной проверкой reCAPTCHA
                 }
                 #endregion
 

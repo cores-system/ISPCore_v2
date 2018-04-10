@@ -45,6 +45,7 @@ namespace ISPCore.Engine.Base
         public static class Tpl
         {
             public static string AntiBot => $"{RootPath}/core/Templates/AntiBot";
+            public static string LimitRequest => $"{RootPath}/core/Templates/LimitRequest";
         }
     }
 }

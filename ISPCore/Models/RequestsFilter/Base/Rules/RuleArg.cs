@@ -1,4 +1,5 @@
 ﻿using ISPCore.Models.Databases.Interface;
+using ISPCore.Models.RequestsFilter.Base.Enums;
 
 namespace ISPCore.Models.RequestsFilter.Base
 {

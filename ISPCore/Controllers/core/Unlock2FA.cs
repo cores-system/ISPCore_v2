@@ -19,7 +19,7 @@ using ISPCore.Models.Security;
 using ISPCore.Models.Databases.json;
 using CheckRequest = ISPCore.Engine.core.Check.Request;
 using System.Threading;
-using ISPCore.Models.RequestsFilter.Base;
+using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.RequestsFilter.Access;
 using ISPCore.Engine.Base.SqlAndCache;
 

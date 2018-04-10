@@ -8,6 +8,8 @@ namespace ISPCore.Engine.Base.SqlAndCache
         public static string CheckLinkWhitelistToAll(string host, string IP) => $"CheckLinkWhitelistToAll-{IP}_{host}";
         public static string CheckLinkWhitelistToAllDomain(string IP) => $"CheckLinkWhitelistToAllDomain-{IP}";
 
+        public static string LimitRequestToreCAPTCHA(string IP) => $"KeyToMem:-{IP}";
+
         public static string IPtables(string IP) => $"IPtables-{IP}";
         public static string IPtables(string IP, string host) => $"IPtables-{IP}_{host}";
 

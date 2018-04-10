@@ -1,12 +1,13 @@
-﻿using ISPCore.Engine.Base;
+﻿using ISPCore.Engine.Auth;
+using ISPCore.Engine.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Engine.core.Cache.CheckLink;
+using ISPCore.Engine.Hash;
 using ISPCore.Engine.Middleware;
 using ISPCore.Models.core;
 using ISPCore.Models.core.Cache.CheckLink.Common;
 using ISPCore.Models.Databases;
-using ISPCore.Models.Databases.json;
-using ISPCore.Models.RequestsFilter.Base;
+using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Models.RequestsFilter.Domains.Log;
 using ISPCore.Models.RequestsFilter.Domains.Types;
@@ -16,8 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -28,12 +28,8 @@ using ModelCache = ISPCore.Models.core.Cache.CheckLink;
 
 namespace ISPCore.Engine.core.Check
 {
-    public static class Request
+    public partial class Request
     {
-        static JsonDB jsonDB = Service.Get<JsonDB>();
-        static IMemoryCache memoryCache = Service.Get<IMemoryCache>();
-
-        #region Check
         public static Task Check(HttpContext context)
         {
             #region Получаем параметры запроса
@@ -161,6 +157,135 @@ namespace ISPCore.Engine.core.Check
                     // Проверяем белый список UserAgent
                     if (!Regex.IsMatch(userAgent, whiteList.UserAgentRegex, RegexOptions.IgnoreCase))
                     {
+                        #region IsWhitePtr
+                        bool IsWhitePtr(out string PtrHostName)
+                        {
+                            PtrHostName = null;
+
+                            string KeyLimitRequestToBlockedWait = $"LimitRequestToBlockedWait-{IP}_{host}";
+                            if (memoryCache.TryGetValue(KeyLimitRequestToBlockedWait, out _))
+                                return true;
+                            memoryCache.Set(KeyLimitRequestToBlockedWait, (byte)0, TimeSpan.FromMinutes(5));
+
+                            #region DNSLookup
+                            try
+                            {
+                                // Белый список Ptr
+                                string WhitePtrRegex = whiteList.PtrRegex;
+                                if (WhitePtrRegex != "^$" && !string.IsNullOrWhiteSpace(WhitePtrRegex))
+                                {
+                                    // Получаем имя хоста по IP
+                                    var DnsHost = Dns.GetHostEntryAsync(IP).Result;
+
+                                    // Получаем IP хоста по имени
+                                    DnsHost = Dns.GetHostEntryAsync(DnsHost.HostName).Result;
+
+                                    // Проверяем имя хоста и IP на совпадение 
+                                    if (DnsHost.AddressList.Where(i => i.ToString() == IP).FirstOrDefault() != null)
+                                    {
+                                        PtrHostName = DnsHost.HostName;
+
+                                        // Проверяем имя хоста на белый список DNSLookup
+                                        if (Regex.IsMatch(DnsHost.HostName, WhitePtrRegex, RegexOptions.IgnoreCase))
+                                        {
+                                            // Добовляем IP в белый список на 9 дней
+                                            WhitePtr.Add(IP, DateTime.Now.AddDays(9));
+                                            memoryCache.Remove(KeyLimitRequestToBlockedWait);
+                                            return true;
+                                        }
+                                    }
+
+                                }
+                            }
+                            catch { }
+                            #endregion
+
+                            // Сносим временную запись
+                            memoryCache.Remove(KeyLimitRequestToBlockedWait);
+                            return false;
+                        }
+                        #endregion
+
+                        #region Локальный метод - "СheckingToreCAPTCHA"
+                        bool СheckingToreCAPTCHA(out Task content, int ExpiresToMinute)
+                        {
+                            content = null;
+
+                            if (IsWhitePtr(out _))
+                                return false;
+
+                            #region Валидный пользователь
+                            if (memoryCache.TryGetValue(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), out (int countRequest, int ExpiresToMinute) item))
+                            {
+                                // Пользователь превысил допустимый лимит
+                                if (item.countRequest >= limitRequest.MaxRequestToAgainСheckingreCAPTCHA)
+                                {
+                                    // Удаляем запись
+                                    memoryCache.Remove(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP));
+                                    return false;
+                                }
+
+                                // Считаем количество запросов
+                                item.countRequest++;
+                                memoryCache.Set(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), item, TimeSpan.FromMinutes(item.ExpiresToMinute));
+                                return false;
+                            }
+                            #endregion
+
+                            #region Кеш шаблона
+                            // Путь к шаблону
+                            string SourceFile = $"{Folders.Tpl.LimitRequest}/reCAPTCHA.tpl";
+                            if (!File.Exists(SourceFile))
+                                SourceFile = $"{Folders.Tpl.LimitRequest}/default/reCAPTCHA.tpl";
+
+                            // Время модификации файла
+                            DateTime LastWriteTimeToFile = File.GetLastWriteTime(SourceFile);
+
+                            // default value
+                            (DateTime LastWriteTime, string Source) cacheTpl = (DateTime.Now, "");
+
+                            // Обновляем кеш
+                            if (!memoryCache.TryGetValue("core.Check.Request:LimitRequest-tpl", out cacheTpl) || LastWriteTimeToFile != cacheTpl.LastWriteTime)
+                            {
+                                cacheTpl.LastWriteTime = LastWriteTimeToFile;
+                                cacheTpl.Source = File.ReadAllText(SourceFile);
+                                memoryCache.Set("core.Check.Request:LimitRequest-tpl", cacheTpl);
+                            }
+                            #endregion
+
+                            #region Замена полей
+                            string tpl = Regex.Replace(cacheTpl.Source, @"\{isp:([^\}]+)\}", key =>
+                            {
+                                switch (key.Groups[1].Value)
+                                {
+                                    case "CoreApiUrl":
+                                        return jsonDB.Base.CoreAPI;
+
+                                    case "reCAPTCHASitekey":
+                                        return jsonDB.Base.reCAPTCHASitekey;
+
+                                    case "IP":
+                                        return IP;
+
+                                    case "ExpiresToMinute":
+                                        return ExpiresToMinute.ToString();
+
+                                    case "hash":
+                                        return md5.text($"{IP}{ExpiresToMinute}:{PasswdToMD5.salt}");
+
+                                    default:
+                                        return string.Empty;
+                                }
+                            });
+                            #endregion
+
+                            // Ответ
+                            context.Response.ContentType = "text/html; charset=utf-8";
+                            content = context.Response.WriteAsync(tpl, context.RequestAborted);
+                            return true;
+                        }
+                        #endregion
+
                         #region Локальный метод - "CheckToLimit"
                         bool CheckToLimit(string keyName, int limit, int ExpiresToMinute, out CacheValue _cacheValue)
                         {
@@ -185,77 +310,84 @@ namespace ISPCore.Engine.core.Check
                         #region Локальный метод - "BlockedToIP"
                         void BlockedToIP(string Msg, DateTime Expires)
                         {
-                            string KeyLimitRequestToBlockedWait = $"LimitRequestToBlockedWait-{IP}_{host}";
-                            if (memoryCache.TryGetValue(KeyLimitRequestToBlockedWait, out _))
+                            if (IsWhitePtr(out string PtrHostName))
                                 return;
-                            memoryCache.Set(KeyLimitRequestToBlockedWait, (byte)0, TimeSpan.FromMinutes(5));
-
-                            #region DNSLookup
-                            string PtrHostName = null;
-                            try
-                            {
-                                // Белый список Ptr
-                                string WhitePtrRegex = whiteList.PtrRegex;
-                                if (WhitePtrRegex != "^$" && !string.IsNullOrWhiteSpace(WhitePtrRegex))
-                                {
-                                    // Получаем имя хоста по IP
-                                    var DnsHost = Dns.GetHostEntryAsync(IP).Result;
-
-                                    // Получаем IP хоста по имени
-                                    DnsHost = Dns.GetHostEntryAsync(DnsHost.HostName).Result;
-
-                                    // Проверяем имя хоста и IP на совпадение 
-                                    if (DnsHost.AddressList.Where(i => i.ToString() == IP).FirstOrDefault() != null)
-                                    {
-                                        PtrHostName = DnsHost.HostName;
-
-                                        // Проверяем имя хоста на белый список DNSLookup
-                                        if (Regex.IsMatch(DnsHost.HostName, WhitePtrRegex, RegexOptions.IgnoreCase))
-                                        {
-                                            // Добовляем IP в белый список на 9 дней
-                                            WhitePtr.Add(IP, DateTime.Now.AddDays(9));
-                                            memoryCache.Remove(KeyLimitRequestToBlockedWait);
-                                            return;
-                                        }
-                                    }
-
-                                }
-                            }
-                            catch { }
-                            #endregion
 
                             // Записываем IP в кеш IPtables и журнал
                             SetBlockedToIPtables(Msg, Expires, PtrHostName);
-
-                            // Сносим временную запись
-                            memoryCache.Remove(KeyLimitRequestToBlockedWait);
                         }
                         #endregion
 
                         // Переменная для кеша
                         CacheValue cacheValue;
 
-                        // Проверяем минутный лимит
+                        #region Метод блокировки
+                        LimitToBlockType BlockType = limitRequest.BlockType;
+                        if (BlockType == LimitToBlockType.reCAPTCHA && (antiBotToGlobalConf.conf.limitRequest.IsEnabled || Domain.limitRequest.UseGlobalConf))
+                        {
+                            // Если домена нету в глобальных настройках
+                            if (!Regex.IsMatch(host, antiBotToGlobalConf.DomainsToreCaptchaRegex, RegexOptions.IgnoreCase))
+                                BlockType = LimitToBlockType._403;
+                        }
+                        #endregion
+
+                        #region Минутный лимит
                         if (limitRequest.MinuteLimit != 0 && CheckToLimit("Minute", limitRequest.MinuteLimit, 1, out cacheValue))
                         {
-                            BlockedToIP("Превышен минутный лимит на запросы", cacheValue.Expires);
-                            memoryCache.Remove($"LimitRequestToMinute-{IP}_{host}");
+                            switch (BlockType)
+                            {
+                                case LimitToBlockType._403:
+                                    BlockedToIP("Превышен минутный лимит на запросы", cacheValue.Expires);
+                                    memoryCache.Remove($"LimitRequestToMinute-{IP}_{host}");
+                                    break;
+                                case LimitToBlockType.reCAPTCHA:
+                                    {
+                                        if (СheckingToreCAPTCHA(out Task res, 2))
+                                            return res;
+                                    }
+                                    break;
+                            }
                         }
+                        #endregion
 
-                        // Проверяем часовой лимит
+                        #region Часовой лимит
                         if (limitRequest.HourLimit != 0 && CheckToLimit("Hour", limitRequest.HourLimit, 60, out cacheValue))
                         {
-                            BlockedToIP("Превышен часовой лимит на запросы", cacheValue.Expires);
-                            memoryCache.Remove($"LimitRequestToHour-{IP}_{host}");
+                            switch (BlockType)
+                            {
+                                case LimitToBlockType._403:
+                                    BlockedToIP("Превышен часовой лимит на запросы", cacheValue.Expires);
+                                    memoryCache.Remove($"LimitRequestToHour-{IP}_{host}");
+                                    break;
+                                case LimitToBlockType.reCAPTCHA:
+                                    {
+                                        if (СheckingToreCAPTCHA(out Task res, 61))
+                                            return res;
+                                    }
+                                    break;
+                            }
                         }
+                        #endregion
 
-                        // Проверяем дневной лимит
+                        #region Дневной лимит
                         if (limitRequest.DayLimit != 0 && CheckToLimit("Day", limitRequest.DayLimit, 1440, out cacheValue))
                         {
-                            BlockedToIP("Превышен дневной лимит на запросы", cacheValue.Expires);
-                            memoryCache.Remove($"LimitRequestToHour-{IP}_{host}");
-                            memoryCache.Remove($"LimitRequestToDay-{IP}_{host}");
+                            switch (BlockType)
+                            {
+                                case LimitToBlockType._403:
+                                    BlockedToIP("Превышен дневной лимит на запросы", cacheValue.Expires);
+                                    memoryCache.Remove($"LimitRequestToHour-{IP}_{host}");
+                                    memoryCache.Remove($"LimitRequestToDay-{IP}_{host}");
+                                    break;
+                                case LimitToBlockType.reCAPTCHA:
+                                    {
+                                        if (СheckingToreCAPTCHA(out Task res, 1441))
+                                            return res;
+                                    }
+                                    break;
+                            }
                         }
+                        #endregion
                     }
                 }
                 #endregion
@@ -918,321 +1050,5 @@ namespace ISPCore.Engine.core.Check
             }
             #endregion
         }
-        #endregion
-
-        #region SetCountRequestToHour
-        public static void SetCountRequestToHour(TypeRequest type, string host, bool EnableCountRequest)
-        {
-            #region Локальный метод - "SetCount"
-            void SetCount(NumberOfRequestHour dt)
-            {
-                switch (type)
-                {
-                    case TypeRequest._200:
-                        dt.Count200++;
-                        break;
-                    case TypeRequest._303:
-                        dt.Count303++;
-                        break;
-                    case TypeRequest._403:
-                        dt.Count403++;
-                        break;
-                    case TypeRequest._401:
-                        dt.Count401++;
-                        break;
-                    case TypeRequest._500:
-                        dt.Count500++;
-                        break;
-                    case TypeRequest._2fa:
-                        dt.Count2FA++;
-                        break;
-                }
-            }
-            #endregion
-
-            if (EnableCountRequest)
-            {
-                string keyNumberOfRequestToHour = KeyToMemoryCache.IspNumberOfRequestToHour(DateTime.Now);
-                if (memoryCache.TryGetValue(keyNumberOfRequestToHour, out IDictionary<string, NumberOfRequestHour> DataNumberOfRequestDay))
-                {
-                    // Если хост есть в кеше
-                    if (DataNumberOfRequestDay.TryGetValue(host, out NumberOfRequestHour dtValue))
-                    {
-                        SetCount(dtValue);
-                    }
-
-                    // Если хоста нету в кеше
-                    else
-                    {
-                        var dt = new NumberOfRequestHour();
-                        dt.Time = DateTime.Now;
-                        SetCount(dt);
-                        DataNumberOfRequestDay.Add(host, dt);
-                    }
-                }
-                else
-                {
-                    // Считаем запрос
-                    var dt = new NumberOfRequestHour();
-                    dt.Time = DateTime.Now;
-                    SetCount(dt);
-
-                    // Создаем кеш
-                    memoryCache.Set(keyNumberOfRequestToHour, new Dictionary<string, NumberOfRequestHour>() { [host] = dt }, TimeSpan.FromHours(2));
-                }
-            }
-        }
-        #endregion
-
-        #region ViewDomainNotFound
-        public static Task ViewDomainNotFound(HttpContext context)
-        {
-            context.Response.StatusCode = 500;
-            return context.Response.WriteAsync(@"<!DOCTYPE html>
-<html lang='ru-RU'>
-<head>
-    <title>Ошибка</title>
-    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>
-    <link rel='stylesheet' href='/statics/style.css'>
-</head>
-<body>
-    <div class='error'>
-        <div class='error-block'>
-
-            <div class='code'>500</div>
-            <div class='title'>Домен не найден</div>
-            <pre>Добавьте домен в ISPCore и настройте фильтр запросов</pre>
-
-            <div class='copyright'>
-                <div>
-                    &copy; 2018 <strong>ISPCore</strong>. All rights reserved.
-                </div>
-                <div>
-                    <a href='/'>Главная сайта</a> / <a href='http://core-system.org/' target='_blank'>Core System</a>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</body>
-</html>", context.RequestAborted);
-        }
-        #endregion
-
-        #region View
-        public static Task View(HttpContext context, ViewBag viewBag, ActionCheckLink Model)
-        {
-            #region Код ответа
-            if (viewBag.IsErrorRule)
-            {
-                context.Response.StatusCode = 500;
-            }
-            else
-            {
-                switch (Model)
-                {
-                    case ActionCheckLink.allow:
-                        {
-                            context.Response.StatusCode = 303;
-                            break;
-
-                        }
-                    case ActionCheckLink.Is2FA:
-                        {
-                            context.Response.StatusCode = 200;
-                            break;
-
-                        }
-                    case ActionCheckLink.deny:
-                        {
-                            context.Response.StatusCode = 403;
-                            break;
-
-                        }
-                    default:
-                        {
-                            context.Response.StatusCode = 500;
-                            break;
-                        }
-                }
-            }
-            #endregion
-
-            #region Локальный метод - "RenderTitle"
-            string RenderTitle()
-            {
-                if (viewBag.IsErrorRule)
-                {
-                    return "Ошибка";
-                }
-                else
-                {
-                    switch (Model)
-                    {
-                        case ActionCheckLink.allow:
-                            return "303";
-                        case ActionCheckLink.deny:
-                            return "Доступ запрещен";
-                        case ActionCheckLink.Is2FA:
-                            return "Aвторизация 2FA";
-                        default:
-                            return "Неизвестная ошибка";
-                    }
-                }
-            }
-            #endregion
-
-            #region Локальный метод - "RenderScript"
-            string RenderScript()
-            {
-                if (Model == ActionCheckLink.Is2FA)
-                {
-                    return @"
-<script>
-    function unlock(e)
-    {
-        e.preventDefault();
-        document.getElementById('unlockError').style.display = 'none';
-
-        var password = document.getElementById('unlockPassword').value;
-
-        $.post('" + viewBag.CoreAPI + "/unlock/2fa', { password: password, host: '" + viewBag.host + "', method: '" + viewBag.method + "', uri: '" + WebUtility.UrlEncode(viewBag.uri) + "', referer: '" + WebUtility.UrlEncode(viewBag.Referer) + @"' }, function (data)
-        {
-            var json = JSON.parse(JSON.stringify(data));
-
-            if (json.msg) {
-                document.getElementById('unlockError').style.display = 'block';
-                document.getElementById('unlockError').innerText = json.msg;
-            }
-            else if (json.result) {
-                window.location.reload();
-            }
-            else {
-                document.getElementById('unlockError').style.display = 'block';
-                document.getElementById('unlockError').innerText = 'Неизвестная ошибка';
-            }
-        })
-    }
-</script>";
-                }
-
-                return string.Empty;
-            }
-            #endregion
-
-            #region Локальный метод - "RenderBody"
-            string RenderBody()
-            {
-                if (viewBag.IsErrorRule)
-                {
-                    return @"<div class='code'>500</div>
-                    <div class='title'>"+ viewBag.ErrorTitleException + @"</div>
-                    <pre>" + viewBag.ErrorRuleException + @"</pre>";
-                }
-                else if (Model == ActionCheckLink.Is2FA)
-                {
-                    return @"<div class='code'>2FA</div>
-                    <div class='title'>Aвторизация</div>
-                    <pre>Введите пароль безопасности для 2FA</pre>
-
-                    <form method='post' action='/' onsubmit='unlock(event)'>
-                        <div class='form-group'>
-                            <div class='input-group form'>
-                                <span class='input-group-addon'><i class='fa fa-lock'></i></span>
-                                <input class='form-control' id='unlockPassword' type='password' name='password'>
-                            </div>
-
-                            <button type='submit' class='btn-unlock'>Unlock</button>
-
-                            <div id='unlockError' class='errorMsg'>eroror</div>
-                        </div>
-                    </form>";
-                }
-                else if (Model == ActionCheckLink.allow)
-                {
-                    return @"<div class='code'>303</div>
-                    <div class='title'>Отправить в backend</div>";
-                }
-
-                else if (Model == ActionCheckLink.deny)
-                {
-                    return @"<div class='code'>403</div>
-                    <div class='title'>Доступ запрещен</div>";
-                }
-
-                else
-                {
-                    return @"<div class='code'>500</div>
-                    <div class='title'>Неизвестная ошибка</div>";
-                }
-            }
-            #endregion
-
-            #region Локальный метод - "RenderDebug"
-            string RenderDebug()
-            {
-                if (viewBag.DebugEnabled)
-                {
-                    return @"
-<!--
-IP:         " + viewBag?.IP + @"
-UserAgent:  " + viewBag?.UserAgent + @"
-method:     " + viewBag?.method + @"
-host:       " + viewBag?.host + @"
-uri:        " + viewBag?.uri + @"
-FormData:   " + viewBag?.FormData + @"
-Referer:    " + viewBag?.Referer + @"
-
-" + viewBag.antiBotToGlobalConf?.Replace("\\\\", "\\")?.Replace("<!--", "&lt;!--")?.Replace("-->", "--&gt;") + @"
-
-
-" + viewBag.jsonDomain?.Replace("\\\\", "\\")?.Replace("<!--", "&lt;!--")?.Replace("-->", "--&gt;") + @"
--->
-";
-                }
-
-                return string.Empty;
-            }
-            #endregion
-
-            // Html ответ
-            return context.Response.WriteAsync(@"<!DOCTYPE html>
-<html lang='ru-RU'>
-<head>
-    <title>" + RenderTitle() + @"</title>
-    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>
-    <link rel='stylesheet' href='/statics/style.css'>
-    " + (Model == ActionCheckLink.Is2FA ? "<script type='text/javascript' src='/statics/jquery.min.js'></script>" : string.Empty) + @"
-</head>
-<body>
-
-" + RenderScript() + @"
-
-    <div class='error'>
-        <div class='error-block'>
-
-            " + RenderBody() + @"
-
-            <div class='copyright'>
-                <div>
-                    &copy; 2018 <strong>ISPCore</strong>. All rights reserved.
-                </div>
-                <div>
-                    <a href='/'>Главная сайта</a> / <a href='http://core-system.org/' target='_blank'>Core System</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-
-" + RenderDebug() + @"
-", context.RequestAborted);
-        }
-        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using ISPCore.Models.RequestsFilter.Base;
+﻿using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Models.RequestsFilter.Domains.Log;
 using System.Collections.Generic;

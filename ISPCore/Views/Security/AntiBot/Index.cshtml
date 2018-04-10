@@ -1,5 +1,5 @@
 ﻿@using ISPCore.Engine.Common.Views
-@using ISPCore.Models.RequestsFilter.Base
+@using ISPCore.Models.RequestsFilter.Base.Enums
 @model ISPCore.Models.Databases.json.AntiBot
 
 @{
@@ -147,7 +147,8 @@
                             </div>
 
                             <div class="tab-pane row" id="tab-limit">
-                                <div class="col-md-4">
+
+                                <div class="col-md-5">
                                     <div class="form-group">
                                         <label>Глобальный<span>лимит запросов</span></label>
                                         <select class="form-control selectpicker" name="limit.IsEnabled">
@@ -155,6 +156,25 @@
                                         </select>
                                     </div>
 
+                                    <div class="form-group">
+                                        <label>Метод<span>блокировки при достижении лимита запросов</span></label>
+                                        <select class="form-control selectpicker changeLimitRequestToBlockType" name="limit.BlockType" onchange="changeLimitRequestToBlockType(this)">
+                                            @Html.Raw(SelectPickerTo.Enum(Model?.limitRequest == null ? LimitToBlockType._403 : Model.limitRequest.BlockType,
+                                                       (LimitToBlockType._403, "403"),
+                                                       (LimitToBlockType.reCAPTCHA, "reCAPTCHA")
+                                              ))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group typeLimitRequestToBlockType">
+                                        <label>Количество<span>запросов перед повторной проверкой reCAPTCHA</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="limit.MaxRequestToAgainСheckingreCAPTCHA"
+                                               @if (Model.limitRequest.MaxRequestToAgainСheckingreCAPTCHA != 300) { <text> value="@Model.limitRequest.MaxRequestToAgainСheckingreCAPTCHA" </text> }
+                                               class="form-control" placeholder="По умолчанию: 300" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-md-offset-1">
                                     <div class="form-group">
                                         <label>Максимальное<span>количество запросов в минуту</span></label>
                                         <input type="number" pattern="^[0-9]+$" name="limit.MinuteLimit"
@@ -176,6 +196,7 @@
                                                class="form-control" placeholder="По умолчанию: Неограниченно" />
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="tab-pane row" id="tab-faq">
@@ -262,7 +283,19 @@
         $(window).trigger('resize');
     }
 
+    function changeLimitRequestToBlockType(self) {
+        var type = $(self).val();
+        $('.typeLimitRequestToBlockType').hide();
+
+        if (type == 'reCAPTCHA') {
+            $('.typeLimitRequestToBlockType').show()
+        }
+
+        $(window).trigger('resize');
+    }
+
     changeAntiBotToBackgroundConf($('.changeAntiBotToBackgroundConf'));
+    changeLimitRequestToBlockType($('.changeLimitRequestToBlockType'));
 </script>
 
 

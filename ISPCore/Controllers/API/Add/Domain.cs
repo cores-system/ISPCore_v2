@@ -8,7 +8,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using ISPCore.Models.Response;
 using ISPCore.Models.RequestsFilter.Domains.Log;
-using ISPCore.Models.RequestsFilter.Base;
+using ISPCore.Models.RequestsFilter.Base.Enums;
 
 namespace ISPCore.Controllers
 {

@@ -1,4 +1,4 @@
-﻿namespace ISPCore.Models.RequestsFilter.Base
+﻿namespace ISPCore.Models.RequestsFilter.Base.Enums
 {
     public enum BruteForceType
     {

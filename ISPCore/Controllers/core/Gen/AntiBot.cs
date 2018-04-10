@@ -4,7 +4,7 @@ using ISPCore.Engine;
 using ISPCore.Models.Databases.json;
 using System.Text.RegularExpressions;
 using ISPCore.Engine.core.Cache.CheckLink;
-using ISPCore.Models.RequestsFilter.Base;
+using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Auth;
 using ISPCore.Engine.Hash;
