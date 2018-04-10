@@ -28,6 +28,7 @@ bld/
 
 # 
 ISPCore/wwwroot/reports/
+ISPCore/wwwroot/style/generate/
 ISPCore/core/Log/
 ISPCore/core/passwd/
 ISPCore/core/sync/
