@@ -27,7 +27,6 @@ bld/
 
 
 # 
-ISPCore/Properties/
 ISPCore/wwwroot/reports/
 ISPCore/core/Log/
 ISPCore/core/passwd/
