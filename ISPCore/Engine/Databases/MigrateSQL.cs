@@ -286,6 +286,7 @@ namespace ISPCore.Engine.Databases
                                         {
                                             coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_Domain_LimitRequest] ADD [BlockType] BIGINT DEFAULT 0 NOT NULL ;");
                                             coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_Domain_LimitRequest] ADD [MaxRequestToAgainСheckingreCAPTCHA] BIGINT DEFAULT 300 NOT NULL ;");
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_Domains] ADD [Auth2faToPasswd] TEXT NULL ;");
                                             goto case 2;
                                         }
 

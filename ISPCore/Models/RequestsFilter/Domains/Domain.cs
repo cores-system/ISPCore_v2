@@ -88,6 +88,11 @@ namespace ISPCore.Models.RequestsFilter.Domains
         public Base.Enums.Auth2faToAccess Auth2faToAccess { get; set; } = Base.Enums.Auth2faToAccess.AccessTo2FA;
 
         /// <summary>
+        /// Пароль в sha256 для авторизации 2FA
+        /// </summary>
+        public string Auth2faToPasswd { get; set; }
+
+        /// <summary>
         /// Защита сайта от ботов
         /// </summary>
         public AntiBot AntiBot { get; set; } = new AntiBot();

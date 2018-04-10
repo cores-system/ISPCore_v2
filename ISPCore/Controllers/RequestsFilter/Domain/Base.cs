@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Newtonsoft.Json;
 using System.Text;
+using ISPCore.Engine.Hash;
 
 namespace ISPCore.Controllers
 {
@@ -59,6 +60,10 @@ namespace ISPCore.Controllers
             if (!Regex.IsMatch(domain.host, "^[a-z0-9-\\.]+$", RegexOptions.IgnoreCase))
                 return Json(new Text($"Домен {domain.host} не должен содержать тип протокола или url"));
             #endregion
+
+            // Пароль 2FA
+            if (!string.IsNullOrWhiteSpace(domain.Auth2faToPasswd))
+                domain.Auth2faToPasswd = domain.Auth2faToPasswd.StartsWith("sha256:") ? domain.Auth2faToPasswd.Replace("sha256:", "") : SHA256.Text(domain.Auth2faToPasswd);
 
             // Новый домен
             if (domain.Id == 0)

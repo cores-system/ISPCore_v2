@@ -86,6 +86,11 @@ namespace ISPCore.Models.core.Cache.CheckLink
         public Auth2faToAccess Auth2faToAccess { get; set; } = Auth2faToAccess.AccessTo2FA;
 
         /// <summary>
+        /// Пароль в sha256 для авторизации 2FA
+        /// </summary>
+        public string Auth2faToPasswd { get; set; }
+
+        /// <summary>
         /// Защита сайта от ботов
         /// </summary>
         public AntiBot AntiBot { get; set; } = new AntiBot();

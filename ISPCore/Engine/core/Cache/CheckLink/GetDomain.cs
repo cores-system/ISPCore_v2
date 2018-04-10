@@ -72,9 +72,10 @@ namespace ISPCore.Engine.core.Cache.CheckLink
                 // Настройки логирования запросов
                 cache.confToLog = domain.confToLog;
 
-                // Защита сайта от BruteForce и Ботов
+                // 2FA и защита сайта от BruteForce
                 cache.StopBruteForce = domain.StopBruteForce;
                 cache.Auth2faToAccess = domain.Auth2faToAccess;
+                cache.Auth2faToPasswd = domain.Auth2faToPasswd;
 
                 #region Найтройки AntiBot
                 // Клонируем обьект

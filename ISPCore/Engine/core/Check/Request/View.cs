@@ -224,6 +224,35 @@ namespace ISPCore.Engine.core.Check
             {
                 if (viewBag.DebugEnabled)
                 {
+                    #region jsonDomain
+                    string jsonDomain()
+                    {
+                        if (viewBag.jsonDomain == null)
+                            return string.Empty;
+
+                        return Regex.Replace(viewBag.jsonDomain.Replace("\\\\", "\\"), "(<!--|-->|\"Auth2faToPasswd\": \"[^\"]+\")", r => 
+                        {
+                            switch (r.Groups[1].Value)
+                            {
+                                case "<!--":
+                                    return "&lt;!--";
+
+                                case "-->":
+                                    return "--&gt;";
+
+                                default:
+                                    {
+                                        if (r.Groups[1].Value.StartsWith("\"Auth2faToPasswd\":"))
+                                            return "\"Auth2faToPasswd\": \"Используется\"";
+                                    }
+                                    break;
+                            }
+
+                            return r.Groups[1].Value;
+                        });
+                    }
+                    #endregion
+
                     return @"
 <!--
 IP:         " + viewBag?.IP + @"
@@ -237,7 +266,7 @@ Referer:    " + viewBag?.Referer + @"
 " + viewBag.antiBotToGlobalConf?.Replace("\\\\", "\\")?.Replace("<!--", "&lt;!--")?.Replace("-->", "--&gt;") + @"
 
 
-" + viewBag.jsonDomain?.Replace("\\\\", "\\")?.Replace("<!--", "&lt;!--")?.Replace("-->", "--&gt;") + @"
+" + jsonDomain() + @"
 -->
 ";
                 }
