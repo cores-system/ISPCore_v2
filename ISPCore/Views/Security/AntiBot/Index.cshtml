@@ -54,11 +54,11 @@
                                         <label>Способ<span>проверки пользователей</span></label>
                                         <select class="form-control selectpicker" name="antiBot.type">
                                             @Html.Raw(SelectPickerTo.Enum(Model == null ? AntiBotType.Off : Model.type,
-                                                               (AntiBotType.Off, "Не выбран"),
-                                                               (AntiBotType.SignalR, "SignalR + JavaScript"),
-                                                               (AntiBotType.CookieAndJS, "JavaScript"),
-                                                               (AntiBotType.reCAPTCHA, "reCAPTCHA")
-                                                      ))
+                                                    (AntiBotType.Off, "Не выбран"),
+                                                    (AntiBotType.SignalR, "SignalR + JavaScript"),
+                                                    (AntiBotType.CookieAndJS, "JavaScript"),
+                                                    (AntiBotType.reCAPTCHA, "reCAPTCHA")
+                                            ))
                                         </select>
                                     </div>
 
@@ -160,9 +160,9 @@
                                         <label>Метод<span>блокировки при достижении лимита запросов</span></label>
                                         <select class="form-control selectpicker changeLimitRequestToBlockType" name="limit.BlockType" onchange="changeLimitRequestToBlockType(this)">
                                             @Html.Raw(SelectPickerTo.Enum(Model?.limitRequest == null ? LimitToBlockType._403 : Model.limitRequest.BlockType,
-                                                            (LimitToBlockType._403, "403"),
-                                                            (LimitToBlockType.reCAPTCHA, "reCAPTCHA")
-                                                   ))
+                                                    (LimitToBlockType._403, "403"),
+                                                    (LimitToBlockType.reCAPTCHA, "reCAPTCHA")
+                                            ))
                                         </select>
                                     </div>
 
