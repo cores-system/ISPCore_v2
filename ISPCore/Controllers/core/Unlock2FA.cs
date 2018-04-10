@@ -28,15 +28,19 @@ namespace ISPCore.Controllers.core
     public class CoreUnlock2FAController : Controller
     {
         [HttpPost]
-        public JsonResult Index(string password, string host, string method, string uri, string referer)
+        public JsonResult Index(string password, string host, string method, string uri, string referer, string hash)
         {
             // Декодируем uri, referer и FormData
             uri = WebUtility.UrlDecode(uri);
             referer = WebUtility.UrlDecode(referer);
 
-            // Проверка переданых параметров
-            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(method) || string.IsNullOrWhiteSpace(uri))
-                return Json(new Models.Response.Text("Отсутствует один из параметров"));
+            #region Проверка переданых параметров
+            if (string.IsNullOrWhiteSpace(password))
+                return Json(new Models.Response.Text("Введите пароль"));
+
+            if (SHA256.Text($"{host}:{method}:{uri}:{referer}:{PasswdToMD5.salt}") != hash)
+                return Json(new Models.Response.Text("Хеш сумма не совпадает"));
+            #endregion
 
             // User-Agent
             string userAgent = string.Empty;

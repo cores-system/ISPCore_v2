@@ -138,6 +138,7 @@ namespace ISPCore.Engine.core.Check
             {
                 if (Model == ActionCheckLink.Is2FA)
                 {
+                    string hash = SHA256.Text($"{viewBag.host}:{viewBag.method}:{viewBag.uri}:{viewBag.Referer}:{PasswdToMD5.salt}");
                     return @"
 <script>
     function unlock(e)
@@ -147,7 +148,7 @@ namespace ISPCore.Engine.core.Check
 
         var password = document.getElementById('unlockPassword').value;
 
-        $.post('" + viewBag.CoreAPI + "/unlock/2fa', { password: password, host: '" + viewBag.host + "', method: '" + viewBag.method + "', uri: '" + WebUtility.UrlEncode(viewBag.uri) + "', referer: '" + WebUtility.UrlEncode(viewBag.Referer) + @"' }, function (data)
+        $.post('" + viewBag.CoreAPI + "/unlock/2fa', { password: password, host: '" + viewBag.host + "', method: '" + viewBag.method + "', uri: '" + WebUtility.UrlEncode(viewBag.uri) + "', referer: '" + WebUtility.UrlEncode(viewBag.Referer) + "', hash: '" + hash + @"' }, function (data)
         {
             var json = JSON.parse(JSON.stringify(data));
 
