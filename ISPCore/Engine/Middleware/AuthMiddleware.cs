@@ -30,7 +30,7 @@ namespace ISPCore.Engine.Middleware
             string IP = httpContext.Connection.RemoteIpAddress.ToString();
 
             // Проверка кук для прохождения авторизации
-            if (IsAuth.Auth(httpContext.Request.Cookies, IP))
+            if (IsAuth.Auth(httpContext.Request.Cookies, IP, out bool IsConfirm2FA))
             {
                 // Авторизация в Telegram
                 if (!TelegramBot.IsAuth(IP)) {

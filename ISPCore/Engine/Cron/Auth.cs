@@ -10,7 +10,7 @@ using ISPCore.Engine.Base.SqlAndCache;
 
 namespace ISPCore.Engine.Cron
 {
-    public class Home
+    public class Auth
     {
         private static bool IsRun = false;
         public static void Run(CoreDB coreDB, IMemoryCache memoryCache)
@@ -20,24 +20,18 @@ namespace ISPCore.Engine.Cron
             IsRun = true;
 
             // Очистка журнала посещений
-            if (!memoryCache.TryGetValue("Cron-Home_Jurnals", out _))
+            if (!memoryCache.TryGetValue("Cron-Auth_Session", out _))
             {
-                memoryCache.Set("Cron-Home_Jurnals", (byte)1, TimeSpan.FromHours(12));
+                memoryCache.Set("Cron-Auth_Session", (byte)1, TimeSpan.FromHours(3));
 
                 SqlToMode.SetMode(SqlMode.Read);
-                var expires = DateTime.Now.AddDays(-30);
-
-                // Пропускаем последние 60 записей
-                foreach (var jurn in coreDB.Home_Jurnals.AsNoTracking().AsEnumerable().Reverse().Skip(60))
+                foreach (var session in coreDB.Auth_Sessions.AsNoTracking())
                 {
                     // Удаляем старые записи
-                    if (expires > jurn.Time)
-                        coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.Home_Jurnals), jurn.Id));
+                    if (DateTime.Now > session.Expires)
+                        coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.Auth_Sessions), session.Id));
                 }
                 SqlToMode.SetMode(SqlMode.ReadOrWrite);
-
-                // Раз в 12 часов
-                GC.Collect(GC.MaxGeneration);
             }
 
             IsRun = false;

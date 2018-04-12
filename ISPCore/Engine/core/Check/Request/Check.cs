@@ -271,7 +271,7 @@ namespace ISPCore.Engine.core.Check
                                         return ExpiresToMinute.ToString();
 
                                     case "hash":
-                                        return md5.text($"{IP}{ExpiresToMinute}:{PasswdToMD5.salt}");
+                                        return md5.text($"{IP}{ExpiresToMinute}:{PasswdTo.salt}");
 
                                     default:
                                         return string.Empty;

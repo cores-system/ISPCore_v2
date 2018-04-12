@@ -83,13 +83,13 @@ namespace ISPCore.Engine.Auth
         /// <summary>
         /// Защита от перебора пароля по кукам
         /// </summary>
-        /// <param name="Settings"></param>
-        /// <param name="memoryCache"></param>
+        /// <param name="act"></param>
+        /// <param name="authCookie"></param>
         /// <param name="RemoteIpAddress">IP адрес пользователя</param>
         public static void FailCookieAuthorization(string act, string authCookie, string RemoteIpAddress)
         {
             var memoryCache = Service.Get<IMemoryCache>();
-            string key = KeyToMemoryCache.LimitLoginCookie(act, RemoteIpAddress);
+            string key = $"LimitLoginCookie:{act}-{RemoteIpAddress}";
             if (memoryCache.TryGetValue(key, out string cookie))
             {
                 if (cookie == authCookie)

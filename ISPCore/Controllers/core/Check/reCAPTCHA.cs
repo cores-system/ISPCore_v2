@@ -20,7 +20,7 @@ namespace ISPCore.Controllers.core
             if (string.IsNullOrWhiteSpace(recaptchaKey))
                 return Json(new Text("recaptchaKey == null"));
 
-            if (hash != md5.text($"{HourCacheToUser}:{PasswdToMD5.salt}"))
+            if (hash != md5.text($"{HourCacheToUser}:{PasswdTo.salt}"))
                 return Json(new Text("hash error"));
 
             // Проверяем reCAPTCHA
@@ -45,7 +45,7 @@ namespace ISPCore.Controllers.core
             if (string.IsNullOrWhiteSpace(recaptchaKey))
                 return Json(new Text("recaptchaKey == null"));
 
-            if (hash != md5.text($"{IP}{ExpiresToMinute}:{PasswdToMD5.salt}"))
+            if (hash != md5.text($"{IP}{ExpiresToMinute}:{PasswdTo.salt}"))
                 return Json(new Text("hash error"));
 
             // Проверяем reCAPTCHA

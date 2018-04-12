@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ISPCore.Engine.Auth
 {
-    public static class PasswdToMD5
+    public static class PasswdTo
     {
         private static string PasswdRoot, Passwd2FA, _salt;
         private static DateTime LastWriteRoot, LastWrite2FA;
@@ -19,7 +19,7 @@ namespace ISPCore.Engine.Auth
 
             // Создаем кеш
             LastWrite = File.GetLastWriteTime(path);
-            passwd = md5.text(File.ReadAllText(path, Encoding.UTF8).Trim() + salt); // В файле пароль под md5
+            passwd = File.ReadAllText(path, Encoding.UTF8).Trim(); // В файле пароль под SHA256
 
             // Отдаем хеш пароля
             return passwd;

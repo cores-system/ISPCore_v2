@@ -292,8 +292,23 @@ namespace ISPCore.Engine.Databases
 
                                     case 2:
                                         {
-                                            // Миграция на 3
-                                            //goto case 3;
+                                            coreDB.Database.ExecuteSqlCommand(@"CREATE TABLE [Auth_Sessions] (
+                                                  [Id] INTEGER  NOT NULL
+                                                , [Confirm2FA] bigint  NOT NULL
+                                                , [Expires] text NOT NULL
+                                                , [HashPasswdToRoot] text NULL
+                                                , [IP] text NULL
+                                                , [Session] text NULL
+                                                , CONSTRAINT [sqlite_master_PK_Auth_Sessions] PRIMARY KEY ([Id])
+                                                );
+                                            ");
+                                            goto case 3;
+                                        }
+
+                                    case 3:
+                                        {
+                                            // Миграция на 4
+                                            //goto case 4;
                                             break;
                                         }
                                 }

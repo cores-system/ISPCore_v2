@@ -138,7 +138,7 @@ namespace ISPCore.Engine.core.Check
             {
                 if (Model == ActionCheckLink.Is2FA)
                 {
-                    string hash = SHA256.Text($"{viewBag.host}:{viewBag.method}:{viewBag.uri}:{viewBag.Referer}:{PasswdToMD5.salt}");
+                    string hash = SHA256.Text($"{viewBag.host}:{viewBag.method}:{viewBag.uri}:{viewBag.Referer}:{PasswdTo.salt}");
                     return @"
 <script>
     function unlock(e)

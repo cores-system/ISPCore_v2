@@ -9,21 +9,17 @@ using System.Collections.Generic;
 using ISPCore.Models.Base.WhiteList;
 using ISPCore.Models.Response;
 using ISPCore.Models.Databases.Interface;
+using ISPCore.Models.Databases;
+using ISPCore.Models.Auth;
 
 namespace ISPCore.Controllers
 {
-    public class SettingsController : Controller
+    public class SettingsController : ControllerToDB
     {
-        JsonDB jsonDB;
-        public SettingsController()
-        {
-            jsonDB = Service.Get<JsonDB>();
-        }
-
         [HttpGet]
         public IActionResult Index(bool ajax)
         {
-            ViewData["salt"] = PasswdToMD5.salt;
+            ViewData["salt"] = PasswdTo.salt;
             ViewData["ajax"] = ajax;
             return View(jsonDB);
         }
@@ -75,18 +71,35 @@ namespace ISPCore.Controllers
                 if (salt.Length < 18)
                     return Json(new Text("Соль должена состоять минимум из 18 символов"));
 
-                PasswdToMD5.salt = salt;
+                PasswdTo.salt = salt;
             }
 
-            // Меняем пароль root
+            #region Меняем пароль root
             if (!string.IsNullOrWhiteSpace(PasswdRoot))
             {
                 if (PasswdRoot.Length < 6)
                     return Json(new Text("Пароль 'Root' должен состоять минимум из 6 символов"));
+                
+                // Меняем пароль в файле
+                System.IO.File.WriteAllText(Folders.Passwd + "/root", SHA256.Text(PasswdRoot));
 
-                System.IO.File.WriteAllText(Folders.Passwd + "/root", md5.text(PasswdRoot));
-                HttpContext.Response.Cookies.Append("auth", PasswdToMD5.Root);
+                // Сессия
+                string authSession = md5.text(DateTime.Now.ToBinary().ToString() + PasswdTo.salt);
+
+                // Создаем сессию в базе
+                coreDB.Auth_Sessions.Add(new AuthSession()
+                {
+                    IP = HttpContext.Connection.RemoteIpAddress.ToString(),
+                    Session = authSession,
+                    HashPasswdToRoot = SHA256.Text(SHA256.Text(PasswdRoot) + PasswdTo.salt),
+                    Expires = DateTime.Now.AddDays(10)
+                });
+                coreDB.SaveChanges();
+
+                // Ставим куки
+                HttpContext.Response.Cookies.Append("authSession", authSession);
             }
+            #endregion
 
             // Меняем пароль 2FA
             if (!string.IsNullOrWhiteSpace(Passwd2FA))
@@ -94,7 +107,7 @@ namespace ISPCore.Controllers
                 if (Passwd2FA.Length < 6)
                     return Json(new Text("Пароль '2FA' должен состоять минимум из 6 символов"));
 
-                System.IO.File.WriteAllText(Folders.Passwd + "/2fa", md5.text(Passwd2FA));
+                System.IO.File.WriteAllText(Folders.Passwd + "/2fa", SHA256.Text(Passwd2FA));
             }
 
             // Ответ

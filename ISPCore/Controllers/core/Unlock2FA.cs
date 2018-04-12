@@ -38,7 +38,7 @@ namespace ISPCore.Controllers.core
             if (string.IsNullOrWhiteSpace(password))
                 return Json(new Models.Response.Text("Введите пароль"));
 
-            if (SHA256.Text($"{host}:{method}:{uri}:{referer}:{PasswdToMD5.salt}") != hash)
+            if (SHA256.Text($"{host}:{method}:{uri}:{referer}:{PasswdTo.salt}") != hash)
                 return Json(new Models.Response.Text("Хеш сумма не совпадает"));
             #endregion
 
@@ -77,7 +77,7 @@ namespace ISPCore.Controllers.core
             #endregion
 
             // Проверяем пароль
-            if (md5.text(md5.text(password) + PasswdToMD5.salt) == PasswdToMD5.FA || (!string.IsNullOrWhiteSpace(domain.Auth2faToPasswd) && SHA256.Text(password) == domain.Auth2faToPasswd))
+            if (SHA256.Text(password) == PasswdTo.FA || (!string.IsNullOrWhiteSpace(domain.Auth2faToPasswd) && SHA256.Text(password) == domain.Auth2faToPasswd))
             {
                 // Добавляем информацию о разрешеном доступе, для вывода информации и отмены доступа
                 AccessIP.Add(IP, host, DateTime.Now.AddHours(12), domain.Auth2faToAccess == Auth2faToAccess.FullAccess ? AccessType.all : AccessType.Is2FA);

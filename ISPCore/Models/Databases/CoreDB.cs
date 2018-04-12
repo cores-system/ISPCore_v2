@@ -20,6 +20,11 @@ namespace ISPCore.Models.Databases
         public DbSet<LatestVersion> Version { get; set; }
 
         /// <summary>
+        /// Сессии авторизованных пользователей
+        /// </summary>
+        public DbSet<Auth.AuthSession> Auth_Sessions { get; set; }
+
+        /// <summary>
         /// Журнал авторизаций в панель
         /// </summary>
         public DbSet<Home.Jurnal> Home_Jurnals { get; set; }

@@ -83,7 +83,7 @@ namespace ISPCore.Controllers.core.Gen
 	    })
 
 	    Hub.start().then(function () {
-		    Hub.invoke('GetValidCookie', '" + IP + "', '" + conf.HourCacheToUser + "', '" + md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdToMD5.salt}") + @"');
+		    Hub.invoke('GetValidCookie', '" + IP + "', '" + conf.HourCacheToUser + "', '" + md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdTo.salt}") + @"');
 	    })
 
     }," + conf.WaitUser + @");

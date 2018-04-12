@@ -73,6 +73,23 @@ namespace ISPCore
         }
         #endregion
 
+        #region FindItem
+        /// <summary>
+        /// Получить элемент
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="db">Колекция</param>
+        /// <param name="predicate">Функция поиска</param>
+        /// <param name="type">Тип поиска по колекции</param>
+        public static T FindItem<T>(this DbSet<T> db, Func<T, bool> predicate, TrackingType type = TrackingType.NoTracking) where T : class
+        {
+            if (type == TrackingType.NoTracking)
+                return db.AsNoTracking().AsEnumerable().Where(predicate).FirstOrDefault();
+
+            return db.Where(predicate).FirstOrDefault();
+        }
+        #endregion
+
         #region FindAll
         /// <summary>
         /// Получить элементы

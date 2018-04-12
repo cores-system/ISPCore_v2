@@ -7,15 +7,17 @@ using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Engine;
 using ISPCore.Models.Databases.json;
 using ISPCore.Engine.Base.SqlAndCache;
+using ISPCore.Models.Databases;
+using ISPCore.Models.Auth;
 
 namespace ISPCore.Controllers
 {
-    public class AuthController : Controller
+    public class AuthController : ControllerToDB
     {
         [HttpGet]
         public IActionResult Index()
         {
-            if (IsAuth.Auth(HttpContext.Request.Cookies, HttpContext.Connection.RemoteIpAddress.ToString()))
+            if (IsAuth.Auth(HttpContext.Request.Cookies, HttpContext.Connection.RemoteIpAddress.ToString(), out _))
                 return LocalRedirect("/");
             
             return View();
@@ -29,14 +31,26 @@ namespace ISPCore.Controllers
             string IP = HttpContext.Connection.RemoteIpAddress.ToString();
 
             // Проверяем пароль
-            if (md5.text(md5.text(passwd) + PasswdToMD5.salt) == PasswdToMD5.Root)
+            if (SHA256.Text(passwd) == PasswdTo.Root)
             {
-
                 // Записываем в журнал
                 JurnalAdd(IP, "Успешная авторизация");
 
+                // Сессия
+                string authSession = md5.text(DateTime.Now.ToBinary().ToString() + PasswdTo.salt);
+
+                // Создаем сессию в базе
+                coreDB.Auth_Sessions.Add(new AuthSession()
+                {
+                    IP = IP,
+                    Session = authSession,
+                    HashPasswdToRoot = SHA256.Text(SHA256.Text(passwd) + PasswdTo.salt),
+                    Expires = DateTime.Now.AddDays(10)
+                });
+                coreDB.SaveChanges();
+
                 // Ставим куки
-                HttpContext.Response.Cookies.Append("auth", PasswdToMD5.Root);
+                HttpContext.Response.Cookies.Append("authSession", authSession);
 
                 // Удаляем список неудачных попыток
                 LimitLogin.SuccessAuthorization(IP);

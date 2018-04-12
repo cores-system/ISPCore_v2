@@ -324,7 +324,7 @@ namespace ISPCore.Engine.core
         /// <param name="key"></param>
         private static bool ValidCookie(string expired, string IP, string key)
         {
-            return DateTime.FromBinary(long.Parse(expired)) > DateTime.Now && key == md5.text($"{expired}:{IP}:{PasswdToMD5.salt}");
+            return DateTime.FromBinary(long.Parse(expired)) > DateTime.Now && key == md5.text($"{expired}:{IP}:{PasswdTo.salt}");
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace ISPCore.Engine.core
             string expired = DateTime.Now.AddHours(HourCacheToUser).ToBinary().ToString();
 
             // Ключ  для проверки
-            string key = md5.text($"{expired}:{IP}:{PasswdToMD5.salt}");
+            string key = md5.text($"{expired}:{IP}:{PasswdTo.salt}");
 
             // Результат
             return $"{expired}:{key}";
@@ -429,10 +429,10 @@ namespace ISPCore.Engine.core
                         return reCAPTCHASitekey;
 
                     case "HashToSignalR":
-                        return md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdToMD5.salt}");
+                        return md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdTo.salt}");
 
                     case "HashToreCAPTCHA":
-                        return md5.text($"{conf.HourCacheToUser}:{PasswdToMD5.salt}");
+                        return md5.text($"{conf.HourCacheToUser}:{PasswdTo.salt}");
 
                     case "ValidCookie":
                         return GetValidCookie(conf.HourCacheToUser, IP);

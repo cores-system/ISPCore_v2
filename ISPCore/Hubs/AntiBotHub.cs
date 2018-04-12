@@ -13,7 +13,7 @@ namespace ISPCore.Hubs
         async public Task GetValidCookie(string IP, int HourCacheToUser, string hash)
         {
             // Делаем проверку IP
-            if (hash != md5.text($"{IP}:{HourCacheToUser}:{PasswdToMD5.salt}"))
+            if (hash != md5.text($"{IP}:{HourCacheToUser}:{PasswdTo.salt}"))
             {
                 await Clients.Client(Context.ConnectionId).InvokeAsync("OnError", "Что-то пошло не так, попробуйте обновить страницу");
                 Context.Connection.Abort();
