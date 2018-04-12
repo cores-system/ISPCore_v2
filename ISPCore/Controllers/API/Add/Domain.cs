@@ -15,7 +15,7 @@ namespace ISPCore.Controllers
     public class ApiAddDomain : ControllerToDB
     {
         #region Domain
-        public JsonResult Domain(string host, BruteForceType bruteForceType, Protection Protect, TypeBlockIP typeBlockIP = TypeBlockIP.global)
+        public JsonResult Domain(string host, BruteForceType bruteForceType, Protection Protect, TypeBlockIP typeBlockIP = TypeBlockIP.global, string auth2faToPasswd = null)
         {
             return new RequestsFilterToDomainBaseController().Save(new Domain()
             {
@@ -23,6 +23,7 @@ namespace ISPCore.Controllers
                 Protect = Protect,
                 typeBlockIP = typeBlockIP,
                 StopBruteForce = bruteForceType,
+                Auth2faToPasswd = auth2faToPasswd
             });
         }
         #endregion
