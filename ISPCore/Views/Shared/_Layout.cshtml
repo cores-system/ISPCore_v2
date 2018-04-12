@@ -37,7 +37,6 @@
 
         <!-- page header -->
         <div class="dev-page-header">
-
             <div class="dph-logo">
                 <a href="/">Intuitive</a>
                 <a class="dev-page-sidebar-collapse">
@@ -50,24 +49,18 @@
             </div>
 
             <ul class="dph-buttons pull-right">
-
-
-                <li class="dph-button-stuck lic-info" style="width: 150px;">
-
-                    <a class="dev-page-rightbar-toggle" style="width: 150px; padding: 10px 0 0 20px !important">
+                <li class="dph-button-stuck lic-info" style="width: 134px;">
+                    <a href="https://my.core-system.org/" target="_blank" class="dev-page-rightbar-toggle" style="width: 134px; padding: 10px 0 0 20px !important">
                         ISPCore: &nbsp;<span class="text-success">@string.Format("v{0}", Startup.version.ToString())</span><br />
                         <small>© Core System 2018</small>
-                        @*Лицензия: <span class="text-success">@(Platform.IsDemo ? "demo" : License.Type.ToString())</span><br />
-                        <small>
-                            @EndOfText.get("Остался", "Осталось", "Осталось", (int)License.Expires)
-                            @((int)License.Expires)
-                            @EndOfText.get("день", "дня", "дней", (int)License.Expires)
-                        </small>*@
+                    </a>
+                </li>
+                <li class="dph-button-stuck lic-info">
+                    <a href="/auth/signout" class="dev-page-rightbar-toggle out-btn">
+                        <i class="fa fa-power-off"></i>
                     </a>
                 </li>
             </ul>
-
-
         </div>
         <!-- ./page header -->
         <!-- page container -->

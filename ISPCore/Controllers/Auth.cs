@@ -74,6 +74,26 @@ namespace ISPCore.Controllers
         }
         #endregion
 
+        #region SignOut
+        [HttpGet]
+        public LocalRedirectResult SignOut()
+        {
+            // Удаляем сессию в SQL
+            if (HttpContext.Request.Cookies.TryGetValue("authSession", out string authSession))
+            {
+                using (var coreDB = Service.Get<CoreDB>())
+                {
+                    coreDB.Auth_Sessions.RemoveAll(i => i.Session == authSession);
+                    coreDB.SaveChanges();
+                }
+            }
+
+            // Удаляем куки
+            HttpContext.Response.Cookies.Delete("authSession");
+            return LocalRedirect("/auth");
+        }
+        #endregion
+
         #region JurnalAdd
         private void JurnalAdd(string ip, string msg)
         {

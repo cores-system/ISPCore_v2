@@ -377,15 +377,18 @@ namespace ISPCore
                 #endregion
             }
             #endregion
-            
+
+            #region Авторизация
             // Страница авторизации
             app.UseMvc(routes => {
                 routes.MapRoute(null, "auth", new { controller = "Auth", action = "Index" });
                 routes.MapRoute(null, "auth/unlock", new { controller = "Auth", action = "Unlock" });
+                routes.MapRoute(null, "auth/signout", new { controller = "Auth", action = "SignOut" });
             });
 
             // Проверка авторизации
             app.UseAuthMiddleware();
+            #endregion
 
             // Главная страница
             app.UseMvc(routes => {

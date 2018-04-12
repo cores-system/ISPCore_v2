@@ -19,7 +19,7 @@ namespace ISPCore.Engine.Cron
                 return;
             IsRun = true;
 
-            // Очистка журнала посещений
+            // Очистка сессий
             if (!memoryCache.TryGetValue("Cron-Auth_Session", out _))
             {
                 memoryCache.Set("Cron-Auth_Session", (byte)1, TimeSpan.FromHours(3));
