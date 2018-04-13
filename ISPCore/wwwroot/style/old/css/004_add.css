@@ -1114,12 +1114,18 @@ input[type=number]:hover::-webkit-inner-spin-button {
 	display: -webkit-box !important;
     display: -ms-flexbox !important;
     display: flex !important;
+	background: #fafafa !important;
     -webkit-box-pack: center;
     -ms-flex-pack: center;
             justify-content: center;
     -webkit-box-align: center;
     -ms-flex-align: center;
             align-items: center;
+}
+
+.out-btn:hover{
+	background: #eef1f7 !important;
+	opacity: 0.8;
 }
 
 .out-btn i{
