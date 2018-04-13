@@ -432,5 +432,29 @@ namespace ISPCore.Engine.Cron
             return false;
         }
         #endregion
+
+        #region ClearingTemp
+        private static bool IsClearTemp = false;
+        public static void ClearingTemp(IMemoryCache memoryCache)
+        {
+            if (IsClearTemp)
+                return;
+            IsClearTemp = true;
+            
+            if (!memoryCache.TryGetValue("Cron-SyncBackup:ClearingTemp", out _))
+            {
+                memoryCache.Set("Cron-SyncBackup:ClearingTemp", (byte)1, TimeSpan.FromHours(8));
+
+                foreach (string inFile in Directory.GetFiles(Folders.Temp.SyncBackup, "*.*"))
+                {
+                    // Если файл лежит больше суток
+                    if (DateTime.Now.AddDays(-1) > File.GetLastWriteTime(inFile))
+                        File.Delete(inFile);
+                }
+            }
+
+            IsClearTemp = false;
+        }
+        #endregion
     }
 }
