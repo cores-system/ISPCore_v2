@@ -1,16 +1,22 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using ISPCore.Engine.Base;
+using ISPCore.Engine.Hash;
 using ISPCore.Models.SyncBackup;
 
 namespace ISPCore.Engine.SyncBackup
 {
-    public class CryptoBox
+    public class CryptoBox : IDisposable
     {
         string PasswdAES;
-        public CryptoBox(string _PasswdAES) {
+        string LocalFile, tmpFile;
+        public CryptoBox(string _PasswdAES, string _localFile, string _tmpFile = null) {
             PasswdAES = _PasswdAES;
+            LocalFile = _localFile;
+            tmpFile = _tmpFile;
         }
 
         #region GetAES
@@ -31,65 +37,39 @@ namespace ISPCore.Engine.SyncBackup
         }
         #endregion
 
-        #region EncryptSize
+        #region OpenRead
         /// <summary>
-        /// Получает размер файла
+        /// Отдает файл зашифрованный в AES256 и сжатый в GZip
         /// </summary>
-        /// <param name="LocalFile">Путь к локальному файлу</param>
-        private long EncryptSize(string LocalFile)
-        {
-            try
-            {
-                // Получаем поток для шифрования
-                ICryptoTransform EncryptoTransform = GetAES().CreateEncryptor();
-
-                // Локальный файл
-                var IntStream = File.OpenRead(LocalFile);
-
-                // Подключаем поток для расшифровки данных
-                var cry = new CryptoStream(IntStream, EncryptoTransform, CryptoStreamMode.Read);
-
-                long size = 0;
-                int Coutread = 0;
-                byte[] buffer = new byte[81920];
-                while((Coutread = cry.Read(buffer, 0 , buffer.Length)) != 0)
-                {
-                    size += Coutread;
-                }
-
-                cry.Dispose();
-                IntStream.Dispose();
-                EncryptoTransform.Dispose();
-
-                return size;
-            }
-            catch { return 0; }
-        }
-        #endregion
-
-        #region Encrypt
-        /// <summary>
-        /// Шифрует файл
-        /// </summary>
-        /// <param name="IntStream">Исходный поток</param>
-        /// <param name="size">Размер файла после шифрования</param>
         /// <param name="error">Данные ошибки</param>
-        /// <returns>Зашифрованный поток</returns>
-        public EncryptStream Encrypt(Stream IntStream, string LocalFile, ref long size, out string error)
+        /// <returns>Временный файл</returns>
+        public FileStream OpenRead(out string error)
         {
             error = null;
             try
             {
-                // Узнаем размер файла в зашифрованном виде
-                size = EncryptSize(LocalFile);
+                // Временный файл
+                tmpFile = $"{Folders.Temp.SyncBackup}/{md5.text(LocalFile)}";
+                
+                using (ICryptoTransform EncryptoTransform = GetAES().CreateEncryptor())
+                {
+                    // Исходный файл
+                    using (FileStream sourceStream = File.OpenRead(LocalFile))
+                    {
+                        // Временный файл
+                        using (FileStream targetStream = new FileStream(tmpFile, FileMode.Create, FileAccess.Write))
+                        {
+                            // Поток архивации и шифрования
+                            using (GZipStream compressionStream = new GZipStream(new CryptoStream(targetStream, EncryptoTransform, CryptoStreamMode.Write), CompressionMode.Compress))
+                            {
+                                sourceStream.CopyTo(compressionStream);
+                            }
+                        }
+                    }
+                }
 
-                // Получаем поток для шифрования
-                ICryptoTransform EncryptoTransform = GetAES().CreateEncryptor();
-
-                //Подключаем поток для расшифровки данных
-                var stream = new EncryptStream(IntStream, EncryptoTransform, CryptoStreamMode.Read);
-                stream.SetLength(size);
-                return stream;
+                // Отдаем временный файл
+                return File.OpenRead(tmpFile);
             }
             catch (Exception ex)
             {
@@ -101,44 +81,52 @@ namespace ISPCore.Engine.SyncBackup
 
         #region Decrypt
         /// <summary>
-        /// Расшировка файла
+        /// 
         /// </summary>
-        /// <param name="IntStream">Зашифрованный поток</param>
-        /// <param name="OutStream">Исходный поток</param>
-        /// <param name="FileSize">Размер файла</param>
         /// <param name="error">Данные ошибки</param>
-        public bool Decrypt(Stream IntStream, Stream OutStream, long FileSize, out string error)
+        public bool Decrypt(out string error)
         {
             try
             {
-                // Получаем поток для дешифровки
-                ICryptoTransform DecryptoTransform = GetAES().CreateDecryptor();
-
-                //Подключаем поток для расшифровки данных
-                CryptoStream crypt = new CryptoStream(IntStream, DecryptoTransform, CryptoStreamMode.Read);
-
-                int read = 0;
-                do
+                using (ICryptoTransform DecryptoTransform = GetAES().CreateDecryptor())
                 {
-                    // Считываем поток
-                    byte[] buffer = new byte[FileSize > 81920 ? 81920 : FileSize];
-                    read = crypt.Read(buffer, 0, buffer.Length);
-                    OutStream.Write(buffer, 0, read);
-                    FileSize -= read;
-                }
-                while (read != 0 && FileSize > 0);
+                    // Поток для расшифровки файла 
+                    using (CryptoStream crypt = new CryptoStream(File.OpenRead(tmpFile), DecryptoTransform, CryptoStreamMode.Read))
+                    {
+                        // Поток для распаковки файла 
+                        using (GZipStream decompresionStream = new GZipStream(crypt, CompressionMode.Decompress))
+                        {
+                            using (FileStream targetStream = File.OpenWrite(LocalFile))
+                            {
+                                // Распаковка и расшифровка файла
+                                decompresionStream.CopyTo(targetStream);
+                            }
 
-                // Закрываем потоки
-                crypt.Close(); crypt.Dispose();
-                DecryptoTransform.Dispose();
-                error = null;
-                return true;
+                            // Успех
+                            error = null;
+                            return true;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
                 error = ex.ToString();
                 return false;
             }
+        }
+        #endregion
+
+        #region Dispose
+        public void Dispose()
+        {
+            try
+            {
+                // Удаляем временный файл
+                if (tmpFile != null)
+                    File.Delete(tmpFile);
+            }
+            catch { }
         }
         #endregion
     }

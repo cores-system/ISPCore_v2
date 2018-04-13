@@ -1,4 +1,6 @@
 ﻿using FluentFTP;
+using ISPCore.Engine.Base;
+using ISPCore.Engine.Hash;
 using ISPCore.Models.SyncBackup;
 using ISPCore.Models.SyncBackup.Tasks;
 using ISPCore.Models.SyncBackup.ToolsEngine;
@@ -6,6 +8,7 @@ using KoenZomers.OneDrive.Api;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Security.Authentication;
@@ -793,19 +796,18 @@ namespace ISPCore.Engine.SyncBackup
                 #region EncryptionAES = true
                 if (EncryptionAES)
                 {
-                    var cry = new CryptoBox(PasswdAES);
-                    using (var FileStream = File.OpenRead(LocalFile))
+                    using (var сryptoBox = new CryptoBox(PasswdAES, LocalFile))
                     {
-                        long FileSize = 0;
-                        using (var EncryptStream = cry.Encrypt(FileStream, LocalFile, ref FileSize, out string error))
+                        using (var FileStream = сryptoBox.OpenRead(out string error))
                         {
-                            if (EncryptStream == null)  {
+                            if (FileStream == null)
+                            {
                                 report.UploadFile(LocalFile, RemoteFile, EncryptionAES, error);
                                 return false;
                             }
 
                             // Новое расширение файла
-                            string NewRemoteFile = Regex.Replace(RemoteFile, "([0-9]+)$", FileSize.ToString());
+                            string NewRemoteFile = Regex.Replace(RemoteFile, "([0-9]+)$", FileStream.Length.ToString());
 
                             // Заливаем на нужный сервер
                             switch (typeSunc)
@@ -813,7 +815,7 @@ namespace ISPCore.Engine.SyncBackup
                                 #region SFTP
                                 case TypeSunc.SFTP:
                                     {
-                                        sftp.UploadFile(EncryptStream, NewRemoteFile, true);
+                                        sftp.UploadFile(FileStream, NewRemoteFile, true);
                                         return true;
                                     }
                                 #endregion
@@ -821,7 +823,7 @@ namespace ISPCore.Engine.SyncBackup
                                 #region OneDrive
                                 case TypeSunc.OneDrive:
                                     {
-                                        oneDrive.UploadFile(EncryptStream, Path.GetFileName(NewRemoteFile), Path.GetDirectoryName(NewRemoteFile)).Wait();
+                                        oneDrive.UploadFile(FileStream, Path.GetFileName(NewRemoteFile), Path.GetDirectoryName(NewRemoteFile)).Wait();
                                         return true;
                                     }
                                 #endregion
@@ -829,7 +831,7 @@ namespace ISPCore.Engine.SyncBackup
                                 #region FTP
                                 case TypeSunc.FTP:
                                     {
-                                        ftp.Upload(EncryptStream, RemoteFile, FtpExists.Overwrite, true);
+                                        ftp.Upload(FileStream, NewRemoteFile, FtpExists.Overwrite, true);
                                         return true;
                                     }
                                 #endregion
@@ -837,7 +839,7 @@ namespace ISPCore.Engine.SyncBackup
                                 #region WebDav
                                 case TypeSunc.WebDav:
                                     {
-                                        var res = webDav.PutFile(NewRemoteFile, EncryptStream).Result;
+                                        var res = webDav.PutFile(NewRemoteFile, FileStream).Result;
                                         if (res.IsSuccessful)
                                             return true;
 
@@ -926,80 +928,90 @@ namespace ISPCore.Engine.SyncBackup
         /// <param name="FileSize">Размер файла</param>
         public bool DownloadFile(string LocalFile, string RemoteFile, bool EncryptionAES, string PasswdAES, long FileSize)
         {
+            // Временный файл
+            string tmpFile = $"{Folders.Temp.SyncBackup}/{md5.text(RemoteFile)}";
+
+            // Путь к конечному файлу
+            string targetFile = EncryptionAES ? tmpFile : LocalFile;
+
             try
             {
-                // Удаляем локальный файлл если он есть
+                #region Удаляем файлы для перезаписи
                 if (File.Exists(LocalFile))
                     File.Delete(LocalFile);
 
-                // Открываем локальный файл
-                using (var LocalStream = File.OpenWrite(LocalFile))
+                if (File.Exists(tmpFile))
+                    File.Delete(tmpFile);
+                #endregion
+
+                #region Загружаем файл
+                switch (typeSunc)
                 {
-                    #region Получаем поток файла на сервере
-                    Stream RemoteStream = null;
-                    switch (typeSunc)
+                    case TypeSunc.SFTP:
+                        {
+                            using (FileStream LocalStream = new FileStream(targetFile, FileMode.Create, FileAccess.Write))
+                            {
+                                sftp.DownloadFile(RemoteFile, LocalStream);
+                                break;
+                            }
+                        }
+
+                    case TypeSunc.FTP:
+                        {
+                            ftp.DownloadFile(targetFile, RemoteFile, overwrite: true);
+                            break;
+                        }
+
+                    case TypeSunc.OneDrive:
+                        {
+                            var item = oneDrive.GetItem(RemoteFile).Result;
+                            if (item == null)
+                            {
+                                report.DownloadFile(targetFile, RemoteFile, EncryptionAES, FileSize, "OneDrive.GetItem(RemoteFile) == null");
+                                return false;
+                            }
+
+                            oneDrive.DownloadItemAndSaveAs(item, targetFile).Wait();
+                            break;
+                        }
+
+                    case TypeSunc.WebDav:
+                        {
+                            var res = webDav.GetRawFile(RemoteFile).Result;
+                            if (!res.IsSuccessful)
+                            {
+                                report.DownloadFile(targetFile, RemoteFile, EncryptionAES, FileSize, (res.Description, res.StatusCode));
+                                return false;
+                            }
+
+                            using (FileStream LocalStream = new FileStream(targetFile, FileMode.Create, FileAccess.Write))
+                            {
+                                CopyStream(res.Stream, LocalStream, FileSize);
+                                break;
+                            }
+                        }
+                }
+                #endregion
+
+                #region CryptoBox
+                if (EncryptionAES)
+                {
+                    using (var сryptoBox = new CryptoBox(PasswdAES, LocalFile, _tmpFile: tmpFile))
                     {
-                        case TypeSunc.SFTP:
-                            {
-                                RemoteStream = sftp.OpenRead(RemoteFile);
-                                break;
-                            }
-
-                        case TypeSunc.FTP:
-                            {
-                                RemoteStream = ftp.OpenRead(RemoteFile);
-                                break;
-                            }
-
-                        case TypeSunc.OneDrive:
-                            {
-                                var item = oneDrive.GetItem(RemoteFile).Result;
-                                if (item == null)
-                                    return false;
-
-                                report.DownloadFile(LocalFile, RemoteFile, EncryptionAES, FileSize, "OneDrive.GetItem(RemoteFile) == null");
-                                RemoteStream = oneDrive.DownloadItem(item).Result;
-                                break;
-                            }
-
-                        case TypeSunc.WebDav:
-                            {
-                                var res = webDav.GetRawFile(RemoteFile).Result;
-                                if (!res.IsSuccessful)
-                                {
-                                    report.DownloadFile(LocalFile, RemoteFile, EncryptionAES, FileSize, (res.Description, res.StatusCode));
-                                    return false;
-                                }
-                                RemoteStream = res.Stream;
-                                break;
-                            }
-                    }
-                    #endregion
-
-                    if (EncryptionAES)
-                    {
-                        var cry = new CryptoBox(PasswdAES);
-                        if (!cry.Decrypt(RemoteStream, LocalStream, FileSize, out string error))
+                        if (!сryptoBox.Decrypt(out string error))
                         {
                             report.DownloadFile(LocalFile, RemoteFile, EncryptionAES, FileSize, error);
                             return false;
                         }
                     }
-                    else
-                    {
-                        CopyStream(RemoteStream, LocalStream, FileSize);
-                    }
-
-                    RemoteStream?.Close();
-                    if (typeSunc == TypeSunc.FTP)
-                        ftp?.GetReply();
-
-                    return true;
                 }
+                #endregion
+
+                return true;
             }
             catch (Exception ex)
             {
-                report.DownloadFile(LocalFile, RemoteFile, EncryptionAES, FileSize, ex.ToString());
+                report.DownloadFile(targetFile, RemoteFile, EncryptionAES, FileSize, ex.ToString());
             }
 
             return false;

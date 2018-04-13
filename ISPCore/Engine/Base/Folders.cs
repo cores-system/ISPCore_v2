@@ -7,7 +7,8 @@ namespace ISPCore.Engine.Base
         public static void CreateDirectory()
         {
             Directory.CreateDirectory(Tmp);
-            Directory.CreateDirectory(AutoUpdate);
+            Directory.CreateDirectory(Temp.AutoUpdate);
+            Directory.CreateDirectory(Temp.SyncBackup);
             Directory.CreateDirectory(Passwd);
             Directory.CreateDirectory(Databases);
             Directory.CreateDirectory(LogRequests);
@@ -23,7 +24,6 @@ namespace ISPCore.Engine.Base
         }
 
         public static string Tmp => "core/tmp";
-        public static string AutoUpdate => "core/tmp/auto-update";
         public static string Passwd => "core/passwd";
         public static string Databases => "core/Databases";
         public static string Log => RootPath + "/core/Log";
@@ -46,6 +46,12 @@ namespace ISPCore.Engine.Base
         {
             public static string AntiBot => $"{RootPath}/core/Templates/AntiBot";
             public static string LimitRequest => $"{RootPath}/core/Templates/LimitRequest";
+        }
+
+        public static class Temp
+        {
+            public static string AutoUpdate => "core/tmp/auto-update";
+            public static string SyncBackup => "core/tmp/SyncBackup";
         }
     }
 }

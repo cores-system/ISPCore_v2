@@ -70,13 +70,13 @@ namespace ISPCore.Engine.Cron
                         if (jsonDB.Base.AutoUpdate && (Platform.Get == PlatformOS.Docker || Platform.Get == PlatformOS.Unix))
                         {
                             // Если метод auto-update.sh еще не вызывался для этой версии ISPCore
-                            if (!File.Exists($"{Folders.AutoUpdate}/{Startup.version.ToString()}.ok"))
+                            if (!File.Exists($"{Folders.Temp.AutoUpdate}/{Startup.version.ToString()}.ok"))
                             {
                                 // Проверяем можно ли текущею версию обновлять
                                 if (client.GetStringAsync($"http://api.core-system.org/isp/UpdateSupport?Version={Startup.version.Version}&Patch={Startup.version.Patch}&os={PlatformOS.Unix.ToString()}").Result == "ok")
                                 {
                                     // Записываем версию ISPCore с которой был вызван auto-update.sh
-                                    File.WriteAllText($"{Folders.AutoUpdate}/{Startup.version.ToString()}.ok", string.Empty);
+                                    File.WriteAllText($"{Folders.Temp.AutoUpdate}/{Startup.version.ToString()}.ok", string.Empty);
 
                                     // Обновляем
                                     Bash bash = new Bash();
