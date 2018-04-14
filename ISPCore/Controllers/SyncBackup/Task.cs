@@ -100,14 +100,16 @@ namespace ISPCore.Controllers
                 #region Используем старый пароль для шифрования файлов
                 if (task.EncryptionAES)
                 {
-                    if (!string.IsNullOrWhiteSpace(FindTask.PasswdAES))
+                    if (string.IsNullOrWhiteSpace(task.PasswdAES))
                     {
-                        if (string.IsNullOrWhiteSpace(task.PasswdAES))
+                        if (!string.IsNullOrWhiteSpace(FindTask.PasswdAES))
+                        {
                             task.PasswdAES = FindTask.PasswdAES;
-                    }
-                    else
-                    {
-                        return Json(new Text("Пароль для шифрования файлов не может быть пустым"));
+                        }
+                        else
+                        {
+                            return Json(new Text("Пароль для шифрования файлов не может быть пустым"));
+                        }
                     }
                 }
                 #endregion
@@ -118,40 +120,46 @@ namespace ISPCore.Controllers
                     case TypeSunc.SFTP:
                     case TypeSunc.FTP:
                         {
-                            if (!string.IsNullOrWhiteSpace(FindTask.FTP.Passwd))
+                            if (string.IsNullOrWhiteSpace(task.FTP.Passwd))
                             {
-                                if (string.IsNullOrWhiteSpace(task.FTP.Passwd))
+                                if (!string.IsNullOrWhiteSpace(FindTask.FTP.Passwd))
+                                {
                                     task.FTP.Passwd = FindTask.FTP.Passwd;
-                            }
-                            else
-                            {
-                                return Json(new Text("Настройки 'FTP/SFTP' имеют недопустимое значение"));
+                                }
+                                else
+                                {
+                                    return Json(new Text("Настройки 'FTP/SFTP' имеют недопустимое значение"));
+                                }
                             }
                             break;
                         }
                     case TypeSunc.WebDav:
                         {
-                            if (!string.IsNullOrWhiteSpace(FindTask.WebDav.Passwd))
+                            if (string.IsNullOrWhiteSpace(task.WebDav.Passwd))
                             {
-                                if (string.IsNullOrWhiteSpace(task.WebDav.Passwd))
+                                if (!string.IsNullOrWhiteSpace(FindTask.WebDav.Passwd))
+                                {
                                     task.WebDav.Passwd = FindTask.WebDav.Passwd;
-                            }
-                            else
-                            {
-                                return Json(new Text("Настройки 'WebDav' имеют недопустимое значение"));
+                                }
+                                else
+                                {
+                                    return Json(new Text("Настройки 'WebDav' имеют недопустимое значение"));
+                                }
                             }
                             break;
                         }
                     case TypeSunc.OneDrive:
                         {
-                            if (!string.IsNullOrWhiteSpace(FindTask.OneDrive.RefreshToken))
+                            if (string.IsNullOrWhiteSpace(task.OneDrive.RefreshToken))
                             {
-                                if (string.IsNullOrWhiteSpace(task.OneDrive.RefreshToken))
+                                if (!string.IsNullOrWhiteSpace(FindTask.OneDrive.RefreshToken))
+                                {
                                     task.OneDrive.RefreshToken = FindTask.OneDrive.RefreshToken;
-                            }
-                            else
-                            {
-                                return Json(new Text("Настройки 'OneDrive' имеют недопустимое значение"));
+                                }
+                                else
+                                {
+                                    return Json(new Text("Пароль для 'OneDrive' не может быть пустым"));
+                                }
                             }
                             break;
                         }
