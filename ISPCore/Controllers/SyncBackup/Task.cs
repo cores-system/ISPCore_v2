@@ -128,7 +128,7 @@ namespace ISPCore.Controllers
                                 }
                                 else
                                 {
-                                    return Json(new Text("Настройки 'FTP/SFTP' имеют недопустимое значение"));
+                                    return Json(new Text("Пароль для 'FTP/SFTP' не может быть пустым"));
                                 }
                             }
                             break;
@@ -143,7 +143,7 @@ namespace ISPCore.Controllers
                                 }
                                 else
                                 {
-                                    return Json(new Text("Настройки 'WebDav' имеют недопустимое значение"));
+                                    return Json(new Text("Пароль для 'WebDav' не может быть пустым"));
                                 }
                             }
                             break;
