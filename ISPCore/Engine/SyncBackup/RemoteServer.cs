@@ -378,19 +378,22 @@ namespace ISPCore.Engine.SyncBackup
                             // Получаем список всех папок
                             foreach (var item in ftp.GetListing(path))
                             {
-                                // Полный путь к папке
-                                string FullName = Tools.ConvertPatchToUnix(path) + $"{item.Name}/";
-
-                                // Добовляем найденую папку в список 'folders'
-                                folders.Add(new DirectoryModel()
+                                if (item.Type == FtpFileSystemObjectType.Directory)
                                 {
-                                    RemoteCreated = default(DateTime),
-                                    RemoteLastModified = item.Modified,
-                                    Folder = FullName
-                                });
+                                    // Полный путь к папке
+                                    string FullName = Tools.ConvertPatchToUnix(path) + $"{item.Name}/";
 
-                                // Получаем список папок внутри найденой папки
-                                ListAllDirectory(FullName, ref folders);
+                                    // Добовляем найденую папку в список 'folders'
+                                    folders.Add(new DirectoryModel()
+                                    {
+                                        RemoteCreated = default(DateTime),
+                                        RemoteLastModified = item.Modified,
+                                        Folder = FullName
+                                    });
+
+                                    // Получаем список папок внутри найденой папки
+                                    ListAllDirectory(FullName, ref folders);
+                                }
                             }
                             break;
                         }
