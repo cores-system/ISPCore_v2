@@ -48,7 +48,7 @@ namespace ISPCore
         public static LatestVersion version => new LatestVersion()
         {
             Version = 2.1,
-            Patch = 6
+            Patch = 7
         };
 
         public static LatestVersion vSql => new LatestVersion()

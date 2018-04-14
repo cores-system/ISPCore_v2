@@ -789,8 +789,9 @@ namespace ISPCore.Engine.SyncBackup
         /// <param name="RemoteFile">Полный путь к удаленому файлу</param>
         /// <param name="EncryptionAES">Использовать шифрование AES 256</param>
         /// <param name="PasswdAES">Пароль для шифрования файлов</param>
-        public bool UploadFile(string LocalFile, string RemoteFile, bool EncryptionAES, string PasswdAES)
+        public bool UploadFile(string LocalFile, string RemoteFile, bool EncryptionAES, string PasswdAES, out long FileSizeToAES)
         {
+            FileSizeToAES = -1;
             try
             {
                 #region EncryptionAES = true
@@ -807,7 +808,8 @@ namespace ISPCore.Engine.SyncBackup
                             }
 
                             // Новое расширение файла
-                            string NewRemoteFile = Regex.Replace(RemoteFile, "([0-9]+)$", FileStream.Length.ToString());
+                            FileSizeToAES = FileStream.Length;
+                            string NewRemoteFile = Regex.Replace(RemoteFile, "([0-9]+)$", FileSizeToAES.ToString());
 
                             // Заливаем на нужный сервер
                             switch (typeSunc)

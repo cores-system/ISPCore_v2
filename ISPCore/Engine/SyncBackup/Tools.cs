@@ -442,10 +442,10 @@ namespace ISPCore.Engine.SyncBackup
                 if (!ListRemoteFiles.Exists(i => i.Name.Contains($"{FileName}{SyncExtensionCheck}")))
                 {
                     // Загружаем файл на сервер
-                    if (md.serv.UploadFile(LocalFile, $"{md.RemoteFolder}{FileName}{SyncExtension}.{InfoLocalFile.Length}", EncryptionAES, PasswdAES))
+                    if (md.serv.UploadFile(LocalFile, $"{md.RemoteFolder}{FileName}{SyncExtension}.{InfoLocalFile.Length}", EncryptionAES, PasswdAES, out long FileSizeToAES))
                     {
                         CountUploadToFilesOKTmp++;
-                        CountUploadToBytesTmp += InfoLocalFile.Length;
+                        CountUploadToBytesTmp += FileSizeToAES == -1 ? InfoLocalFile.Length : FileSizeToAES;
                     }
                     CountUploadToFilesAllTmp++;
                 }
