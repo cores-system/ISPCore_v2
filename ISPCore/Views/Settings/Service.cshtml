@@ -30,21 +30,6 @@
 
                             <div class="tab-pane active row" id="tab-TelegramBot">
                                 <div class="col-md-4">
-
-                                    <div class="form-group">
-                                        <label>Авторизация<span>через Telegram</span></label>
-                                        <select class="form-control selectpicker" name="tlg.EnabledToAuth">
-                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.EnabledToAuth, "Включена", "Отключить", "Выключена", "Включить"))
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Уведомления<span>через Telegram</span></label>
-                                        <select class="form-control selectpicker" name="tlg.IsNotification">
-                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.IsNotification, "Включены", "Отключить", "Выключены", "Включить"))
-                                        </select>
-                                    </div>
-
                                     <div class="form-group">
                                         <label>Token<span>to access the HTTP API</span></label>
                                         <input name="tlg.Token"

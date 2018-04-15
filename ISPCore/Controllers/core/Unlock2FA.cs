@@ -95,10 +95,6 @@ namespace ISPCore.Controllers.core
                 // Удаляем список неудачных попыток
                 LimitLogin.SuccessAuthorization(IP);
 
-                // Уведомление в TelegramBot
-                if (!Service.Get<JsonDB>().TelegramBot.EnabledToAuth)
-                    TelegramBot.SendMsg($"Успешная авторизация 2FA\n{IP}\n{host}");
-
                 // Отдаем результат
                 return Json(new Models.Response.TrueOrFalse(true));
             }

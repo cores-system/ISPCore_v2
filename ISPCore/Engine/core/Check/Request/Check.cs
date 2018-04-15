@@ -661,17 +661,7 @@ namespace ISPCore.Engine.core.Check
 
                     // Если IP для 2FA уже есть
                     if (memoryCache.TryGetValue(KeyToMemoryCache.CheckLinkWhitelistTo2FA(host, IP), out byte _))
-                    {
-                        // Авторизация в Telegram
-                        if (!TelegramBot.IsAuth(IP, Is2FA: true))
-                        {
-                            context.Response.ContentType = "text/html";
-                            return context.Response.WriteAsync(TelegramBot.AuthToHtml(IP), context.RequestAborted);
-                        }
-
-                        // Успех
                         return View(context, viewBag, ActionCheckLink.allow);
-                    }
 
                     // Просим пройти 2FA авторизацию
                     viewBag.CoreAPI = jsonDB.Base.CoreAPI;

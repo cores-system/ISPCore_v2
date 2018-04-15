@@ -32,11 +32,8 @@ namespace ISPCore.Engine.Middleware
             // Проверка кук для прохождения авторизации
             if (IsAuth.Auth(httpContext.Request.Cookies, IP, out bool IsConfirm2FA))
             {
-                // Авторизация в Telegram
-                if (!TelegramBot.IsAuth(IP)) {
-                    httpContext.Response.ContentType = "text/html";
-                    return httpContext.Response.WriteAsync(TelegramBot.AuthToHtml(IP));
-                }
+                // Авторизация 2FA
+#warning Авторизация 2FA
 
                 // Успех
                 return _next(httpContext);

@@ -313,16 +313,6 @@ namespace ISPCore.Models.Databases.json
     public class Telega
     {
         /// <summary>
-        /// Включена/Выключена авторизация
-        /// </summary>
-        public bool EnabledToAuth { get; set; }
-
-        /// <summary>
-        /// Включить/Выключть уведомления
-        /// </summary>
-        public bool IsNotification { get; set; }
-
-        /// <summary>
         /// Токен
         /// </summary>
         public string Token { get; set; }
