@@ -348,15 +348,16 @@ namespace ISPCore
                 #region API - Edit
                 app.UseMvc(routes =>
                 {
-                    routes.MapRoute(null, "api/edit/settings/base", new { controller = "ApiEditSettings", action = "Base" });
-                    routes.MapRoute(null, "api/edit/settings/api", new { controller = "ApiEditSettings", action = "API" });
-                    routes.MapRoute(null, "api/edit/settings/security", new { controller = "ApiEditSettings", action = "Security" });
-                    routes.MapRoute(null, "api/edit/settings/passwd", new { controller = "ApiEditSettings", action = "Passwd" });
-                    routes.MapRoute(null, "api/edit/settings/brute-force", new { controller = "ApiEditSettings", action = "BruteForce" });
-                    routes.MapRoute(null, "api/edit/settings/telegrambot", new { controller = "ApiEditSettings", action = "TelegramBot" });
+                    routes.MapRoute(null, "api/edit/settings/base", new { controller = "ApiEditSettingsToBase", action = "Base" });
+                    routes.MapRoute(null, "api/edit/settings/api", new { controller = "ApiEditSettingsToBase", action = "API" });
+                    routes.MapRoute(null, "api/edit/settings/security", new { controller = "ApiEditSettingsToBase", action = "Security" });
+                    routes.MapRoute(null, "api/edit/settings/passwd", new { controller = "ApiEditSettingsToBase", action = "Passwd" });
+                    routes.MapRoute(null, "api/edit/settings/brute-force", new { controller = "ApiEditSettingsToBase", action = "BruteForce" });
+                    routes.MapRoute(null, "api/edit/settings/anti-ddos", new { controller = "ApiEditSettingsToBase", action = "AntiDdos" });
+                    routes.MapRoute(null, "api/edit/settings/antivirus", new { controller = "ApiEditSettingsToBase", action = "AntiVirus" });
 
-                    routes.MapRoute(null, "api/edit/settings/anti-ddos", new { controller = "ApiEditSettings", action = "AntiDdos" });
-                    routes.MapRoute(null, "api/edit/settings/antivirus", new { controller = "ApiEditSettings", action = "AntiVirus" });
+                    routes.MapRoute(null, "api/edit/settings/service/telegram", new { controller = "ApiEditSettingsToService", action = "Telegram" });
+
 
                     routes.MapRoute(null, "api/edit/antibot/base", new { controller = "ApiEditAntiBot", action = "Base" });
                     routes.MapRoute(null, "api/edit/antibot/limit", new { controller = "ApiEditAntiBot", action = "Limit" });
@@ -405,9 +406,15 @@ namespace ISPCore
 
             #region Настройки
             app.UseMvc(routes => {
-                routes.MapRoute(null, "settings", new { controller = "Settings", action = "Index" });
-                routes.MapRoute(null, "settings/save/base", new { controller = "Settings", action = "Save" });
-                routes.MapRoute(null, "settings/remove/whiteList", new { controller = "Settings", action = "RemoveWhiteList" });
+                routes.MapRoute(null, "settings", new { controller = "SettingsToBase", action = "Index" });
+                routes.MapRoute(null, "settings/save/base", new { controller = "SettingsToBase", action = "Save" });
+
+                routes.MapRoute(null, "settings/whitelist", new { controller = "SettingsToWhiteList", action = "Index" });
+                routes.MapRoute(null, "settings/save/whitelist", new { controller = "SettingsToWhiteList", action = "Save" });
+                routes.MapRoute(null, "settings/remove/whitelist", new { controller = "SettingsToWhiteList", action = "RemoveWhiteList" });
+
+                routes.MapRoute(null, "settings/service", new { controller = "SettingsToService", action = "Index" });
+                routes.MapRoute(null, "settings/save/service", new { controller = "SettingsToService", action = "Save" });
             });
             #endregion
 
@@ -428,7 +435,7 @@ namespace ISPCore
                 routes.MapRoute(null, "security/antivirus/stop", new { controller = "SecurityToAntiVirus", action = "Stop" });
             });
 
-            // Антидосс
+            // AntiDdos
             if (Platform.Get == PlatformOS.Unix)
             {
                 app.UseMvc(routes =>

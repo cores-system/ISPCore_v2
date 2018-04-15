@@ -1,0 +1,119 @@
+﻿@using ISPCore.Engine.Common.Views
+@model ISPCore.Models.Databases.json.JsonDB
+
+@{
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right" onclick="saveEditSite(this, '/settings/save/service')">Сохранить изменения</button>
+        <h3>Настройки</h3>
+        <p>Сервисы уведомлений</p>
+    </div>
+
+    <form id="form" method="POST">
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-TelegramBot" role="tab" data-toggle="tab">Telegram</a></li>
+                            <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-TelegramBot">
+                                <div class="col-md-4">
+
+                                    <div class="form-group">
+                                        <label>Авторизация<span>через Telegram</span></label>
+                                        <select class="form-control selectpicker" name="tlg.EnabledToAuth">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.EnabledToAuth, "Включена", "Отключить", "Выключена", "Включить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Уведомления<span>через Telegram</span></label>
+                                        <select class="form-control selectpicker" name="tlg.IsNotification">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.IsNotification, "Включены", "Отключить", "Выключены", "Включить"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Token<span>to access the HTTP API</span></label>
+                                        <input name="tlg.Token"
+                                               @if (!string.IsNullOrWhiteSpace(Model.TelegramBot.Token)) { <text> value="@Model.TelegramBot.Token" </text> }
+                                               class="form-control" placeholder="id:key" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Id<span>для отправки уведомлений</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="tlg.ClietnId" value="@Model.TelegramBot.ClietnId" class="form-control" />
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        <h2><i class="fa fa-cubes"></i>Telegram</h2>
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Token to access the HTTP API</div>
+                                            <div class="faq-text">
+                                                <p>Токен бота пол ученый в @@BotFather</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Id для отправки уведомлений</div>
+                                            <div class="faq-text">
+                                                <p>Ваш Id в Telegram</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)

@@ -9,7 +9,7 @@ namespace ISPCore.Controllers
     public class ApiRemoveWhiteList : Controller
     {
         public JsonResult Base(int Id) {
-            return new SettingsController().RemoveWhiteList(Id);
+            return new SettingsToWhiteListController().RemoveWhiteList(Id);
         }
     }
 }

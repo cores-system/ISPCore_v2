@@ -77,7 +77,12 @@
                         <a href="/" onclick="return loadPage(this)"><i class="fa fa-desktop"></i> <span>Главная</span></a>
                     </li>
                     <li>
-                        <a href="/settings" onclick="return loadPage(this)"><i class="fa fa-gear"></i> <span>Настройки</span></a>
+                        <a><i class="fa fa-gear"></i> <span>Настройки</span></a>
+                        <ul>
+                            <li><a href="/settings" onclick="return loadPage(this)">Основное</a></li>
+                            <li><a href="/settings/whitelist" onclick="return loadPage(this)">Белый список</a></li>
+                            <li><a href="/settings/service" onclick="return loadPage(this)">Сервисы уведомлений</a></li>
+                        </ul>
                     </li>
 
                     <li>

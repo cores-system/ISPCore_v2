@@ -8,15 +8,14 @@
     }
 }
 
-<div class="page-title">
-    <a href="/backup/task" onclick="return loadPage(this)" class="btn btn-success t_right">Добавить задание</a>
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle">
+        <button href="/backup/task" onclick="return loadPage(this)" class="btn btn-success t_right">Добавить задание</button>
 
-    <h1>Задания</h1>
-    <p>Список заданий для синхронизации</p>
-</div>
+        <h3>Задания</h3>
+        <p>Список заданий для синхронизации</p>
+    </div>
 
-
-<div class="wrapper" style="padding: 0px 21px 20px;">
     <div class="table-responsive">
         @if (Model.Page.GetItems().Any())
         {

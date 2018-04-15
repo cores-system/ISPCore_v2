@@ -24,7 +24,7 @@ namespace ISPCore.Controllers.core
                 return Json(new Text("hash error"));
 
             // Проверяем reCAPTCHA
-            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Base.reCAPTCHASecret))
+            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Security.reCAPTCHASecret))
             {
                 // Валидные куки
                 string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, HttpContext.Connection.RemoteIpAddress.ToString());
@@ -49,7 +49,7 @@ namespace ISPCore.Controllers.core
                 return Json(new Text("hash error"));
 
             // Проверяем reCAPTCHA
-            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Base.reCAPTCHASecret))
+            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Security.reCAPTCHASecret))
             {
                 // Создаем кеш
                 memoryCache.Set(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), (0, ExpiresToMinute), TimeSpan.FromMinutes(ExpiresToMinute));

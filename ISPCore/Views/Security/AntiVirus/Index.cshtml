@@ -32,16 +32,17 @@
 </script>
 
 
-<div class="wrapper">
+<div class="wrapper wrapper-page-title">
     <div class="page-subtitle">
-        <button class="btn btn-success t_right margin-left-10 margin-bottom-10" onclick="saveEditSite(this, '/security/antivirus/save')">Сохранить изменения</button>
+        <button class="btn btn-success t_right margin-left-10" onclick="saveEditSite(this, '/security/antivirus/save')">Сохранить изменения</button>
         @if (IsRunAV) {
-            <button class="btn btn-danger t_right margin-bottom-10" onclick="saveAndRedirect(this,'/security/antivirus/stop', '/security/antivirus')">Остановить проверку</button>
+            <button class="btn btn-danger t_right" onclick="saveAndRedirect(this,'/security/antivirus/stop', '/security/antivirus')">Остановить проверку</button>
         }
         else {
-            <button class="btn btn-success t_right margin-bottom-10" onclick="cmdToAV(this,'start')">Запустить проверку</button>
+            <button class="btn btn-success t_right" onclick="cmdToAV(this,'start')">Запустить проверку</button>
         }
         <h3>Антивирус</h3>
+        <p>Проверка файлов на вирусы</p>
     </div>
 
     <form id="form" method="POST">

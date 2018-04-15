@@ -1,6 +1,4 @@
 ﻿@using ISPCore.Engine.Common.Views
-@using Newtonsoft.Json
-@using ISPCore.Models.Base.WhiteList
 @model ISPCore.Models.Databases.json.JsonDB
 
 @{
@@ -10,10 +8,11 @@
     }
 }
 
-<div class="wrapper">
+<div class="wrapper wrapper-page-title">
     <div class="page-subtitle">
         <button class="btn btn-success t_right" onclick="saveEditSite(this, '/settings/save/base')">Сохранить изменения</button>
         <h3>Настройки</h3>
+        <p>Базовые настройки ISPCore</p>
     </div>
 
     <form id="form" method="POST">
@@ -26,9 +25,7 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="active"><a href="#tab-base" role="tab" data-toggle="tab">Основное</a></li>
                             <li><a href="#tab-security" role="tab" data-toggle="tab">Безопасность</a></li>
-                            <li><a href="#tab-whitelist" role="tab" data-toggle="tab">Белый список</a></li>
                             <li><a href="#tab-StopBruteForce" role="tab" data-toggle="tab">Brute Force</a></li>
-                            <li><a href="#tab-TelegramBot" role="tab" data-toggle="tab">Telegram Bot</a></li>
                             <li><a href="#tab-api" role="tab" data-toggle="tab">API</a></li>
                             <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
                         </ul>
@@ -55,16 +52,6 @@
                                         <input type="number" pattern="^[0-9]+$" name="bs.CountParallel"
                                                @if (Model.Base.CountParallel != 1) { <text> value="@Model.Base.CountParallel" </text> }
                                                class="form-control" placeholder="По умолчанию: 1" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>reCAPTCHA<span>Secret</span></label>
-                                        <input type="text" name="bs.reCAPTCHASecret" class="form-control" value="@Model.Base.reCAPTCHASecret" placeholder="Секретный ключ reCAPTCHA" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>reCAPTCHA<span>Sitekey</span></label>
-                                        <input type="text" name="bs.reCAPTCHASitekey" class="form-control" value="@Model.Base.reCAPTCHASitekey" placeholder="data-sitekey" />
                                     </div>
                                 </div>
 
@@ -94,7 +81,17 @@
 
 
                             <div class="tab-pane row" id="tab-security">
-                                <div class="col-md-4">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Смена пароля<span>root</span></label>
+                                        <input type="text" name="PasswdRoot" class="form-control" placeholder="Введите новый пароль" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Смена пароля<span>2FA</span></label>
+                                        <input type="text" name="Passwd2FA" class="form-control" placeholder="Введите новый пароль" />
+                                    </div>
+
                                     <div class="form-group">
                                         <label>Количество<span>попыток авторизации за 10 минут</span></label>
                                         <input type="number" pattern="^[0-9]+$" name="sc.CountAccess"
@@ -108,86 +105,23 @@
                                                @if (Model.Security.BlockingTime != 40) { <text> value="@Model.Security.BlockingTime" </text> }
                                                class="form-control" placeholder="По умолчанию: 40 минут" />
                                     </div>
+                                </div>
 
+                                <div class="col-md-6 col-md-offset-1">
                                     <div class="form-group">
                                         <label>Соль<span>криптография</span></label>
                                         <input type="text" name="salt" value="@ViewData["salt"]" class="form-control" placeholder="Введите рандомные символы" />
                                     </div>
-                                </div>
-                                <div class="col-md-2"></div>
-                                <div class="col-md-4">
+
                                     <div class="form-group">
-                                        <label>Смена пароля<span>root</span></label>
-                                        <input type="text" name="PasswdRoot" class="form-control" placeholder="Введите новый пароль" />
+                                        <label>reCAPTCHA<span>Secret</span></label>
+                                        <input type="text" name="sc.reCAPTCHASecret" class="form-control" value="@Model.Security.reCAPTCHASecret" placeholder="Секретный ключ reCAPTCHA" />
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Смена пароля<span>2FA</span></label>
-                                        <input type="text" name="Passwd2FA" class="form-control" placeholder="Введите новый пароль" />
+                                        <label>reCAPTCHA<span>Sitekey</span></label>
+                                        <input type="text" name="sc.reCAPTCHASitekey" class="form-control" value="@Model.Security.reCAPTCHASitekey" placeholder="data-sitekey" />
                                     </div>
-                                </div>
-                            </div>
-
-
-                            <div class="tab-pane row" id="tab-whitelist">
-                                <div class="add-gray-table">
-                                    <div class="panel-heading clearfix">
-                                        <div class="page-subtitle">
-                                            <a class="btn btn-warning t_right" onclick="addWhiteList();" style="margin-top: 10px;">Добавить</a>
-                                            <div class="t_over">
-                                                <h3>Белый список</h3>
-                                                <p>Список IP-адресов и ботов которые не блокируются в AntiBot/Anti-DDos и других проверках</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="table-responsive table-visible">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 160px;">Тип</th>
-                                                        <th style="width: 200px;">Описание</th>
-                                                        <th style="min-width: 250px;">Правило / Regex</th>
-                                                        <th style="width: 40px;"></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="site-whitelist"></tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="tab-pane row" id="tab-TelegramBot">
-                                <div class="col-md-4">
-
-                                    <div class="form-group">
-                                        <label>Авторизация<span>через Telegram</span></label>
-                                        <select class="form-control selectpicker" name="tlg.EnabledToAuth">
-                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.EnabledToAuth, "Включена", "Отключить", "Выключена", "Включить"))
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Уведомления<span>через Telegram</span></label>
-                                        <select class="form-control selectpicker" name="tlg.IsNotification">
-                                            @Html.Raw(SelectPickerTo.Bool(Model.TelegramBot.IsNotification, "Включены", "Отключить", "Выключены", "Включить"))
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Token<span>to access the HTTP API</span></label>
-                                        <input name="tlg.Token"
-                                               @if (!string.IsNullOrWhiteSpace(Model.TelegramBot.Token)) { <text> value="@Model.TelegramBot.Token" </text> }
-                                               class="form-control" placeholder="id:key" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Id<span>для отправки уведомлений</span></label>
-                                        <input type="number" pattern="^[0-9]+$" name="tlg.ClietnId" value="@Model.TelegramBot.ClietnId" class="form-control" />
-                                    </div>
-
                                 </div>
                             </div>
 
@@ -354,36 +288,13 @@
                                                 <p>Генерируемое уникальное значение, которое используется для проверки авторизации, рекомендуем не менять без надобности</p>
                                             </div>
                                         </div>
-
-                                        <h2><i class="fa fa-cubes"></i>Telegram Bot</h2>
-                                        <div class="faq-item">
-                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Авторизация через Telegram</div>
-                                            <div class="faq-text">
-                                                <h5>Учитывается для панели и 2FA</h5>
-                                                <p>После успешного ввода пароля, потребуется подтвердить авторизацию в Telegram</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="faq-item">
-                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Уведомления через Telegram</div>
-                                            <div class="faq-text">
-                                                <p>Уведомления об успешной авторизации и другие настроенные параметры</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="faq-item">
-                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Id для отправки уведомлений</div>
-                                            <div class="faq-text">
-                                                <p>Ваш Id в Telegram</p>
-                                            </div>
-                                        </div>
-
+                                        
                                         <h2><i class="fa fa-cubes"></i>Дополнительно</h2>
                                         <div class="faq-item">
                                             <div class="faq-title"><span class="fa fa-angle-down"></span>Brute Force</div>
                                             <div class="faq-text">
-                                                <h5>Максимальное количество запросов</h5>
-                                                <p>Указывает максимальное количество запросов для каждого IP адреса за определенный период</p>
+                                                <h5>Максимальное количество авторизаций</h5>
+                                                <p>Указывает максимальное количество авторизаций для каждого IP-адреса за определенный период</p>
                                             </div>
                                         </div>
 
@@ -411,15 +322,6 @@
 
     </form>
 </div>
-
-
-
-<script>
-    var WhiteList = @Html.Raw(JsonConvert.SerializeObject(Model.WhiteList.Values ?? new List<WhiteListModel>())) ;
-    for (var i = 0; i < WhiteList.length; i++) {
-        addWhiteList(WhiteList[i])
-    }
-</script>
 
 
 <script>

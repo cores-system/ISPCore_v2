@@ -262,7 +262,7 @@ namespace ISPCore.Engine.core.Check
                                         return jsonDB.Base.CoreAPI;
 
                                     case "reCAPTCHASitekey":
-                                        return jsonDB.Base.reCAPTCHASitekey;
+                                        return jsonDB.Security.reCAPTCHASitekey;
 
                                     case "IP":
                                         return IP;

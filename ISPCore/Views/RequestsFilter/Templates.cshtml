@@ -7,17 +7,15 @@
     }
 }
 
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle">
+        <button href="/requests-filter/template" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10">Создать</button>
+        <button onclick="$('#file').click(); return false;" class="btn btn-primary t_right">Импорт</button>
 
-<div class="page-title">
-    <a href="/requests-filter/template" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10 margin-bottom-10">Создать</a>
-    <a onclick="$('#file').click(); return false;" class="btn btn-primary t_right margin-bottom-10">Импорт</a>
+        <h3>Шаблоны</h3>
+        <p>Список шаблонов с правилами для сайтов</p>
+    </div>
 
-    <h1>Шаблоны</h1>
-    <p>Список шаблонов с правилами для сайтов</p>
-</div>
-
-
-<div class="wrapper" style="padding: 0px 21px 20px;">
     <div class="table-responsive">
         @if (Model.Page.GetItems().Any())
         {

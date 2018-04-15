@@ -303,7 +303,7 @@ namespace ISPCore.Engine.core
             
             // reCAPTCHA, SignalR или JavaScript
             var tplName = (!IsRecaptcha && antiBotType == AntiBotType.reCAPTCHA) ? AntiBotType.SignalR : antiBotType;
-            outHtml = Html(tplName.ToString(), antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Base.reCAPTCHASitekey);
+            outHtml = Html(tplName.ToString(), antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey);
             return false;
 
             #region Локальный метод - "IsGlobalConf"

@@ -120,16 +120,6 @@ namespace ISPCore.Models.Databases.json
         /// Количиство новых уведомлений
         /// </summary>
         public int CountNotification { get; set; }
-
-        /// <summary>
-        /// https://www.google.com/recaptcha/admin
-        /// </summary>
-        public string reCAPTCHASecret { get; set; }
-
-        /// <summary>
-        /// https://www.google.com/recaptcha/admin
-        /// </summary>
-        public string reCAPTCHASitekey { get; set; }
     }
 
     public class Security
@@ -153,6 +143,16 @@ namespace ISPCore.Models.Databases.json
             get { return _BlockingTime == 0 ? 40 : _BlockingTime; }
             set { _BlockingTime = value; }
         }
+
+        /// <summary>
+        /// https://www.google.com/recaptcha/admin
+        /// </summary>
+        public string reCAPTCHASecret { get; set; }
+
+        /// <summary>
+        /// https://www.google.com/recaptcha/admin
+        /// </summary>
+        public string reCAPTCHASitekey { get; set; }
     }
 
     public class AntiDdos

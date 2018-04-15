@@ -92,19 +92,18 @@
 
 
 
-<div class="page-title">
-    <div class="form-group t_right flex" style="max-width: 400px;">
-        <input type="text" class="form-control form-search margin-bottom-10" id="search-form" placeholder="Поиск домена">
-        <a onclick="$('#file').click(); return false;" class="btn btn-primary t_right margin-left-10 margin-bottom-10">Импорт</a>
-        <a href="/requests-filter/domain/base" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10 margin-bottom-10">Добавить сайт</a>
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle">
+        <div class="form-group t_right flex margin-bottom-0" style="max-width: 400px;">
+            <input type="text" class="form-control form-search margin-top-5" id="search-form" placeholder="Поиск домена">
+            <button onclick="$('#file').click(); return false;" class="btn btn-primary t_right margin-left-10">Импорт</button>
+            <button href="/requests-filter/domain/base" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10">Добавить сайт</button>
+        </div>
+
+        <h3>Сайты</h3>
+        <p>Список защищенных сайтов</p>
     </div>
 
-    <h1>Сайты</h1>
-    <p>Список защищенных сайтов</p>
-</div>
-
-
-<div class="wrapper" style="padding: 0px 21px 20px;">
     <div class="table-responsive">
         @if (Model.Page.GetItems().Any())
         {

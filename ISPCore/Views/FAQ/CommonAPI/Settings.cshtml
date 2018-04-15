@@ -92,7 +92,7 @@
             </tr>
             <tr>
                 <td><strong>Параметры String:</strong></td>
-                <td>CoreAPI, reCAPTCHASecret</td>
+                <td>CoreAPI</td>
             </tr>
             <tr>
                 <td><strong>Ответы:</strong></td>
@@ -117,6 +117,10 @@
                 <td>CountAccess, BlockingTime</td>
             </tr>
             <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>reCAPTCHASitekey, reCAPTCHASecret</td>
+            </tr>
+            <tr>
                 <td><strong>Ответы:</strong></td>
                 <td>msg=string, result=bool</td>
             </tr>
@@ -137,36 +141,6 @@
             <tr>
                 <td><strong>Параметры Int:</strong></td>
                 <td>MinuteLimit, HourLimit, DayLimit</td>
-            </tr>
-            <tr>
-                <td><strong>Ответы:</strong></td>
-                <td>msg=string, result=bool</td>
-            </tr>
-        </table>
-    </div>
-</div>
-
-<div class="faq-item">
-    <div class="faq-title"><span class="fa fa-angle-down"></span>Telegram Bot</div>
-    <div class="faq-text">
-        <table class="table margin-bottom-0 table-bordered text-left">
-            <tr>
-                <td style="width: 150px;">
-                    <strong>url:</strong>
-                </td>
-                <td>/api/edit/settings/telegrambot</td>
-            </tr>
-            <tr>
-                <td><strong>Параметры Bool:</strong></td>
-                <td>EnabledToAuth, IsNotification</td>
-            </tr>
-            <tr>
-                <td><strong>Параметры String:</strong></td>
-                <td>Token</td>
-            </tr>
-            <tr>
-                <td><strong>Параметры Int:</strong></td>
-                <td>ClietnId</td>
             </tr>
             <tr>
                 <td><strong>Ответы:</strong></td>
@@ -215,6 +189,35 @@
             <tr>
                 <td><strong>Параметры String:</strong></td>
                 <td>PasswdRoot, Passwd2FA, salt</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+
+<h2><i class="fa fa-gear"></i>Сервисы уведомлений</h2>
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Telegram</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/service/telegram</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>Token</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>ClietnId</td>
             </tr>
             <tr>
                 <td><strong>Ответы:</strong></td>

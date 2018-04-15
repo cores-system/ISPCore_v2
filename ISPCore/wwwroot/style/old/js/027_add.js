@@ -188,7 +188,7 @@ function addWhiteList(option) {
 
         var newId = $('.set-id-val', code).val();
         if (newId > 0)
-            $.sl('load', '/settings/remove/whiteList', { back: false, ignore: true, data: { id: newId }, dataType: 'json' })
+            $.sl('load', '/settings/remove/whitelist', { back: false, ignore: true, data: { id: newId }, dataType: 'json' })
     })
 	
 	$('.selectpicker', code).selectpicker('refresh');

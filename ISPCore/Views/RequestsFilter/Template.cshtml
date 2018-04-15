@@ -9,12 +9,12 @@
 
 
 <!-- Tabs -->
-<div class="wrapper">
+<div class="wrapper wrapper-page-title">
     <div class="page-subtitle">
-        <button class="btn btn-success t_right margin-left-10 margin-bottom-10" onclick="saveEditSite(this, '/requests-filter/template/save')">Сохранить изменения</button>
+        <button class="btn btn-success t_right margin-left-10" onclick="saveEditSite(this, '/requests-filter/template/save')">Сохранить изменения</button>
         @if (((int)ViewData["Id"]) != 0)
         {
-            <a class="btn btn-primary t_right margin-bottom-10" href="/requests-filter/template/export?Id=@ViewData["Id"]" target="_blank">Экспорт</a>
+            <button class="btn btn-primary t_right" href="/requests-filter/template/export?Id=@ViewData["Id"]" target="_blank">Экспорт</button>
         }
         <h3>Шаблон: @Model?.Name</h3>
         <p>Настройка правил для шаблона</p>

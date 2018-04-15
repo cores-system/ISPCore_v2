@@ -1134,7 +1134,24 @@ input[type=number]:hover::-webkit-inner-spin-button {
 }
 
 
+.container .wrapper-page {
+	padding: 30px 25px 20px !important;
+}
 
+.container .wrapper-page-title {
+	padding: 20px 25px 20px !important;
+}
+
+
+.page-subtitle p {
+    font-size: 12px !important;
+    color: rgb(153, 153, 153);
+}
+
+.page-subtitle button {
+    margin-top: 5px !important;
+    margin-bottom: 10px !important;
+}
 
 
 

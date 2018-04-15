@@ -1,0 +1,61 @@
+﻿@using Newtonsoft.Json
+@using ISPCore.Models.Base.WhiteList
+@model ISPCore.Models.Databases.json.JsonDB
+
+@{
+    if ((bool)ViewData["ajax"]) {
+        Layout = null;
+    }
+}
+
+<div class="wrapper wrapper-page">
+    <form id="form" method="POST">
+        <div class="wrapper wrapper-white" style="padding: 0px">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="add-gray-table">
+                        <div class="panel-heading clearfix">
+                            <div class="page-subtitle margin-top-10">
+                                <a class="btn btn-success t_right margin-left-10" onclick="saveEditSite(this, '/settings/save/whitelist')" style="margin-top: 10px;">Сохранить</a>
+                                <a class="btn btn-warning t_right" onclick="addWhiteList();" style="margin-top: 10px;">Добавить</a>
+                                <div class="t_over">
+                                    <h3>Белый список</h3>
+                                    <p>Список IP-адресов и ботов которые не блокируются в AntiBot/Anti-DDos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive table-visible">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 160px;">Тип</th>
+                                            <th style="width: 200px;">Описание</th>
+                                            <th style="min-width: 250px;">Правило / Regex</th>
+                                            <th style="width: 40px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="site-whitelist"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+    var WhiteList = @Html.Raw(JsonConvert.SerializeObject(Model.WhiteList.Values ?? new List<WhiteListModel>())) ;
+    for (var i = 0; i < WhiteList.length; i++) {
+        addWhiteList(WhiteList[i])
+    }
+</script>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)

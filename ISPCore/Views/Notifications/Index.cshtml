@@ -7,73 +7,75 @@
 }
 
 
-<div class="wrapper">
 @if (!Model.Page.GetItems().Any())
 {
-    <div class="page-subtitle">
-        <h3>Уведомления</h3>
-        <p>Позволяют вам следить за различными сведениями системы</p>
+    <div class="wrapper wrapper-page-title">
+        <div class="page-subtitle">
+            <h3>Уведомления</h3>
+            <p>Позволяют вам следить за различными сведениями системы</p>
+        </div>
+        <p>У вас еще нет уведомлений</p>
     </div>
-    <p>У вас еще нет уведомлений</p>
 }
 else
 {
-    <div class="tabs">
-        <div class="panel-body tab-content">
+    <div class="wrapper wrapper-page">
+        <div class="tabs">
+            <div class="panel-body tab-content">
 
-            <div class="tab-pane active">
-                <div class="page-subtitle">
-                    <h3>Уведомления</h3>
-                    <p>Позволяют вам следить за различными сведениями системы</p>
-                </div>
+                <div class="tab-pane active">
+                    <div class="page-subtitle">
+                        <h3>Уведомления</h3>
+                        <p>Позволяют вам следить за различными сведениями системы</p>
+                    </div>
 
-                <div class="table-responsive">
-                    <table class="table table-jornal">
-                        @foreach (var note in Model.Page.GetItems())
-                        {
-                            <thead>
-                                <tr>
-                                    <th width="150">Категория</th>
-                                    <th>Сообщение</th>
-                                    <th width="80" class="text-center">Время</th>
-                                    <th width="110" class="text-center">Дата</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <tr style="background: #f7f7f7;">
-                                    <td>@note.Category</td>
-                                    <td>@note.Msg</td>
-                                    <td class="text-center">@note.Time.ToString("H:mm")</td>
-                                    <td class="text-center">@note.Time.ToString("dd.MM.yyyy")</td>
-                                </tr>
-                                @foreach (var item in note.More)
-                                {
+                    <div class="table-responsive">
+                        <table class="table table-jornal">
+                            @foreach (var note in Model.Page.GetItems())
+                            {
+                                <thead>
                                     <tr>
-                                        <td colspan="1">
-                                            <span class="text-warning">@item.Name:</span>
-                                        </td>
-                                        <td colspan="3">
-                                            <span class="text-short">@if (item.Value.Contains(" href=")) { @Html.Raw(item.Value) } else { @item.Value }</span>
-                                        </td>
+                                        <th width="150">Категория</th>
+                                        <th>Сообщение</th>
+                                        <th width="80" class="text-center">Время</th>
+                                        <th width="110" class="text-center">Дата</th>
                                     </tr>
-                                }
-                            </tbody>
-                        }
-                    </table>
+                                </thead>
+
+                                <tbody>
+                                    <tr style="background: #f7f7f7;">
+                                        <td>@note.Category</td>
+                                        <td>@note.Msg</td>
+                                        <td class="text-center">@note.Time.ToString("H:mm")</td>
+                                        <td class="text-center">@note.Time.ToString("dd.MM.yyyy")</td>
+                                    </tr>
+                                    @foreach (var item in note.More)
+                                    {
+                                        <tr>
+                                            <td colspan="1">
+                                                <span class="text-warning">@item.Name:</span>
+                                            </td>
+                                            <td colspan="3">
+                                                <span class="text-short">@if (item.Value.Contains(" href=")) { @Html.Raw(item.Value) } else { @item.Value }</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            }
+                        </table>
+                    </div>
+
+                    <script>
+                        $("html, body").animate({ scrollTop: 0 }, 0);
+                    </script>
+
                 </div>
 
-                <script>
-                    $("html, body").animate({ scrollTop: 0 }, 0);
-                </script>
-
+                @Html.Raw(Model.Page.Nav())
             </div>
-
-            @Html.Raw(Model.Page.Nav())
         </div>
     </div>
 }
-</div>
 
 <script>
     $(function () {
