@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using ISPCore.Models.Databases.json;
 using System.Text;
+using ISPCore.Engine.Auth;
+using ISPCore.Models.RequestsFilter.Domains;
 
 namespace ISPCore.Engine.Middleware
 {
@@ -26,16 +28,29 @@ namespace ISPCore.Engine.Middleware
                 if (!jsonDB.API.Enabled)
                     return httpContext.Response.WriteAsync($"API disabled");
 
+                // IP-адрес пользователя
+                string IP = httpContext.Connection.RemoteIpAddress.ToString();
+
                 // Белый IP
-                if (jsonDB.API.WhiteIP == httpContext.Connection.RemoteIpAddress.ToString())
+                if (jsonDB.API.WhiteIP == IP)
                     return _next(httpContext);
 
                 // Проверяем авторизацию
                 if (httpContext.Request.Headers.TryGetValue("Authorization", out var auth))
                 {
-                    // Авторизован
+                    // Проверка авторизации
                     if (auth.ToString().Replace("Basic ", "") == Convert.ToBase64String(Encoding.ASCII.GetBytes($"{jsonDB.API.Login}:{jsonDB.API.Password}")))
+                    {
+                        // Авторизован
+                        LimitLogin.SuccessAuthorization(IP);
                         return _next(httpContext);
+                    }
+                    else
+                    {
+                        // Пароль или логин не совпадает 
+                        LimitLogin.FailAuthorization(IP, TypeBlockIP.global);
+                        return httpContext.Response.WriteAsync("Login or password does not match");
+                    }
                 }
 
                 // Пользователь не авторизован
