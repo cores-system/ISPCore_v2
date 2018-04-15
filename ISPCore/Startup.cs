@@ -356,8 +356,9 @@ namespace ISPCore
                     routes.MapRoute(null, "api/edit/settings/anti-ddos", new { controller = "ApiEditSettingsToBase", action = "AntiDdos" });
                     routes.MapRoute(null, "api/edit/settings/antivirus", new { controller = "ApiEditSettingsToBase", action = "AntiVirus" });
 
+                    routes.MapRoute(null, "api/edit/settings/service/email", new { controller = "ApiEditSettingsToService", action = "Email" });
                     routes.MapRoute(null, "api/edit/settings/service/telegram", new { controller = "ApiEditSettingsToService", action = "Telegram" });
-
+                    routes.MapRoute(null, "api/edit/settings/service/sms", new { controller = "ApiEditSettingsToService", action = "SMS" });
 
                     routes.MapRoute(null, "api/edit/antibot/base", new { controller = "ApiEditAntiBot", action = "Base" });
                     routes.MapRoute(null, "api/edit/antibot/limit", new { controller = "ApiEditAntiBot", action = "Limit" });

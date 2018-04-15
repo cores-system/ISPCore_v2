@@ -202,6 +202,36 @@
 
 <h2><i class="fa fa-gear"></i>Сервисы уведомлений</h2>
 <div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Email</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/service/email</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Bool:</strong></td>
+                <td>useSsl</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>ConnectPort</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>ConnectUrl, Login, Passwd</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>msg=string, result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
     <div class="faq-title"><span class="fa fa-angle-down"></span>Telegram</div>
     <div class="faq-text">
         <table class="table margin-bottom-0 table-bordered text-left">
@@ -216,15 +246,32 @@
                 <td>Token</td>
             </tr>
             <tr>
-                <td><strong>Параметры Int:</strong></td>
-                <td>ClietnId</td>
-            </tr>
-            <tr>
                 <td><strong>Ответы:</strong></td>
-                <td>msg=string, result=bool</td>
+                <td>result=bool</td>
             </tr>
         </table>
     </div>
 </div>
 
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>SMS</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/edit/settings/service/sms</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры String:</strong></td>
+                <td>apikey</td>
+            </tr>
+            <tr>
+                <td><strong>Ответы:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
 

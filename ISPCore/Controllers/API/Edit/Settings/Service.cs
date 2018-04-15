@@ -15,10 +15,24 @@ namespace ISPCore.Controllers
             jsonDB = Service.Get<JsonDB>();
         }
 
-        public JsonResult Telegram(Telega tlg)
+        public JsonResult Telegram(TelegramBot tlg)
         {
-            CommonModels.Update(tlg, jsonDB.TelegramBot, HttpContext, updateType: UpdateType.skip);
-            return new SettingsToServiceController().Save(tlg, IsAPI: true);
+            CommonModels.Update(tlg, jsonDB.ServiceBot.Telegram, HttpContext, updateType: UpdateType.skip);
+            return new SettingsToServiceController().Save(tlg, jsonDB.ServiceBot.Email, jsonDB.ServiceBot.SMS, IsAPI: true);
+        }
+
+
+        public JsonResult Email(EmailBot email)
+        {
+            CommonModels.Update(email, jsonDB.ServiceBot.Email, HttpContext, updateType: UpdateType.skip);
+            return new SettingsToServiceController().Save(jsonDB.ServiceBot.Telegram, email, jsonDB.ServiceBot.SMS, IsAPI: true);
+        }
+
+
+        public JsonResult SMS(SmsBot sms)
+        {
+            CommonModels.Update(sms, jsonDB.ServiceBot.SMS, HttpContext, updateType: UpdateType.skip);
+            return new SettingsToServiceController().Save(jsonDB.ServiceBot.Telegram, jsonDB.ServiceBot.Email, sms, IsAPI: true);
         }
     }
 }

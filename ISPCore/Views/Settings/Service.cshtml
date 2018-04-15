@@ -1,5 +1,5 @@
 ﻿@using ISPCore.Engine.Common.Views
-@model ISPCore.Models.Databases.json.JsonDB
+@model ISPCore.Models.Databases.json.ServiceBot
 
 @{
     if ((bool)ViewData["ajax"])
@@ -23,25 +23,61 @@
 
                     <div class="tabs">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li class="active"><a href="#tab-TelegramBot" role="tab" data-toggle="tab">Telegram</a></li>
+                            <li class="active"><a href="#tab-email" role="tab" data-toggle="tab">Email</a></li>
+                            <li><a href="#tab-TelegramBot" role="tab" data-toggle="tab">Telegram</a></li>
+                            <li><a href="#tab-sms" role="tab" data-toggle="tab">SMS</a></li>
                             <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
                         </ul>
                         <div class="panel-body tab-content tab-div-content">
 
-                            <div class="tab-pane active row" id="tab-TelegramBot">
+                            <div class="tab-pane active row" id="tab-email">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Адрес<span>почтового сервера</span></label>
+                                        <input name="email.ConnectUrl" class="form-control" value="@Model.Email.ConnectUrl" placeholder="smtp.yandex.ru" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Порт<span>почтового сервера</span></label>
+                                        <input name="email.ConnectPort" class="form-control" value="@Model.Email.ConnectPort" placeholder="25" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Безопасное<span>подключение</span></label>
+                                        <select class="form-control selectpicker" name="email.useSsl">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.Email.useSsl, "Да", "Нет"))
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-lg-offset-1">
+                                    <div class="form-group">
+                                        <label>Логин<span>от почты</span></label>
+                                        <input name="email.Login" class="form-control" value="@Model.Email.Login" placeholder="user@yandex.ru" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Пароль<span>от почты</span></label>
+                                        <input name="email.Passwd" class="form-control" value="@Model.Email.Passwd" placeholder="passwd" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane row" id="tab-TelegramBot">
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Token<span>to access the HTTP API</span></label>
-                                        <input name="tlg.Token"
-                                               @if (!string.IsNullOrWhiteSpace(Model.TelegramBot.Token)) { <text> value="@Model.TelegramBot.Token" </text> }
-                                               class="form-control" placeholder="id:key" />
+                                        <input name="tlg.Token" value="@Model.Telegram.Token" class="form-control" placeholder="id:key" />
                                     </div>
+                                </div>
+                            </div>
 
+                            <div class="tab-pane row" id="tab-sms">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Id<span>для отправки уведомлений</span></label>
-                                        <input type="number" pattern="^[0-9]+$" name="tlg.ClietnId" value="@Model.TelegramBot.ClietnId" class="form-control" />
+                                        <label>API<span>ключ</span></label>
+                                        <input name="sms.apikey" class="form-control" value="@Model.SMS.apikey" placeholder="API-ключ" />
                                     </div>
-
                                 </div>
                             </div>
 
@@ -77,13 +113,13 @@
                                             </div>
                                         </div>
 
+                                        <h2><i class="fa fa-cubes"></i>SMS</h2>
                                         <div class="faq-item">
-                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Id для отправки уведомлений</div>
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>API ключ</div>
                                             <div class="faq-text">
-                                                <p>Ваш Id в Telegram</p>
+                                                <p>API-ключ доступен в личном кабинете <a href="https://smspilot.ru/my-settings.php" target="_blank">https://smspilot.ru/my-settings.php</a></p>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>

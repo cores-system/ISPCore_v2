@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using ISPCore.Models.Databases.json;
 using ISPCore.Engine.Auth;
 using ISPCore.Engine.Base;
 using ISPCore.Models.Response;
 using ISPCore.Models.Databases;
+using ISPCore.Models.Databases.json;
 
 namespace ISPCore.Controllers
 {
@@ -15,20 +15,26 @@ namespace ISPCore.Controllers
         {
             ViewData["salt"] = PasswdTo.salt;
             ViewData["ajax"] = ajax;
-            return View("/Views/Settings/Service.cshtml", jsonDB);
+            return View("/Views/Settings/Service.cshtml", jsonDB.ServiceBot);
         }
 
 
         [HttpPost]
-        public JsonResult Save(Telega tlg, bool IsAPI = false)
+        public JsonResult Save(TelegramBot tlg, EmailBot email, SmsBot sms, bool IsAPI = false)
         {
             #region Демо режим
             if (Platform.IsDemo)
                 return Json(new Text("Операция недоступна в демо-режиме"));
             #endregion
 
+            // Проверка Email
+            if (!string.IsNullOrWhiteSpace(email.ConnectUrl) && 0 >= email.ConnectPort)
+                return Json(new Text("Укажите порт почтового сервера"));
+
             // Меняем настройки
-            jsonDB.TelegramBot = tlg;
+            jsonDB.ServiceBot.Telegram = tlg;
+            jsonDB.ServiceBot.Email = email;
+            jsonDB.ServiceBot.SMS = sms;
             jsonDB.Save();
             
             // Ответ

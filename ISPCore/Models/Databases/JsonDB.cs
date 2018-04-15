@@ -21,7 +21,7 @@ namespace ISPCore.Models.Databases.json
         public AntiDdos AntiDdos { get; set; } = new AntiDdos();
         public AntiVirus AntiVirus { get; set; } = new AntiVirus();
         public AntiBot AntiBot { get; set; } = new AntiBot();
-        public Telega TelegramBot { get; set; } = new Telega();
+        public ServiceBot ServiceBot { get; set; } = new ServiceBot();
         public BruteForceConf BruteForceConf { get; set; } = new BruteForceConf();
         public List<ProjectNews> ProjectNews { get; set; } = new List<ProjectNews>();
         public List<ProjectChange> ProjectChange { get; set; } = new List<ProjectChange>();
@@ -51,7 +51,7 @@ namespace ISPCore.Models.Databases.json
                 AntiDdos = jsonDB.AntiDdos;
                 AntiBot = jsonDB.AntiBot;
                 AntiVirus = jsonDB.AntiVirus;
-                TelegramBot = jsonDB.TelegramBot;
+                ServiceBot = jsonDB.ServiceBot;
                 BruteForceConf = jsonDB.BruteForceConf;
                 ProjectNews = jsonDB.ProjectNews;
                 ProjectChange = jsonDB.ProjectChange;
@@ -310,19 +310,6 @@ namespace ISPCore.Models.Databases.json
         public string WhiteIP { get; set; }
     }
 
-    public class Telega
-    {
-        /// <summary>
-        /// Токен
-        /// </summary>
-        public string Token { get; set; }
-
-        /// <summary>
-        /// Id клиента, куда отсылать данные
-        /// </summary>
-        public int ClietnId { get; set; }
-    }
-
     public class BruteForceConf
     {
         private int _minuteLimit, _hourLimit, _dayLimit;
@@ -371,5 +358,57 @@ namespace ISPCore.Models.Databases.json
             }
             set { _dayLimit = value; }
         }
+    }
+
+
+    public class ServiceBot
+    {
+        public TelegramBot Telegram { get; set; } = new TelegramBot();
+        public EmailBot Email { get; set; } = new EmailBot();
+        public SmsBot SMS { get; set; } = new SmsBot();
+    }
+
+    public class TelegramBot
+    {
+        /// <summary>
+        /// Токен
+        /// </summary>
+        public string Token { get; set; }
+    }
+
+    public class EmailBot
+    {
+        /// <summary>
+        /// Адрес почтового сервера
+        /// </summary>
+        public string ConnectUrl { get; set; }
+
+        /// <summary>
+        /// Порт почтового сервера
+        /// </summary>
+        public int ConnectPort { get; set; }
+
+        /// <summary>
+        /// Безопасное подключение
+        /// </summary>
+        public bool useSsl { get; set; }
+
+        /// <summary>
+        /// Логин
+        /// </summary>
+        public string Login { get; set; }
+
+        /// <summary>
+        /// Пароль
+        /// </summary>
+        public string Passwd { get; set; }
+    }
+
+    public class SmsBot
+    {
+        /// <summary>
+        /// https://smspilot.ru/my-settings.php?tab=acc
+        /// </summary>
+        public string apikey { get; set; }
     }
 }
