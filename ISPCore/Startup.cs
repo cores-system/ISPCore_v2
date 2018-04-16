@@ -54,7 +54,7 @@ namespace ISPCore
         public static LatestVersion vSql => new LatestVersion()
         {
             Version = 0.1,
-            Patch = 3
+            Patch = 4
         };
         #endregion
 
@@ -383,13 +383,19 @@ namespace ISPCore
             #region Авторизация
             // Страница авторизации
             app.UseMvc(routes => {
-                routes.MapRoute(null, "auth", new { controller = "Auth", action = "Index" });
-                routes.MapRoute(null, "auth/unlock", new { controller = "Auth", action = "Unlock" });
-                routes.MapRoute(null, "auth/signout", new { controller = "Auth", action = "SignOut" });
+                routes.MapRoute(null, "auth", new { controller = "AuthToBase", action = "Index" });
+                routes.MapRoute(null, "auth/unlock", new { controller = "AuthToBase", action = "Unlock" });
+                routes.MapRoute(null, "auth/signout", new { controller = "AuthToBase", action = "SignOut" });
             });
 
             // Проверка авторизации
             app.UseAuthMiddleware();
+
+            // Страница 2FA
+            app.UseMvc(routes => {
+                routes.MapRoute(null, "auth/confirm", new { controller = "AuthToConfirm", action = "Index" });
+                routes.MapRoute(null, "auth/confirm/unlock", new { controller = "AuthToConfirm", action = "Unlock" });
+            });
             #endregion
 
             // Главная страница

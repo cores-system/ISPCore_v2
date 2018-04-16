@@ -12,7 +12,7 @@ using ISPCore.Models.Auth;
 
 namespace ISPCore.Controllers
 {
-    public class AuthController : ControllerToDB
+    public class AuthToBaseController : ControllerToDB
     {
         [HttpGet]
         public IActionResult Index()
@@ -20,7 +20,7 @@ namespace ISPCore.Controllers
             if (IsAuth.Auth(HttpContext.Request.Cookies, HttpContext.Connection.RemoteIpAddress.ToString(), out _))
                 return LocalRedirect("/");
             
-            return View();
+            return View("/Views/Auth/Base.cshtml");
         }
 
         #region Unlock

@@ -117,6 +117,11 @@ namespace ISPCore.Models.Databases.json
         public bool EnableToDomainNotFound { get; set; } = true;
 
         /// <summary>
+        /// Авторизация 2FA
+        /// </summary>
+        public bool EnableTo2FA { get; set; }
+
+        /// <summary>
         /// Количиство новых уведомлений
         /// </summary>
         public int CountNotification { get; set; }

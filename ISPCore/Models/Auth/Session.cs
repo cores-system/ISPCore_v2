@@ -30,5 +30,10 @@ namespace ISPCore.Models.Auth
         /// До какого числа сессия считается активной 
         /// </summary>
         public DateTime Expires { get; set; }
+
+        /// <summary>
+        /// Время создания сессии
+        /// </summary>
+        public DateTime CreateTime { get; set; } = DateTime.Now;
     }
 }

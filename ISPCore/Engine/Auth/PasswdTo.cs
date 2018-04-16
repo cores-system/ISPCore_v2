@@ -8,7 +8,7 @@ namespace ISPCore.Engine.Auth
 {
     public static class PasswdTo
     {
-        private static string PasswdRoot, Passwd2FA, _salt;
+        private static string PasswdRoot, Passwd2FA, _salt, _google2FA;
         private static DateTime LastWriteRoot, LastWrite2FA;
 
         private static string ReadPasswd(ref string passwd, ref DateTime LastWrite, string path)
@@ -25,7 +25,12 @@ namespace ISPCore.Engine.Auth
             return passwd;
         }
 
+        public static string Root => ReadPasswd(ref PasswdRoot, ref LastWriteRoot, $"{Folders.Passwd}/root");
+        public static string FA => ReadPasswd(ref Passwd2FA, ref LastWrite2FA, $"{Folders.Passwd}/2fa");
 
+        /// <summary>
+        /// Соль
+        /// </summary>
         public static string salt
         {
             get
@@ -51,8 +56,28 @@ namespace ISPCore.Engine.Auth
             }
         }
 
+        /// <summary>
+        /// GoogleTo2FA
+        /// </summary>
+        public static string Google2FA
+        {
+            get
+            {
+                if (_google2FA != null)
+                    return _google2FA;
 
-        public static string Root => ReadPasswd(ref PasswdRoot, ref LastWriteRoot, $"{Folders.Passwd}/root");
-        public static string FA => ReadPasswd(ref Passwd2FA, ref LastWrite2FA, $"{Folders.Passwd}/2fa");
+                if (File.Exists($"{Folders.Passwd}/Google2FA"))
+                {
+                    _google2FA = File.ReadAllText($"{Folders.Passwd}/Google2FA");
+                }
+                else
+                {
+                    _google2FA = Generate.Passwd(30) + md5.text(DateTime.Now.ToBinary().ToString());
+                    File.WriteAllText($"{Folders.Passwd}/Google2FA", _google2FA);
+                }
+
+                return _google2FA;
+            }
+        }
     }
 }

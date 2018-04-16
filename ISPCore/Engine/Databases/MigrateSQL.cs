@@ -307,8 +307,14 @@ namespace ISPCore.Engine.Databases
 
                                     case 3:
                                         {
-                                            // Миграция на 4
-                                            //goto case 4;
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [Auth_Sessions] ADD [CreateTime] TEXT DEFAULT [2000-00-00 00:00:00.0000000] NOT NULL ;");
+                                            goto case 4;
+                                        }
+
+                                    case 4:
+                                        {
+                                            // Миграция на 5
+                                            //goto case 5;
                                             break;
                                         }
                                 }

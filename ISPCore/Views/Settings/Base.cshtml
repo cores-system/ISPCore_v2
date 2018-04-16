@@ -41,21 +41,12 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Адрес<span>Core API</span></label>
-                                        <input type="text" name="bs.CoreAPI"
-                                               @if (Model.Base.CoreAPI != "/core") { <text> value="@Model.Base.CoreAPI" </text> }
-                                               class="form-control" placeholder="/core" />
+                                        <label>Двухфакторная<span>аутентификация</span></label>
+                                        <select class="form-control selectpicker" name="bs.EnableTo2FA" onchange="ChangeAuth2FA(this.value)">
+                                            @Html.Raw(SelectPickerTo.Bool(Model.Base.EnableTo2FA, "Включена", "Отключить", "Выключена", "Включить"))
+                                        </select>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Количество<span>потоков в 'Parallel.ForEach'</span></label>
-                                        <input type="number" pattern="^[0-9]+$" name="bs.CountParallel"
-                                               @if (Model.Base.CountParallel != 1) { <text> value="@Model.Base.CountParallel" </text> }
-                                               class="form-control" placeholder="По умолчанию: 1" />
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 col-md-offset-1">
                                     <div class="form-group">
                                         <label>Режим<span>дебага</span></label>
                                         <select class="form-control selectpicker" name="bs.DebugEnabled">
@@ -68,6 +59,22 @@
                                         <select class="form-control selectpicker" name="bs.EnableToDomainNotFound">
                                             @Html.Raw(SelectPickerTo.Bool(Model.Base.EnableToDomainNotFound, "Включена", "Отключить", "Выключена", "Включить"))
                                         </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-md-offset-1">
+                                    <div class="form-group">
+                                        <label>Адрес<span>Core API</span></label>
+                                        <input type="text" name="bs.CoreAPI"
+                                               @if (Model.Base.CoreAPI != "/core") { <text> value="@Model.Base.CoreAPI" </text> }
+                                               class="form-control" placeholder="/core" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Количество<span>потоков в 'Parallel.ForEach'</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="bs.CountParallel"
+                                               @if (Model.Base.CountParallel != 1) { <text> value="@Model.Base.CountParallel" </text> }
+                                               class="form-control" placeholder="По умолчанию: 1" />
                                     </div>
 
                                     <div class="form-group">
@@ -288,7 +295,7 @@
                                                 <p>Генерируемое уникальное значение, которое используется для проверки авторизации, рекомендуем не менять без надобности</p>
                                             </div>
                                         </div>
-                                        
+
                                         <h2><i class="fa fa-cubes"></i>Дополнительно</h2>
                                         <div class="faq-item">
                                             <div class="faq-title"><span class="fa fa-angle-down"></span>Brute Force</div>
@@ -323,6 +330,32 @@
     </form>
 </div>
 
+
+
+<div class="modal fade" id="modal-GoogleAuth" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Добавьте аккаунт</h4>
+            </div>
+            <div class="modal-body" style="text-align: center">
+                <p class="margin-bottom-0">Используйте "Google Authenticator" или "Яндекс.Ключ"</p>
+                <img src="@ViewBag.BarcodeImageUrl" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-bottom: 0px">Добавил</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ChangeAuth2FA(value) {
+        if (value == 'true') {
+            $('#modal-GoogleAuth').modal('show');
+        }
+    }
+</script>
 
 <script>
     function changeTypeAPI(self) {

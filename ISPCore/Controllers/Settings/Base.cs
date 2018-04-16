@@ -7,6 +7,8 @@ using ISPCore.Engine.Base;
 using ISPCore.Models.Response;
 using ISPCore.Models.Databases;
 using ISPCore.Models.Auth;
+using ISPCore.Engine;
+using ISPCore.Models.Databases.Enums;
 
 namespace ISPCore.Controllers
 {
@@ -15,6 +17,10 @@ namespace ISPCore.Controllers
         [HttpGet]
         public IActionResult Index(bool ajax)
         {
+            GoogleTo2FA TwoFacAuth = new GoogleTo2FA();
+            var setupInfo = TwoFacAuth.GenerateSetupCode("ISPCore", HttpContext.Request.Host.Host, PasswdTo.Google2FA, 300, 300, useHttps: true);
+            ViewBag.BarcodeImageUrl = setupInfo.QrCodeSetupImageUrl;
+
             ViewData["salt"] = PasswdTo.salt;
             ViewData["ajax"] = ajax;
             return View("/Views/Settings/Base.cshtml", jsonDB);
@@ -29,6 +35,9 @@ namespace ISPCore.Controllers
                 return Json(new Text("Операция недоступна в демо-режиме"));
             #endregion
 
+            //
+            bool EnableTo2FA = jsonDB.Base.EnableTo2FA;
+
             #region Обновляем базу
             jsonDB.Base = bs;
             jsonDB.Security = sc;
@@ -41,7 +50,7 @@ namespace ISPCore.Controllers
             if (!string.IsNullOrWhiteSpace(salt))
             {
                 if (salt.Length < 18)
-                    return Json(new Text("Соль должена состоять минимум из 18 символов"));
+                    return Json(new Text("Соль должна состоять минимум из 18 символов"));
 
                 PasswdTo.salt = salt;
             }
@@ -81,6 +90,23 @@ namespace ISPCore.Controllers
 
                 System.IO.File.WriteAllText(Folders.Passwd + "/2fa", SHA256.Text(Passwd2FA));
             }
+
+            #region Включение 2FA
+            if (!EnableTo2FA && bs.EnableTo2FA)
+            {
+                if (HttpContext.Request.Cookies.TryGetValue("authSession", out string authSession))
+                {
+                    using (var coreDB = Service.Get<CoreDB>())
+                    {
+                        if (coreDB.Auth_Sessions.FindItem(i => i.Session == authSession, TrackingType.Tracking) is AuthSession item)
+                        {
+                            item.Confirm2FA = true;
+                            coreDB.SaveChanges();
+                        }
+                    }
+                }
+            }
+            #endregion
 
             // Ответ
             if (IsAPI)

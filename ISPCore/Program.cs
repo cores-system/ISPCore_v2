@@ -89,8 +89,7 @@ namespace ISPCore
                     Engine.Cron.WhitePtrIP.Run(coreDB, memoryCache);                // Удаляем из базы старые IP адреса
                     Engine.RequestsFilter.Access.AccessIP.Clear();                  // Очистка списка IP с разрешенным доступом
                     Engine.Cron.Home.Run(coreDB, memoryCache);                      // Очистка журнала посещений
-                    Engine.Cron.Auth.Run(coreDB, memoryCache);                      // Очистка сессий
-                    Engine.Cron.AntiDdos.Run(coreDB, jsonDB, memoryCache);          // Сбор статистики && очистка базы и правил IPTables
+                    Engine.Cron.Auth.Run(coreDB, jsonDB, memoryCache);              // Очистка сессий
                     Engine.Cron.AntiDdos.Run(coreDB, jsonDB, memoryCache);          // Сбор статистики && очистка базы и правил IPTables
 
                     Engine.Cron.Monitoring.Run(coreDB, memoryCache);                // Статистика "/isp/monitoring"
