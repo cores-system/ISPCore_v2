@@ -307,7 +307,7 @@ namespace ISPCore.Engine.Databases
 
                                     case 3:
                                         {
-                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [Auth_Sessions] ADD [CreateTime] TEXT DEFAULT [2000-00-00 00:00:00.0000000] NOT NULL ;");
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [Auth_Sessions] ADD [CreateTime] TEXT DEFAULT [2018-04-24 10:57:30.9735464] NOT NULL ;");
                                             goto case 4;
                                         }
 
