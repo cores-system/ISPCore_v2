@@ -7,7 +7,7 @@ using ISPCore.Models.SyncBackup.Operation;
 
 namespace ISPCore.Controllers
 {
-    public class SyncBackupToOperationController : ControllerToDB
+    public class SyncBackupFilesToOperation : ControllerToDB
     {
         [HttpGet]
         public IActionResult Index(bool ajax, int page = 1, int TaskId = -1)
@@ -22,7 +22,7 @@ namespace ISPCore.Controllers
 
             // Выводим контент
             var navPage = new NavPage<Notation>(db, HttpContext, 15, page);
-            return View("~/Views/SyncBackup/Operation.cshtml", navPage, ajax);
+            return View("~/Views/SyncBackup/Files/Operation.cshtml", navPage, ajax);
         }
     }
 }

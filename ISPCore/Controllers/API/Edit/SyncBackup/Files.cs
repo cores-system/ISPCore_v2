@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ISPCore.Controllers
 {
-    public class ApiEditBackup : ControllerToDB
+    public class ApiEditBackupFiles : ControllerToDB
     {
         #region Edit
         public JsonResult Edit<T>(T oldItem, T newItem) where T : class

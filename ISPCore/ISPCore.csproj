@@ -60,6 +60,7 @@
 
   <ItemGroup>
     <Folder Include="Views\Common\" />
+    <Folder Include="Views\SyncBackup\Database\MySQL\" />
   </ItemGroup>
 
 </Project>

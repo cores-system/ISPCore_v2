@@ -281,9 +281,9 @@ namespace ISPCore
                     routes.MapRoute(null, "api/list/requests-filter/monitoring/stats/month", new { controller = "ApiListMonitoring", action = "StatsMonth" });
                     routes.MapRoute(null, "api/list/requests-filter/monitoring/jurnal", new { controller = "ApiListMonitoring", action = "Jurnal" });
 
-                    routes.MapRoute(null, "api/list/backup/task", new { controller = "ApiListBackup", action = "Task" });
-                    routes.MapRoute(null, "api/list/backup/tasks", new { controller = "ApiListBackup", action = "Tasks" });
-                    routes.MapRoute(null, "api/list/backup/operations", new { controller = "ApiListBackup", action = "Operation" });
+                    routes.MapRoute(null, "api/list/backup/io/task", new { controller = "ApiListBackupFiles", action = "Task" });
+                    routes.MapRoute(null, "api/list/backup/io/tasks", new { controller = "ApiListBackupFiles", action = "Tasks" });
+                    routes.MapRoute(null, "api/list/backup/io/operations", new { controller = "ApiListBackupFiles", action = "Operation" });
                 });
                 #endregion
 
@@ -293,8 +293,8 @@ namespace ISPCore
                     routes.MapRoute(null, "api/add/whitelist", new { controller = "ApiAddWhiteList", action = "Base" });
                     routes.MapRoute(null, "api/add/security/iptables", new { controller = "ApiAddIptables", action = "Base" });
 
-                    routes.MapRoute(null, "api/add/backup/task", new { controller = "ApiAddBackup", action = "Task" });
-                    routes.MapRoute(null, "api/add/backup/ignore", new { controller = "ApiAddBackup", action = "Ignore" });
+                    routes.MapRoute(null, "api/add/backup/io/task", new { controller = "ApiAddBackupFiles", action = "Task" });
+                    routes.MapRoute(null, "api/add/backup/io/ignore", new { controller = "ApiAddBackupFiles", action = "Ignore" });
 
                     routes.MapRoute(null, "api/add/requests-filter/template", new { controller = "ApiAddTemplate", action = "Base" });
                     routes.MapRoute(null, "api/add/requests-filter/template/rule", new { controller = "ApiAddRule", action = "RuleTemplate" });
@@ -315,8 +315,8 @@ namespace ISPCore
                     routes.MapRoute(null, "api/remove/security/iptables", new { controller = "ApiRemoveIptables", action = "BlockedsIP" });
                     routes.MapRoute(null, "api/remove/security/antivirus", new { controller = "ApiRemoveAntivirus", action = "Base" });
 
-                    routes.MapRoute(null, "api/remove/backup/task", new { controller = "ApiRemoveBackup", action = "Task" });
-                    routes.MapRoute(null, "api/remove/backup/ignore", new { controller = "ApiRemoveBackup", action = "Ignore" });
+                    routes.MapRoute(null, "api/remove/backup/io/task", new { controller = "ApiRemoveBackupFiles", action = "Task" });
+                    routes.MapRoute(null, "api/remove/backup/io/ignore", new { controller = "ApiRemoveBackupFiles", action = "Ignore" });
 
                     routes.MapRoute(null, "api/remove/requests-filter/rules/base", new { controller = "ApiRemoveRules", action = "Rule" });
                     routes.MapRoute(null, "api/remove/requests-filter/rules/replace", new { controller = "ApiRemoveRules", action = "RuleReplace" });
@@ -340,8 +340,8 @@ namespace ISPCore
                     routes.MapRoute(null, "api/common/template/export", new { controller = "ApiCommonTemplate", action = "Export" });
                     routes.MapRoute(null, "api/common/template/import", new { controller = "ApiCommonTemplate", action = "Import" });
 
-                    routes.MapRoute(null, "api/common/backup/clearing/cache", new { controller = "ApiCommonBackup", action = "ClearingCache" });
-                    routes.MapRoute(null, "api/common/backup/recovery", new { controller = "ApiCommonBackup", action = "Recovery" });
+                    routes.MapRoute(null, "api/common/backup/io/clearing/cache", new { controller = "ApiCommonBackupFiles", action = "ClearingCache" });
+                    routes.MapRoute(null, "api/common/backup/io/recovery", new { controller = "ApiCommonBackupFiles", action = "Recovery" });
                 });
                 #endregion
 
@@ -371,10 +371,10 @@ namespace ISPCore
 
                     routes.MapRoute(null, "api/edit/template", new { controller = "ApiEditTemplate", action = "Base" });
 
-                    routes.MapRoute(null, "api/edit/backup/task", new { controller = "ApiEditBackup", action = "Task" });
-                    routes.MapRoute(null, "api/edit/backup/ftp", new { controller = "ApiEditBackup", action = "FTP" });
-                    routes.MapRoute(null, "api/edit/backup/webdav", new { controller = "ApiEditBackup", action = "WebDav" });
-                    routes.MapRoute(null, "api/edit/backup/onedrive", new { controller = "ApiEditBackup", action = "OneDrive" });
+                    routes.MapRoute(null, "api/edit/backup/io/task", new { controller = "ApiEditBackupFiles", action = "Task" });
+                    routes.MapRoute(null, "api/edit/backup/io/ftp", new { controller = "ApiEditBackupFiles", action = "FTP" });
+                    routes.MapRoute(null, "api/edit/backup/io/webdav", new { controller = "ApiEditBackupFiles", action = "WebDav" });
+                    routes.MapRoute(null, "api/edit/backup/io/onedrive", new { controller = "ApiEditBackupFiles", action = "OneDrive" });
                 });
                 #endregion
             }
@@ -542,34 +542,34 @@ namespace ISPCore
             });
             #endregion
 
-            #region SyncBackup
+            #region SyncBackup - IO
             // Views
             app.UseMvc(routes =>
             {
-                routes.MapRoute(null, "backup/tasks", new { controller = "SyncBackupToTasks", action = "Index" });
-                routes.MapRoute(null, "backup/operation", new { controller = "SyncBackupToOperation", action = "Index" });
+                routes.MapRoute(null, "backup/io/tasks", new { controller = "SyncBackupFilesToTasks", action = "Index" });
+                routes.MapRoute(null, "backup/io/operation", new { controller = "SyncBackupFilesToOperation", action = "Index" });
             });
 
             // Задание
             app.UseMvc(routes =>
             {
-                routes.MapRoute(null, "backup/task", new { controller = "SyncBackupToTask", action = "Index" });
-                routes.MapRoute(null, "backup/task/remove", new { controller = "SyncBackupToTask", action = "Remove" });
-                routes.MapRoute(null, "backup/task/save", new { controller = "SyncBackupToTask", action = "Save" });
-                routes.MapRoute(null, "backup/task/clearing-cache", new { controller = "SyncBackupToTask", action = "ClearingCache" });
+                routes.MapRoute(null, "backup/io/task", new { controller = "SyncBackupFilesToTask", action = "Index" });
+                routes.MapRoute(null, "backup/io/task/remove", new { controller = "SyncBackupFilesToTask", action = "Remove" });
+                routes.MapRoute(null, "backup/io/task/save", new { controller = "SyncBackupFilesToTask", action = "Save" });
+                routes.MapRoute(null, "backup/io/task/clearing-cache", new { controller = "SyncBackupFilesToTask", action = "ClearingCache" });
             });
 
             // Улиты
             app.UseMvc(routes =>
             {
-                routes.MapRoute(null, "backup/tools", new { controller = "SyncBackupToTools", action = "Index" });
-                routes.MapRoute(null, "backup/tools/recover", new { controller = "SyncBackupToTools", action = "Recovery" });
+                routes.MapRoute(null, "backup/io/tools", new { controller = "SyncBackupFilesToTools", action = "Index" });
+                routes.MapRoute(null, "backup/io/tools/recover", new { controller = "SyncBackupFilesToTools", action = "Recovery" });
             });
 
             // Получение токенов
             app.UseMvc(routes =>
             {
-                routes.MapRoute(null, "backup/authorize/onedrive", new { controller = "SyncBackupToAuthorize", action = "OneDrive" });
+                routes.MapRoute(null, "backup/io/authorize/onedrive", new { controller = "SyncBackupFilesToAuthorize", action = "OneDrive" });
             });
             #endregion
 

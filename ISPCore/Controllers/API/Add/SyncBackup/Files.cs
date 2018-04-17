@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using ISPCore.Models.Databases;
 using ISPCore.Models.SyncBackup.Tasks;
-using Microsoft.EntityFrameworkCore;
 using ISPCore.Models.Response;
 
 namespace ISPCore.Controllers
 {
-    public class ApiAddBackup : ControllerToDB
+    public class ApiAddBackupFiles : ControllerToDB
     {
         public JsonResult Task(Task tk, FTP ftp, Models.SyncBackup.Tasks.WebDav webDav, OneDrive oneDrive)
         {
-            return new SyncBackupToTaskController().Save(tk, ftp, webDav, oneDrive);
+            return new SyncBackupFilesToTask().Save(tk, ftp, webDav, oneDrive);
         }
 
 

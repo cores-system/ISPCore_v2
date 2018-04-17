@@ -10,7 +10,7 @@
 
 <div class="wrapper wrapper-page-title">
     <div class="page-subtitle">
-        <button href="/backup/task" onclick="return loadPage(this)" class="btn btn-success t_right">Добавить задание</button>
+        <button href="/backup/io/task" onclick="return loadPage(this)" class="btn btn-success t_right">Добавить задание</button>
 
         <h3>Задания</h3>
         <p>Список заданий для синхронизации</p>
@@ -70,9 +70,9 @@
                             </td>
 
                             <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
-                                <a href="/backup/operation?TaskId=@task.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-history"></i></a>
-                                <a href="/backup/task?Id=@task.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
-                                <a onclick="return deleteElement(this,'/backup/task/remove',{Id:'@task.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                                <a href="/backup/io/operation?TaskId=@task.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-history"></i></a>
+                                <a href="/backup/io/task?Id=@task.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
+                                <a onclick="return deleteElement(this,'/backup/io/task/remove',{Id:'@task.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
                             </td>
                         </tr>
                     }

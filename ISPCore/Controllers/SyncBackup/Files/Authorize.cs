@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ISPCore.Controllers
 {
-    public class SyncBackupToAuthorizeController : Controller
+    public class SyncBackupFilesToAuthorize : Controller
     {
         [HttpGet]
         async public Task<IActionResult> OneDrive(string client_id, string code)
@@ -31,7 +31,7 @@ namespace ISPCore.Controllers
                 catch { }
             }
 
-            return View("~/Views/SyncBackup/Authorize/OneDrive.cshtml");
+            return View("~/Views/SyncBackup/Files/Authorize/OneDrive.cshtml");
         }
     }
 }

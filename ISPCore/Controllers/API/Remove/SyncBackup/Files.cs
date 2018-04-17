@@ -5,11 +5,11 @@ using ISPCore.Models.Response;
 
 namespace ISPCore.Controllers
 {
-    public class ApiRemoveBackup : ControllerToDB
+    public class ApiRemoveBackupFiles : ControllerToDB
     {
         public JsonResult Task(int Id)
         {
-            return new SyncBackupToTaskController().Remove(Id);
+            return new SyncBackupFilesToTask().Remove(Id);
         }
 
 

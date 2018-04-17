@@ -8,7 +8,7 @@ using ISPCore.Models.SyncBackup.Operation;
 
 namespace ISPCore.Controllers
 {
-    public class ApiListBackup : ControllerToDB
+    public class ApiListBackupFiles : ControllerToDB
     {
         public JsonResult Task(int Id) => Json(coreDB.SyncBackup_Tasks.FindAndInclude(Id, AsNoTracking: true));
         public JsonResult Tasks(int page = 1, int pageSize = 20) => Json(coreDB.SyncBackup_Tasks.AsNoTracking().AsEnumerable().Skip((page * pageSize) - pageSize).Take(pageSize));

@@ -15,13 +15,13 @@ using System.Threading;
 
 namespace ISPCore.Controllers
 {
-    public class SyncBackupToToolsController : Controller
+    public class SyncBackupFilesToTools : Controller
     {
         [HttpGet]
         public IActionResult Index(bool ajax)
         {
             ViewData["ajax"] = ajax;
-            return View("~/Views/SyncBackup/Tools.cshtml");
+            return View("~/Views/SyncBackup/Files/Tools.cshtml");
         }
         
 

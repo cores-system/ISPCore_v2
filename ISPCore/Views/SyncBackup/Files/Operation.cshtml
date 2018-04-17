@@ -34,10 +34,10 @@
                         <table class="table table-jornal">
                             @if (ViewBag.WorkNote != null)
                             {
-                                @Html.Partial("Common/OperationNote.cshtml", (IEnumerable<Notation>)ViewBag.WorkNote)
+                                @Html.Partial("../Common/OperationNote.cshtml", (IEnumerable<Notation>)ViewBag.WorkNote)
                             }
 
-                            @Html.Partial("Common/OperationNote.cshtml", Model.Page.GetItems())
+                            @Html.Partial("../Common/OperationNote.cshtml", Model.Page.GetItems())
                         </table>
                     </div>
 

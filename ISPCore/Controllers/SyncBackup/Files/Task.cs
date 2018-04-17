@@ -9,14 +9,14 @@ using ISPCore.Engine.Base;
 
 namespace ISPCore.Controllers
 {
-    public class SyncBackupToTaskController : ControllerToDB
+    public class SyncBackupFilesToTask : ControllerToDB
     {
         [HttpGet]
         public IActionResult Index(bool ajax, int Id)
         {
             ViewData["Id"] = Id;
             ViewData["ajax"] = ajax;
-            return View("~/Views/SyncBackup/Task.cshtml", coreDB.SyncBackup_Tasks.FindAndInclude(Id, AsNoTracking: true));
+            return View("~/Views/SyncBackup/Files/Task.cshtml", coreDB.SyncBackup_Tasks.FindAndInclude(Id, AsNoTracking: true));
         }
 
         #region Save
