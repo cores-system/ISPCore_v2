@@ -49,10 +49,19 @@
             </div>
 
             <ul class="dph-buttons pull-right">
-                <li class="dph-button-stuck lic-info" style="width: 134px;">
+                @*<li class="dph-button-stuck lic-info" style="width: 134px;">
                     <a href="https://my.core-system.org/" target="_blank" class="dev-page-rightbar-toggle" style="width: 134px; padding: 10px 0 0 20px !important">
                         ISPCore: &nbsp;<span class="text-success">@string.Format("v{0}", Startup.version.ToString())</span><br />
                         <small>© Core System 2018</small>
+                    </a>
+                </li>*@
+                <li class="dph-button-stuck lic-info">
+                    <a href="/notifications" onclick="return loadPage(this)" class="dev-page-rightbar-toggle noty-btn">
+                        <i class="fa fa-bell"></i>
+                        @if (JsonDB.Base.CountNotification > 0)
+                        {
+                            <span class="label label-noty notice-label">+@JsonDB.Base.CountNotification</span> 
+                        }
                     </a>
                 </li>
                 <li class="dph-button-stuck lic-info">
@@ -85,8 +94,9 @@
                         </ul>
                     </li>
 
+                    <li class="title">Web Firewall</li>
                     <li>
-                        <a><i class="fa fa-list"></i> <span>Безопасность системы</span></a>
+                        <a><i class="fa fa-list"></i> <span>Global Firewall</span></a>
                         <ul>
                             <li><a href="/security/iptables" onclick="return loadPage(this)">Брандмауэр</a></li>
                             @if (Platform.Get == PlatformOS.Unix) {
@@ -94,10 +104,8 @@
                             }
 
                             <li><a href="/security/antibot" onclick="return loadPage(this)">Защита от ботов</a></li>
-                            <li><a href="/security/antivirus" onclick="return loadPage(this)">Антивирус</a></li>
                         </ul>
                     </li>
-
                     <li>
                         <a><i class="fa fa-globe"></i> <span>Фильтрация запросов</span></a>
                         <ul>
@@ -108,24 +116,28 @@
                         </ul>
                     </li>
 
-                     <li>
-                        <a><i class="fa fa-cloud"></i> <span>Sync Backup</span></a>
+                    <li class="title">Security</li>
+                    <li>
+                        <a href="/security/antivirus" onclick="return loadPage(this)"><i class="fa fa-bug"></i> <span>Антивирус</span></a>
+                    </li>
+
+                    <li class="title">Sync Backup</li>
+                    <li>
+                        <a><i class="fa fa-cloud"></i> <span>Бекап файлов</span></a>
                         <ul>
                             <li><a href="/backup/tasks" onclick="return loadPage(this)">Задания</a></li>
                             <li><a href="/backup/tools" onclick="return loadPage(this)">Улиты</a></li>
                             <li><a href="/backup/operation" onclick="return loadPage(this)">Выполнено / Выполняется</a></li>
                         </ul>
                     </li>
+                    @*<li>
+                        <a><i class="fa fa-database"></i> <span>MySQL Dump</span></a>
+                        <ul>
+                            <li><a href="/backup/tasks" onclick="return loadPage(this)">Задания</a></li>
+                            <li><a href="/backup/operation" onclick="return loadPage(this)">Отчеты</a></li>
+                        </ul>
+                    </li>*@
 
-                    <li>
-                        <a href="/notifications" onclick="return loadPage(this)">
-                            <i class="fa fa-bell"></i> <span>Уведомления</span>
-                            @if (JsonDB.Base.CountNotification > 0)
-                            {
-                                <span class="label label-danger notice-label">+@JsonDB.Base.CountNotification</span>
-                            }
-                        </a>
-                    </li>
 
                     @*<li>
                                             <a href="/api" onclick="return loadPage(this)"><i class="fa fa-question"></i> <span>Public API</span></a>

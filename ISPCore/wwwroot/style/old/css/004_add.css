@@ -1133,6 +1133,23 @@ input[type=number]:hover::-webkit-inner-spin-button {
 	color: #88a8d0 !important;
 }
 
+.noty-btn{
+	display: -webkit-box !important;
+    display: -ms-flexbox !important;
+    display: flex !important;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+            align-items: center;
+}
+
+.noty-btn i{
+	font-size: 16px !important;
+	color: #88a8d0 !important;
+}
+
 
 .container .wrapper-page {
 	padding: 30px 25px 20px !important;
@@ -1153,7 +1170,12 @@ input[type=number]:hover::-webkit-inner-spin-button {
     margin-bottom: 10px !important;
 }
 
-
+.label-noty
+{
+	margin-bottom: 8px;
+    margin-left: -2px;
+	color: #e74e40;
+}
 
 
 
