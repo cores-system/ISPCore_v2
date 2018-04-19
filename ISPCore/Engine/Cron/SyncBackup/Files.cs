@@ -16,9 +16,9 @@ using ISPCore.Models.Databases;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 
-namespace ISPCore.Engine.Cron
+namespace ISPCore.Engine.Cron.SyncBackup
 {
-    public class SyncBackup
+    public class Files
     {
         #region Run
         static bool IsRun = false;
@@ -29,7 +29,7 @@ namespace ISPCore.Engine.Cron
             IsRun = true;
 
             #region Очистка базы 'Операции' и папки 'ReportSync'
-            if (memoryCache.TryGetValue("CronSyncBackupClearDB", out DateTime CronSyncBackupClearDB))
+            if (memoryCache.TryGetValue("CronSyncBackupIO:ClearDB", out DateTime CronSyncBackupClearDB))
             {
                 // Если дата отличается от текущей
                 if (CronSyncBackupClearDB.Day != DateTime.Now.Day)
@@ -38,7 +38,7 @@ namespace ISPCore.Engine.Cron
                     SqlToMode.SetMode(SqlMode.Read);
 
                     // Обновляем кеш
-                    memoryCache.Set("CronSyncBackupClearDB", DateTime.Now);
+                    memoryCache.Set("CronSyncBackupIO:ClearDB", DateTime.Now);
 
                     // Чистим базу
                     foreach (var note in coreDB.SyncBackup_Notations.AsNoTracking())
@@ -72,7 +72,7 @@ namespace ISPCore.Engine.Cron
             else
             {
                 // Создаем кеш задним числом
-                memoryCache.Set("CronSyncBackupClearDB", DateTime.Now.AddDays(-1));
+                memoryCache.Set("CronSyncBackupIO:ClearDB", DateTime.Now.AddDays(-1));
             }
             #endregion
 

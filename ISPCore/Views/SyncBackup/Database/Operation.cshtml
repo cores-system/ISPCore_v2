@@ -1,0 +1,94 @@
+﻿@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.SyncBackup.Database.Report>
+
+@{
+    if (Model.ajax) {
+        Layout = null;
+    }
+}
+
+
+
+@if (!Model.Page.GetItems().Any())
+{
+    <div class="wrapper wrapper-page-title">
+        <div class="page-subtitle">
+            <h3>Операции</h3>
+            <p>Список выполненных операций за неделю</p>
+        </div>
+        <p>Отсутствует список операций</p>
+    </div>
+}
+else
+{
+    <div class="wrapper wrapper-page">
+        <div class="tabs">
+            <div class="panel-body tab-content">
+
+
+                <div class="tab-pane active">
+                    <div class="page-subtitle">
+                        <h3>Операции</h3>
+                        <p>Список выполненных операций за неделю</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-jornal">
+                            <thead>
+                                <tr>
+                                    <th width="150">Категория</th>
+                                    <th>Сообщение</th>
+                                    <th width="80" class="text-center">Время</th>
+                                    <th width="110" class="text-center">Дата</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.Page.GetItems())
+                                {
+                                    <tr style="background: #f7f7f7;">
+                                        <td>@item.Category</td>
+                                        <td>@item.Msg</td>
+                                        <td class="text-center">@item.Time.ToString("H:mm")</td>
+                                        <td class="text-center">@item.Time.ToString("dd.MM.yyyy")</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="1">
+                                            <span class="text-warning">Состояние:</span>
+                                        </td>
+                                        <td colspan="3">
+                                            <span class="text-short">@item.Status</span>
+                                        </td>
+                                    </tr>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.ErrorMsg))
+                                    {
+                                        <tr>
+                                            <td colspan="1">
+                                                <span class="text-warning">Ошибка:</span>
+                                            </td>
+                                            <td colspan="3">
+                                                <span class="text-short">@item.ErrorMsg</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <script>
+                        $("html, body").animate({ scrollTop: 0 }, 0);
+                    </script>
+
+                </div>
+
+                @Html.Raw(Model.Page.Nav())
+            </div>
+        </div>
+    </div>
+}
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)

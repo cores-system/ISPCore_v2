@@ -573,6 +573,23 @@ namespace ISPCore
             });
             #endregion
 
+            #region SyncBackup - DB
+            // Views
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(null, "backup/db/tasks", new { controller = "SyncBackupDatabaseToTasks", action = "Index" });
+                routes.MapRoute(null, "backup/db/operation", new { controller = "SyncBackupDatabaseToOperation", action = "Index" });
+            });
+
+            // Задание
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(null, "backup/db/task", new { controller = "SyncBackupDatabaseToTask", action = "Index" });
+                routes.MapRoute(null, "backup/db/task/remove", new { controller = "SyncBackupDatabaseToTask", action = "Remove" });
+                routes.MapRoute(null, "backup/db/task/save", new { controller = "SyncBackupDatabaseToTask", action = "Save" });
+            });
+            #endregion
+
             // Уведомления
             app.UseMvc(routes => {
                 routes.MapRoute(null, "notifications", new { controller = "Notifications", action = "Index" });

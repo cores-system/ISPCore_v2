@@ -124,6 +124,9 @@ namespace ISPCore
 
                 case IQueryable<Task> Tasks:
                     return (dynamic)Tasks.Where(i => i.Id == Id).Include(f => f.FTP).Include(w => w.WebDav).Include(o => o.OneDrive).Include(i => i.IgnoreFileOrFolders).FirstOrDefault();
+
+                case IQueryable<Models.SyncBackup.Database.Task> Tasks:
+                    return (dynamic)Tasks.Where(i => i.Id == Id).Include(i => i.Conf).Include(i => i.MySQL).FirstOrDefault();
             }
 
             return null;

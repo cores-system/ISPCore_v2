@@ -1,0 +1,209 @@
+﻿@using ISPCore.Models.Base
+@using ISPCore.Engine.Common.Views
+@using ISPCore.Models.SyncBackup.Database.Enums
+@model ISPCore.Models.SyncBackup.Database.Task
+
+@{
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle">
+        <button class="btn btn-success t_right margin-left-10" onclick="saveEditSite(this, '/backup/db/task/save')">Сохранить изменения</button>
+        <h3>Задание: @Model?.Description</h3>
+        <p>Настройка задания для бекапа базы данных</p>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="task.Id" id="itemID" value="@ViewData["Id"]" />
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="">
+
+                    <div class="tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-base" role="tab" data-toggle="tab">Основное</a></li>
+                            <li><a href="#tab-more" role="tab" data-toggle="tab">Дополнительно</a></li>
+                            <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
+                        </ul>
+                        <div class="panel-body tab-content tab-div-content">
+
+                            <div class="tab-pane active row" id="tab-base">
+
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Описание<span>задания</span></label>
+                                        <input type="text" name="task.Description" value="@Model?.Description" class="form-control" placeholder="Имя задания" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Выполнять<span>задание</span></label>
+                                        <select class="form-control selectpicker" name="task.JobStatus">
+                                            @Html.Raw(SelectPickerTo.Int(Model == null || Model.JobStatus == JobStatus.on, "Да", "Нет"))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Интервал<span>бекапа в минутах</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="task.SuncTime"
+                                               value="@(Model != null && Model.SuncTime != 60 ? Model.SuncTime.ToString() : "")"
+                                               class="form-control" placeholder="По умолчанию: 60 минут" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Локальный<span>каталог</span></label>
+                                        <input type="text" name="conf.Whence" value="@Model?.Conf.Whence" class="form-control" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Использовать<span>сжатие данных</span></label>
+                                        <select class="form-control selectpicker" name="conf.Compression">
+                                            @Html.Raw(SelectPickerTo.Enum(Model == null ? CompressionType.None : Model.Conf.Compression,
+                                                  (CompressionType.None, "Нет"),
+                                                  (CompressionType.GZip, "GZip")
+                                            ))
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Дописывать<span>время к бекапу</span></label>
+                                        <select class="form-control selectpicker" name="conf.AddBackupTime">
+                                            @Html.Raw(SelectPickerTo.Bool(Model != null && Model.Conf.AddBackupTime, "Да", "Нет"))
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-lg-offset-1">
+                                    <div class="form-group typeDav">
+                                        <label>Сервер<span>базы данных</span></label>
+                                        <input type="text" name="mysql.Host"
+                                               value="@(Model == null || Model.MySQL.Host == "localhost" ? "" : Model.MySQL.Host)"
+                                               class="form-control" placeholder="По умолчанию: localhost" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Порт<span>для подключения</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="mysql.Port"
+                                               value="@(Model != null && Model.MySQL.Port != 3306 ? Model.MySQL.Port.ToString() : "")"
+                                               class="form-control" placeholder="По умолчанию: 3306" />
+                                    </div>
+
+                                    <div class="form-group typeDav">
+                                        <label>Имя<span>пользователя</span></label>
+                                        <input type="text" name="mysql.User" value="@Model?.MySQL.User" class="form-control" placeholder="root" />
+                                    </div>
+
+                                    <div class="form-group typeDav">
+                                        <label>Пароль<span>от базы</span></label>
+                                        <input type="text" name="mysql.Password" class="form-control" placeholder="Укажите пароль" />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="tab-pane row" id="tab-more">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label>Список<span>игнорируемых баз (по одной в строке)</span></label>
+                                        <textarea class="form-control" placeholder="performance_schema" style="height: 220px" name="conf.IgnoreDatabases">@Model?.Conf.IgnoreDatabases</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-md-offset-1">
+                                    <div class="form-group">
+                                        <label>Список<span>экспортируемых баз (по одной в строке)</span></label>
+                                        <textarea class="form-control" placeholder="По умолчанию сохраняются все базы" style="height: 220px" name="conf.DumpDatabases">@Model?.Conf.DumpDatabases</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane row" id="tab-faq">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-md-offset-3">
+
+                                            <div id="dev-faq-form">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                        <div class="input-group-btn">
+                                                            <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p id="dev-faq-search-result"></p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="faq">
+                                        <h2><i class="fa fa-cubes"></i>Основное</h2>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Интервал бекапа в минутах</div>
+                                            <div class="faq-text">
+                                                <h5>Интервал бэкапа</h5>
+                                                <p>Время через которое задание будет выполнено повторно</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Локальный каталог</div>
+                                            <div class="faq-text">
+                                                <p>Папка куда будет сохранятся бекап базы</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Дописывать время к бекапу</div>
+                                            <div class="faq-text">
+                                                <h5>Время бэкапа</h5>
+                                                <p>К имени файла будет дописываться дата и время бекапа - "name_17.04.2018-18.00.sql"</p>
+                                            </div>
+                                        </div>
+
+                                        <h2><i class="fa fa-cubes"></i>Дополнительно</h2>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Список игнорируемых баз</div>
+                                            <div class="faq-text">
+                                                <h5>Игнорируемые базы</h5>
+                                                <p>В случаи если вы экспортируете базы под root, вы можете исключить технические базы, такие как "performance_schema"</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Список экспортируемых баз</div>
+                                            <div class="faq-text">
+                                                <h5>Экспортируемые базы</h5>
+                                                <p>Вы можете выбрать нужные базы в случаи экспорта под root</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)

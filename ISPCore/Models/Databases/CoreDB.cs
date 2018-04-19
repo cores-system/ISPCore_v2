@@ -77,17 +77,22 @@ namespace ISPCore.Models.Databases
         public DbSet<RequestsFilter.Domains.AntiVirus> RequestsFilter_Domain_AntiVirus { get; set; }
         #endregion
 
-        #region SyncBackup - Задания
+        #region SyncBackup - IO
         public DbSet<SyncBackup.Tasks.Task> SyncBackup_Tasks { get; set; }
         public DbSet<SyncBackup.Tasks.FTP> SyncBackup_Task_FTP { get; set; }
         public DbSet<SyncBackup.Tasks.WebDav> SyncBackup_Task_WebDav { get; set; }
         public DbSet<SyncBackup.Tasks.OneDrive> SyncBackup_Task_OneDrive { get; set; }
         public DbSet<SyncBackup.Tasks.IgnoreFileOrFolders> SyncBackup_Task_IgnoreFileOrFolders { get; set; }
-        #endregion
 
-        #region SyncBackup - Выполненые операции
         public DbSet<SyncBackup.Operation.Notation> SyncBackup_Notations { get; set; }
         public DbSet<SyncBackup.Operation.More> SyncBackup_Notation_More { get; set; }
+        #endregion
+
+        #region SyncBackup - Database
+        public DbSet<SyncBackup.Database.Task> SyncBackup_db_Tasks { get; set; }
+        public DbSet<SyncBackup.Database.DumpConf> SyncBackup_db_Task_Conf { get; set; }
+        public DbSet<SyncBackup.Database.MySQL> SyncBackup_db_Task_MySQL { get; set; }
+        public DbSet<SyncBackup.Database.Report> SyncBackup_db_Reports { get; set; }
         #endregion
 
         #region Уведомления

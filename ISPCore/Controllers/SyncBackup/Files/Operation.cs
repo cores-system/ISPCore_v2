@@ -17,7 +17,8 @@ namespace ISPCore.Controllers
 
             // Список активных операций
             if (page == 1) {
-                ViewBag.WorkNote = CoreDB.SyncBackupWorkNote.Where(i => TaskId == -1 || i.TaskId == TaskId);
+                var workNotes = CoreDB.SyncBackupWorkNote.Where(i => TaskId == -1 || i.TaskId == TaskId).ToList();
+                ViewBag.WorkNote = workNotes.Count == 0 ? null : workNotes;
             }
 
             // Выводим контент

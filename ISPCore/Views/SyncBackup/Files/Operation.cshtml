@@ -9,17 +9,20 @@
 }
 
 
-<div class="wrapper wrapper-page">
-    @if (!Model.Page.GetItems().Any() && ViewBag.WorkNote == null)
-    {
+
+@if (!Model.Page.GetItems().Any() && ViewBag.WorkNote == null)
+{
+    <div class="wrapper wrapper-page-title">
         <div class="page-subtitle">
             <h3>Операции</h3>
             <p>Список выполняющихся/выполненных операций за неделю</p>
         </div>
         <p>Отсутствует список операций</p>
-    }
-    else
-    {
+    </div>
+}
+else
+{
+    <div class="wrapper wrapper-page">
         <div class="tabs">
             <div class="panel-body tab-content">
 
@@ -33,11 +36,11 @@
                     <div class="table-responsive">
                         <table class="table table-jornal">
                             @if (ViewBag.WorkNote != null)
-                            {
-                                @Html.Partial("../Common/OperationNote.cshtml", (IEnumerable<Notation>)ViewBag.WorkNote)
-                            }
+                        {
+                            @Html.Partial("Common/OperationNote.cshtml", (IEnumerable<Notation>)ViewBag.WorkNote)
+                    }
 
-                            @Html.Partial("../Common/OperationNote.cshtml", Model.Page.GetItems())
+                            @Html.Partial("Common/OperationNote.cshtml", Model.Page.GetItems())
                         </table>
                     </div>
 
@@ -50,8 +53,8 @@
                 @Html.Raw(Model.Page.Nav())
             </div>
         </div>
-    }
-</div>
+    </div>
+}
 
 
 @ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)

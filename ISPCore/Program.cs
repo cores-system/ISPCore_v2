@@ -98,8 +98,10 @@ namespace ISPCore
 
                     Engine.Cron.Notifications.Run(coreDB, jsonDB, memoryCache);     // Уведомления
                     Engine.Cron.AntiVirus.Run(coreDB);                              // Проверка доменов антивирусом
-                    Engine.Cron.SyncBackup.Run(coreDB, memoryCache);                // SyncBackup
-                    Engine.Cron.SyncBackup.ClearingTemp(memoryCache);               // Очистка временных файлов
+
+                    Engine.Cron.SyncBackup.Database.Run(coreDB, memoryCache);       // SyncBackup - DB
+                    Engine.Cron.SyncBackup.Files.Run(coreDB, memoryCache);          // SyncBackup - IO
+                    Engine.Cron.SyncBackup.Files.ClearingTemp(memoryCache);         // Очистка временных файлов
                 }
             }
             catch (Exception ex)
