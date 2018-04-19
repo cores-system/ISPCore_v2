@@ -284,6 +284,10 @@ namespace ISPCore
                     routes.MapRoute(null, "api/list/backup/io/task", new { controller = "ApiListBackupFiles", action = "Task" });
                     routes.MapRoute(null, "api/list/backup/io/tasks", new { controller = "ApiListBackupFiles", action = "Tasks" });
                     routes.MapRoute(null, "api/list/backup/io/operations", new { controller = "ApiListBackupFiles", action = "Operation" });
+
+                    routes.MapRoute(null, "api/list/backup/db/task", new { controller = "ApiListBackupDatabase", action = "Task" });
+                    routes.MapRoute(null, "api/list/backup/db/tasks", new { controller = "ApiListBackupDatabase", action = "Tasks" });
+                    routes.MapRoute(null, "api/list/backup/db/operations", new { controller = "ApiListBackupDatabase", action = "Operation" });
                 });
                 #endregion
 
@@ -295,6 +299,8 @@ namespace ISPCore
 
                     routes.MapRoute(null, "api/add/backup/io/task", new { controller = "ApiAddBackupFiles", action = "Task" });
                     routes.MapRoute(null, "api/add/backup/io/ignore", new { controller = "ApiAddBackupFiles", action = "Ignore" });
+
+                    routes.MapRoute(null, "api/add/backup/db/task", new { controller = "ApiAddBackupDatabase", action = "Task" });
 
                     routes.MapRoute(null, "api/add/requests-filter/template", new { controller = "ApiAddTemplate", action = "Base" });
                     routes.MapRoute(null, "api/add/requests-filter/template/rule", new { controller = "ApiAddRule", action = "RuleTemplate" });
@@ -317,6 +323,8 @@ namespace ISPCore
 
                     routes.MapRoute(null, "api/remove/backup/io/task", new { controller = "ApiRemoveBackupFiles", action = "Task" });
                     routes.MapRoute(null, "api/remove/backup/io/ignore", new { controller = "ApiRemoveBackupFiles", action = "Ignore" });
+
+                    routes.MapRoute(null, "api/remove/backup/db/task", new { controller = "ApiRemoveBackupDatabase", action = "Task" });
 
                     routes.MapRoute(null, "api/remove/requests-filter/rules/base", new { controller = "ApiRemoveRules", action = "Rule" });
                     routes.MapRoute(null, "api/remove/requests-filter/rules/replace", new { controller = "ApiRemoveRules", action = "RuleReplace" });
@@ -375,6 +383,10 @@ namespace ISPCore
                     routes.MapRoute(null, "api/edit/backup/io/ftp", new { controller = "ApiEditBackupFiles", action = "FTP" });
                     routes.MapRoute(null, "api/edit/backup/io/webdav", new { controller = "ApiEditBackupFiles", action = "WebDav" });
                     routes.MapRoute(null, "api/edit/backup/io/onedrive", new { controller = "ApiEditBackupFiles", action = "OneDrive" });
+
+                    routes.MapRoute(null, "api/edit/backup/db/task", new { controller = "ApiEditBackupDatabase", action = "Task" });
+                    routes.MapRoute(null, "api/edit/backup/db/task/dumpconf", new { controller = "ApiEditBackupDatabase", action = "DumpConf" });
+                    routes.MapRoute(null, "api/edit/backup/db/mysql", new { controller = "ApiEditBackupDatabase", action = "MySQL" });
                 });
                 #endregion
             }
