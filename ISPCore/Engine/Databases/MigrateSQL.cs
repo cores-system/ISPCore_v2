@@ -311,10 +311,67 @@ namespace ISPCore.Engine.Databases
                                             goto case 4;
                                         }
 
+                                    #region case 4
                                     case 4:
                                         {
-                                            // Миграция на 5
-                                            //goto case 5;
+                                            coreDB.Database.ExecuteSqlCommand(@"CREATE TABLE [SyncBackup_db_Tasks] (
+                                                  [Id] INTEGER  NOT NULL
+                                                , [Description] text NULL
+                                                , [JobStatus] bigint  NOT NULL
+                                                , [LastSync] text NOT NULL
+                                                , [SuncTime] bigint  NOT NULL
+                                                , [TypeDb] bigint  NOT NULL
+                                                , CONSTRAINT [sqlite_master_PK_SyncBackup_db_Tasks] PRIMARY KEY ([Id])
+                                                );
+                                            ");
+
+                                            coreDB.Database.ExecuteSqlCommand(@"CREATE TABLE [SyncBackup_db_Task_Conf] (
+                                                  [Id] INTEGER  NOT NULL
+                                                , [AddBackupTime] bigint  NOT NULL
+                                                , [Compression] bigint  NOT NULL
+                                                , [DumpDatabases] text NULL
+                                                , [IgnoreDatabases] text NULL
+                                                , [TaskId] bigint  NOT NULL
+                                                , [Whence] text NULL
+                                                , CONSTRAINT [sqlite_master_PK_SyncBackup_db_Task_Conf] PRIMARY KEY ([Id])
+                                                , FOREIGN KEY ([TaskId]) REFERENCES [SyncBackup_db_Tasks] ([Id]) ON DELETE CASCADE ON UPDATE NO ACTION
+                                                );
+                                                CREATE UNIQUE INDEX [IX_SyncBackup_db_Task_Conf_TaskId] ON [SyncBackup_db_Task_Conf] ([TaskId] ASC);
+                                            ");
+
+                                            coreDB.Database.ExecuteSqlCommand(@"CREATE TABLE [SyncBackup_db_Task_MySQL] (
+                                                  [Id] INTEGER  NOT NULL
+                                                , [Host] text NULL
+                                                , [Password] text NULL
+                                                , [Port] bigint  NOT NULL
+                                                , [TaskId] bigint  NOT NULL
+                                                , [User] text NULL
+                                                , CONSTRAINT [sqlite_master_PK_SyncBackup_db_Task_MySQL] PRIMARY KEY ([Id])
+                                                , FOREIGN KEY ([TaskId]) REFERENCES [SyncBackup_db_Tasks] ([Id]) ON DELETE CASCADE ON UPDATE NO ACTION
+                                                );
+                                                CREATE UNIQUE INDEX [IX_SyncBackup_db_Task_MySQL_TaskId] ON [SyncBackup_db_Task_MySQL] ([TaskId] ASC);
+                                            ");
+
+                                            coreDB.Database.ExecuteSqlCommand(@"CREATE TABLE [SyncBackup_db_Reports] (
+                                                  [Id] INTEGER  NOT NULL
+                                                , [Category] text NULL
+                                                , [ErrorMsg] text NULL
+                                                , [Msg] text NULL
+                                                , [Status] text NULL
+                                                , [TaskId] bigint  NOT NULL
+                                                , [Time] text NOT NULL
+                                                , CONSTRAINT [sqlite_master_PK_SyncBackup_db_Reports] PRIMARY KEY ([Id])
+                                                );
+                                            ");
+
+                                            goto case 5;
+                                        }
+                                    #endregion
+
+                                    case 5:
+                                        {
+                                            // Миграция на 6
+                                            //goto case 6;
                                             break;
                                         }
                                 }

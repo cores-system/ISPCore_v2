@@ -54,7 +54,7 @@ namespace ISPCore
         public static LatestVersion vSql => new LatestVersion()
         {
             Version = 0.1,
-            Patch = 4
+            Patch = 5
         };
         #endregion
 
