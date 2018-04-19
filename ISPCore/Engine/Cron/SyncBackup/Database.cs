@@ -145,7 +145,7 @@ namespace ISPCore.Engine.Cron.SyncBackup
 
                 // Dump SQL
                 string bashCompression = task.Conf.Compression == CompressionType.GZip ? "| gzip" : "";
-                new Bash().Run($"mysqldump --port={task.MySQL.Port} --host={task.MySQL.Host} --user={task.MySQL.User} --password={task.MySQL.Password} {dbName} 2>>{fileLog} {bashCompression} > {outSQL}");
+                new Bash().Run($"mysqldump --port={task.MySQL.Port} --host={task.MySQL.Host} --user={task.MySQL.User} --password={task.MySQL.Password} --ignore-table=mysql.event {dbName} 2>>{fileLog} {bashCompression} > {outSQL}");
             }
 
             // Ошибки
