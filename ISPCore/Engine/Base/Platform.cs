@@ -43,5 +43,10 @@ namespace ISPCore.Engine.Base
         /// https://195.211.154.91:8793/
         /// </summary>
         public static bool IsDemo => File.Exists($"{Folders.RootPath}/IsDemo");
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static bool IsDebug=> File.Exists($"{Folders.RootPath}/IsDebug");
     }
 }

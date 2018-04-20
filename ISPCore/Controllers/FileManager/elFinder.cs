@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using System;
 using System.IO;
 using ISPCore.Engine.Base;
+using ISPCore.Models.Base;
 
 namespace ISPCore.Controllers
 {
@@ -28,6 +29,16 @@ namespace ISPCore.Controllers
             return connector.GetThumbnail(HttpContext.Request, HttpContext.Response, hash);
         }
 
+        public IActionResult Target(string targetfile)
+        {
+            try
+            {
+                return File(System.IO.File.OpenRead($"{DirectoryRoot}/{targetfile}"), MimeTypeMap.GetMimeType(Path.GetExtension(targetfile)));
+            }
+            catch (Exception ex) { return Content(ex.ToString()); }
+        }
+
+
         private Connector GetConnector()
         {
             var driver = new FileSystemDriver();
@@ -36,7 +47,7 @@ namespace ISPCore.Controllers
             var uri = new Uri(absoluteUrl);
 
             var root = new Root(
-                new DirectoryInfo("C:/Users/htc/Desktop/test"),
+                new DirectoryInfo(DirectoryRoot),
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/target/",
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/thumb/")
             {
@@ -52,13 +63,19 @@ namespace ISPCore.Controllers
         }
 
 
-        public IActionResult Target(string targetfile)
+        private string DirectoryRoot
         {
-            try
+            get
             {
-                return File(System.IO.File.OpenRead($"C:/Users/htc/Desktop/test/{targetfile}"), MimeTypeMap.GetMimeType(Path.GetExtension(targetfile)));
+                if (Platform.IsDebug)
+                    return "C:/Users/htc/Desktop/test";
+
+                if (Platform.IsDemo)
+                    return "/home/demo/elFinder";
+
+                // Linux/Docker
+                return "/";
             }
-            catch (Exception ex) { return Content(ex.ToString()); }
         }
     }
 }
