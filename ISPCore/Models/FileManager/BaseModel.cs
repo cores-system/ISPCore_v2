@@ -60,6 +60,7 @@ namespace ISPCore.Models.FileManager
         [DataMember(Name = "locked")]
         public byte Locked { get; protected set; }
 
+
         public static BaseModel Create(FileInfo info, Root root)
         {
             if (info == null)
@@ -88,5 +89,64 @@ namespace ISPCore.Models.FileManager
             return response;
         }
 
+
+        public static BaseModel Create(DirectoryInfo directory, Root root)
+        {
+            if (directory == null)
+            {
+                throw new ArgumentNullException("directory");
+            }
+
+            if (root == null)
+            {
+                throw new ArgumentNullException("root");
+            }
+
+            if (root.Directory.FullName == directory.FullName)
+            {
+                bool hasSubdirs = false;
+                DirectoryInfo[] subdirs = directory.GetDirectories();
+                foreach (var item in subdirs)
+                {
+                    if ((item.Attributes & FileAttributes.Hidden) != FileAttributes.Hidden)
+                    {
+                        hasSubdirs = true;
+                        break;
+                    }
+                }
+                var response = new RootModel
+                {
+                    Mime = "directory",
+                    Dirs = hasSubdirs ? (byte)1 : (byte)0,
+                    Hash = root.VolumeId + Utils.EncodePath(directory.Name),
+                    Read = 1,
+                    Write = root.IsReadOnly ? (byte)0 : (byte)1,
+                    Locked = root.IsLocked ? (byte)1 : (byte)0,
+                    Name = root.Alias,
+                    Size = 0,
+                    UnixTimeStamp = (long)(directory.LastWriteTimeUtc - _unixOrigin).TotalSeconds,
+                    VolumeId = root.VolumeId
+                };
+                return response;
+            }
+            else
+            {
+                string parentPath = directory.Parent.FullName.Substring(root.Directory.FullName.Length);
+                var response = new DirectoryModel
+                {
+                    Mime = "directory",
+                    ContainsChildDirs = directory.GetDirectories().Length > 0 ? (byte)1 : (byte)0,
+                    Hash = root.VolumeId + Utils.EncodePath(directory.FullName.Substring(root.Directory.FullName.Length)),
+                    Read = 1,
+                    Write = root.IsReadOnly ? (byte)0 : (byte)1,
+                    Locked = ((root.LockedFolders != null && root.LockedFolders.Any(f => f == directory.Name)) || root.IsLocked) ? (byte)1 : (byte)0,
+                    Size = 0,
+                    Name = directory.Name,
+                    UnixTimeStamp = (long)(directory.LastWriteTimeUtc - _unixOrigin).TotalSeconds,
+                    ParentHash = root.VolumeId + Utils.EncodePath(parentPath.Length > 0 ? parentPath : directory.Parent.Name)
+                };
+                return response;
+            }
+        }
     }
 }

@@ -74,6 +74,15 @@ namespace ISPCore.Engine.FileManager
 
                             return driver.PasteAsync(null, dst, targets, parameters.GetValueOrDefault("cut") == "1").Result;
                         }
+
+                    case "duplicate":
+                        {
+                            IEnumerable<string> targets = GetTargetsArray(request);
+                            if (targets == null)
+                                return MissedParameter("targets");
+
+                            return driver.DuplicateAsync(targets);
+                        }
                 }
             }
 
