@@ -1,0 +1,85 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>elFinder - v1.0.1</title>
+
+    <link rel="stylesheet" href="/style/elfinder/bootstrap.min.css" />
+    <link rel="stylesheet" href="/style/elfinder/css/themes/base/all.css" />
+    <link rel="stylesheet" href="/style/elfinder/css/css/elfinder.full.css" />
+    <link rel="stylesheet" href="/style/elfinder/css/css/theme.css" />
+    <link rel="stylesheet" href="/style/elfinder/css/themes/material/css/theme-gray.css" />
+</head>
+<body>
+
+    <div id="elfinder"></div>
+
+
+    <script src="/style/elfinder/jquery-1.12.4.min.js"></script>
+    <script src="/style/elfinder/jquery-ui-1.12.0.min.js"></script>
+    <script src="/style/elfinder/js/elfinder.full.js"></script>
+
+    <script type="text/javascript">
+        $(function ()
+        {
+            var myCommands = elFinder.prototype._options.commands;
+
+            var disabled = ['extract', 'archive', 'resize', 'help', 'select']; // Not yet implemented commands in ElFinder.Net
+
+            $.each(disabled, function (i, cmd)
+            {
+                (idx = $.inArray(cmd, myCommands)) !== -1 && myCommands.splice(idx, 1);
+            });
+            
+
+            var options = {
+                url: '/file-manager/connector',
+                rememberLastDir: true,
+                commands: myCommands,
+                uiOptions: {
+                    toolbar: [
+                        ['back', 'forward'],
+                        ['reload'],
+                        ['home', 'up'],
+                        ['mkdir', 'mkfile', 'upload'],
+                        ['open', 'download'],
+                        ['info'],
+                        ['quicklook'],
+                        ['copy', 'cut', 'paste'],
+                        ['rm'],
+                        ['duplicate', 'rename', 'edit'],
+                        ['view', 'sort']
+                    ]
+                },
+                resizable: false,
+                lang: 'ru',
+                defaultView: 'list',
+            };
+
+            
+            var elf = $('#elfinder').elfinder(options).elfinder('instance');
+
+            var resizeTimer;
+            $(window).resize(function () {
+                resizeTimer && clearTimeout(resizeTimer);
+                if (!$('#elfinder').hasClass('elfinder-fullscreen')) {
+                    resizeTimer = setTimeout(function () {
+                        var h = parseInt($(window).height());
+                        if (h != parseInt($('#elfinder').height())) {
+                            elf.resize('100%', h);
+                        }
+                    }, 200);
+                }
+            });
+
+            $(window).trigger('resize')
+        });
+    </script>
+
+</body>
+</html>

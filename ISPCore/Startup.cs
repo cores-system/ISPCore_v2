@@ -48,7 +48,7 @@ namespace ISPCore
         public static LatestVersion version => new LatestVersion()
         {
             Version = 2.1,
-            Patch = 8
+            Patch = 9
         };
 
         public static LatestVersion vSql => new LatestVersion()
@@ -599,6 +599,16 @@ namespace ISPCore
                 routes.MapRoute(null, "backup/db/task", new { controller = "SyncBackupDatabaseToTask", action = "Index" });
                 routes.MapRoute(null, "backup/db/task/remove", new { controller = "SyncBackupDatabaseToTask", action = "Remove" });
                 routes.MapRoute(null, "backup/db/task/save", new { controller = "SyncBackupDatabaseToTask", action = "Save" });
+            });
+            #endregion
+
+            #region Файловый менеджер
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(null, "file-manager", new { controller = "FileManager", action = "Index" });
+                routes.MapRoute(null, "file-manager/target/{targetfile}", new { controller = "FileManager", action = "Target" });
+                routes.MapRoute(null, "file-manager/connector", new { controller = "FileManager", action = "Сonnector" });
+                routes.MapRoute(null, "file-manager/thumb/{hash}", new { controller = "FileManager", action = "Thumbs" });
             });
             #endregion
 
