@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ISPCore.Engine.Base
+namespace ISPCore.Engine.FileManager
 {
     public static class MimeTypeMap
     {

@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using elFinder.NetCore;
 using Microsoft.AspNetCore.Http.Extensions;
 using System;
 using System.IO;
 using ISPCore.Engine.Base;
-using ISPCore.Models.Base;
+using ISPCore.Engine.FileManager;
 
 namespace ISPCore.Controllers
 {
@@ -17,10 +16,10 @@ namespace ISPCore.Controllers
             return View("/Views/FileManager/Base.cshtml");
         }
 
-        public virtual async Task<IActionResult> Сonnector()
+        public virtual IActionResult Сonnector()
         {
             var connector = GetConnector();
-            return await connector.Process(HttpContext.Request);
+            return connector.Process(HttpContext.Request);
         }
         
         public IActionResult Thumbs(string hash)
@@ -46,7 +45,7 @@ namespace ISPCore.Controllers
             string absoluteUrl = UriHelper.BuildAbsolute(Request.Scheme, Request.Host);
             var uri = new Uri(absoluteUrl);
 
-            var root = new Root(
+            var root = new elFinder.NetCore.Root(
                 new DirectoryInfo(DirectoryRoot),
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/target/",
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/thumb/")
