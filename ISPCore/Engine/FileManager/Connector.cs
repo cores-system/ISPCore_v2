@@ -7,6 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ISPCore.Engine.FileManager
 {
+    #warning: Ждем Pull request + nuget > v1.0.1
+    /// <summary>
+    /// elFinder.NetCore.Root
+    /// elFinder.NetCore.FileSystemDriver - DuplicateAsync
+    /// "\\" на "/"
+    /// </summary>
     public class Connector : elFinder.NetCore.Connector
     {
         private FileSystemDriver driver;

@@ -38,6 +38,7 @@ ISPCore/core/Databases/ISPCore.db
 ISPCore/core/Databases/ISPCore.json
 ISPCore/cert.pfx
 ISPCore/RunBash.sh
+ISPCore/IsDebug
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
