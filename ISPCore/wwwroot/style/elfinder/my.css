@@ -1,0 +1,12 @@
+﻿.elfinder-quicklook-titlebar-icon.elfinder-platformWin{
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+    top: 19px;
+}
+
+.elfinder-upload-dialog-wrapper .ui-button{
+	margin-left: 0;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}

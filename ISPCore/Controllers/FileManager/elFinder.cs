@@ -36,7 +36,7 @@ namespace ISPCore.Controllers
             var uri = new Uri(absoluteUrl);
 
             var root = new Root(
-                new DirectoryInfo("/"),
+                new DirectoryInfo("C:/Users/htc/Desktop/test"),
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/target/",
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/thumb/")
             {
@@ -56,7 +56,7 @@ namespace ISPCore.Controllers
         {
             try
             {
-                return File(System.IO.File.OpenRead($"/{targetfile}"), MimeTypeMap.GetMimeType(Path.GetExtension(targetfile)));
+                return File(System.IO.File.OpenRead($"C:/Users/htc/Desktop/test/{targetfile}"), MimeTypeMap.GetMimeType(Path.GetExtension(targetfile)));
             }
             catch (Exception ex) { return Content(ex.ToString()); }
         }
