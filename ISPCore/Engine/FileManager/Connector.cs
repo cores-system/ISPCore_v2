@@ -15,7 +15,7 @@ namespace ISPCore.Engine.FileManager
             this.driver = driver;
         }
 
-
+        #region Process
         public new IActionResult Process(HttpRequest request)
         {
             IDictionary<string, string> parameters = request.Query.Count > 0
@@ -27,40 +27,97 @@ namespace ISPCore.Engine.FileManager
             if (!string.IsNullOrWhiteSpace(cmd))
             {
                 string target = parameters.GetValueOrDefault("target");
-                if (!string.IsNullOrWhiteSpace(target) && target.ToLower() != "null")
+                if (string.IsNullOrWhiteSpace(target) || target.ToLower() != "null")
+                    target = null;
+
+                switch (cmd)
                 {
-                    switch (cmd)
-                    {
-                        case "get":
-                            {
-                                // Content Encoding
-                                if (parameters.TryGetValue("conv", out string conv) && conv != "0")
-                                    return driver.GetAsync(target, conv);
+                    case "get":
+                        {
+                            if (target == null)
+                                return MissedParameter(cmd);
 
-                                // Оригинал файла
-                                return driver.GetAsync(target).Result;
-                            }
+                            // Content Encoding
+                            if (parameters.TryGetValue("conv", out string conv) && conv != "0")
+                                return driver.GetAsync(target, conv);
 
-                        case "put":
-                            {
-                                string content = parameters.GetValueOrDefault("content");
-                                if (!string.IsNullOrWhiteSpace(target))
-                                {
-                                    // Content Encoding
-                                    if (parameters.TryGetValue("encoding", out string conv))
-                                        return driver.PutAsync(target, content, conv);
+                            // Оригинал файла
+                            return driver.GetAsync(target).Result;
+                        }
 
-                                    // Оригинал
-                                    return driver.PutAsync(target, content).Result;
-                                }
-                                break;
-                            }
-                    }
+                    case "put":
+                        {
+                            if (target == null)
+                                return MissedParameter(cmd);
+
+                            string content = parameters.GetValueOrDefault("content");
+                            if (string.IsNullOrWhiteSpace(target))
+                                return MissedParameter("content");
+
+                            // Content Encoding
+                            if (parameters.TryGetValue("encoding", out string conv))
+                                return driver.PutAsync(target, content, conv);
+
+                            // Оригинал
+                            return driver.PutAsync(target, content).Result;
+                        }
+
+                    case "paste":
+                        {
+                            IEnumerable<string> targets = GetTargetsArray(request);
+                            if (targets == null)
+                                return MissedParameter("targets");
+
+                            string dst = parameters.GetValueOrDefault("dst");
+                            if (string.IsNullOrEmpty(dst))
+                                return MissedParameter("dst");
+
+                            return driver.PasteAsync(null, dst, targets, parameters.GetValueOrDefault("cut") == "1").Result;
+                        }
                 }
             }
 
             // Базовая логика
             return base.Process(request).Result;
         }
+        #endregion
+
+        #region GetTargetsArray
+        private IEnumerable<string> GetTargetsArray(HttpRequest request)
+        {
+            IEnumerable<string> targets = null;
+            // At the moment, request.Form is throwing an InvalidOperationException...
+            //if (request.Form.ContainsKey("targets"))
+            //{
+            //    targets = request.Form["targets"];
+            //}
+
+            IDictionary<string, string> parameters = request.Query.Count > 0
+                ? request.Query.ToDictionary(k => k.Key, v => string.Join(";", v.Value))
+                : request.Form.ToDictionary(k => k.Key, v => string.Join(";", v.Value));
+
+            if (targets == null)
+            {
+                string t = parameters.GetValueOrDefault("targets[]");
+                if (string.IsNullOrEmpty(t))
+                {
+                    t = parameters.GetValueOrDefault("targets");
+                }
+                if (string.IsNullOrEmpty(t))
+                {
+                    return null;
+                }
+                targets = t.Split(';'); // 2018.02.23: Bug Fix Issue #3
+            }
+            return targets;
+        }
+        #endregion
+
+        #region MissedParameter
+        private JsonResult MissedParameter(string command)
+        {
+            return new JsonResult(new { error = new string[] { "errCmdParams", command } });
+        }
+        #endregion
     }
 }

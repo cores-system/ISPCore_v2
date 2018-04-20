@@ -8,6 +8,7 @@ namespace ISPCore.Engine.FileManager
 {
     public class FileSystemDriver : elFinder.NetCore.FileSystemDriver
     {
+        #region private
         /// <summary>
         /// 
         /// </summary>
@@ -27,6 +28,7 @@ namespace ISPCore.Engine.FileManager
 
             return CodePagesEncodingProvider.Instance.GetEncoding(conv);
         }
+        #endregion
 
         #region GetAsync
         public JsonResult GetAsync(string target, string conv)
