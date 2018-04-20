@@ -27,7 +27,7 @@ namespace ISPCore.Engine.FileManager
             if (!string.IsNullOrWhiteSpace(cmd))
             {
                 string target = parameters.GetValueOrDefault("target");
-                if (string.IsNullOrWhiteSpace(target) || target.ToLower() != "null")
+                if (string.IsNullOrWhiteSpace(target) || target.ToLower() == "null")
                     target = null;
 
                 switch (cmd)
