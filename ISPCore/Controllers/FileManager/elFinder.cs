@@ -13,7 +13,7 @@ namespace ISPCore.Controllers
         public IActionResult Index(bool ajax)
         {
             ViewData["ajax"] = ajax;
-            return View("/Views/FileManager/Base.cshtml");
+            return View("/Views/FileManager/elFinder.cshtml");
         }
 
         public virtual IActionResult Сonnector()
@@ -41,9 +41,6 @@ namespace ISPCore.Controllers
         private Connector GetConnector()
         {
             var driver = new FileSystemDriver();
-
-            string absoluteUrl = UriHelper.BuildAbsolute(Request.Scheme, Request.Host);
-            var uri = new Uri(absoluteUrl);
 
             var root = new elFinder.NetCore.Root(
                 new DirectoryInfo(DirectoryRoot),

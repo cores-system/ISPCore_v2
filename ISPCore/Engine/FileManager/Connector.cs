@@ -12,6 +12,8 @@ namespace ISPCore.Engine.FileManager
     /// elFinder.NetCore.Root
     /// elFinder.NetCore.FileSystemDriver - DuplicateAsync
     /// "\\" на "/"
+    /// 
+    /// #fix: paste
     /// </summary>
     public class Connector : elFinder.NetCore.Connector
     {
