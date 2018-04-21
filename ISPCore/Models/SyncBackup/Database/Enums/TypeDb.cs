@@ -3,5 +3,6 @@
     public enum TypeDb
     {
         MySQL = 0,
+        PostgreSQL = 1
     }
 }

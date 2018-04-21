@@ -370,8 +370,15 @@ namespace ISPCore.Engine.Databases
 
                                     case 5:
                                         {
-                                            // Миграция на 6
-                                            //goto case 6;
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE SyncBackup_db_Task_MySQL RENAME TO SyncBackup_db_Task_ConnectionConf;");
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE SyncBackup_db_Task_Conf RENAME TO SyncBackup_db_Task_DumpConf;");
+                                            goto case 6;
+                                        }
+
+                                    case 6:
+                                        {
+                                            // Миграция на 7
+                                            //goto case 7;
                                             break;
                                         }
                                 }

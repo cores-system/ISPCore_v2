@@ -85,19 +85,19 @@
             </tr>
             <tr>
                 <td><strong>Параметры Bool:</strong></td>
-                <td>conf.AddBackupTime</td>
+                <td>dumpConf.AddBackupTime</td>
             </tr>
             <tr>
                 <td><strong>Параметры Int:</strong></td>
-                <td>tk.SuncTime, mysql.Port</td>
+                <td>tk.SuncTime, connectionConf.Port</td>
             </tr>
             <tr>
                 <td><strong>Параметры String:</strong></td>
-                <td>tk.Description, conf.IgnoreDatabases, conf.DumpDatabases, conf.Whence, mysql.Host, mysql.User, mysql.Password</td>
+                <td>tk.Description, dumpConf.IgnoreDatabases, dumpConf.DumpDatabases, dumpConf.Whence, connectionConf.Host, connectionConf.User, connectionConf.Password</td>
             </tr>
             <tr>
                 <td><strong>Параметры Enum:</strong></td>
-                <td>tk.JobStatus=(on|off), tk.TypeDb=MySQL, conf.Compression=(GZip|None)</td>
+                <td>tk.JobStatus=(on|off), tk.TypeDb=(MySQL|PostgreSQL), dumpConf.Compression=(GZip|None)</td>
             </tr>
             <tr>
                 <td><strong>Ответы:</strong></td>
@@ -151,7 +151,7 @@
             </tr>
             <tr>
                 <td><strong>Параметры Enum:</strong></td>
-                <td>JobStatus=(on|off), TypeDb=MySQL</td>
+                <td>JobStatus=(on|off), TypeDb=(MySQL|PostgreSQL)</td>
             </tr>
             <tr>
                 <td><strong>Ответы:</strong></td>
@@ -198,14 +198,14 @@
 
 
 <div class="faq-item">
-    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / MySQL</div>
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Настройки / ConnectionConf</div>
     <div class="faq-text">
         <table class="table margin-bottom-0 table-bordered text-left">
             <tr>
                 <td style="width: 150px;">
                     <strong>url:</strong>
                 </td>
-                <td>/api/edit/backup/db/mysql</td>
+                <td>/api/edit/backup/db/connectionconf</td>
             </tr>
             <tr>
                 <td><strong>Параметры Int:</strong></td>

@@ -90,8 +90,8 @@ namespace ISPCore.Models.Databases
 
         #region SyncBackup - Database
         public DbSet<SyncBackup.Database.Task> SyncBackup_db_Tasks { get; set; }
-        public DbSet<SyncBackup.Database.DumpConf> SyncBackup_db_Task_Conf { get; set; }
-        public DbSet<SyncBackup.Database.MySQL> SyncBackup_db_Task_MySQL { get; set; }
+        public DbSet<SyncBackup.Database.DumpConf> SyncBackup_db_Task_DumpConf { get; set; }
+        public DbSet<SyncBackup.Database.ConnectionConf> SyncBackup_db_Task_ConnectionConf { get; set; }
         public DbSet<SyncBackup.Database.Report> SyncBackup_db_Reports { get; set; }
         #endregion
 

@@ -54,7 +54,7 @@ namespace ISPCore
         public static LatestVersion vSql => new LatestVersion()
         {
             Version = 0.1,
-            Patch = 5
+            Patch = 6
         };
         #endregion
 
@@ -386,7 +386,7 @@ namespace ISPCore
 
                     routes.MapRoute(null, "api/edit/backup/db/task", new { controller = "ApiEditBackupDatabase", action = "Task" });
                     routes.MapRoute(null, "api/edit/backup/db/task/dumpconf", new { controller = "ApiEditBackupDatabase", action = "DumpConf" });
-                    routes.MapRoute(null, "api/edit/backup/db/mysql", new { controller = "ApiEditBackupDatabase", action = "MySQL" });
+                    routes.MapRoute(null, "api/edit/backup/db/connectionconf", new { controller = "ApiEditBackupDatabase", action = "ConnectionConf" });
                 });
                 #endregion
             }

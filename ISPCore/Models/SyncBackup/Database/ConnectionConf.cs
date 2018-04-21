@@ -3,22 +3,17 @@ using ISPCore.Models.Databases.Interface;
 
 namespace ISPCore.Models.SyncBackup.Database
 {
-    public class MySQL : IUpdate
-    {
+    public class ConnectionConf : IUpdate
+    { 
         public int Id { get; set; }
         public int TaskId { get; set; }
-
-        private int _port;
+        
         private string _host;
 
         /// <summary>
         /// Порт
         /// </summary>
-        public int Port
-        {
-            get { return 0 >= _port ? 3306 : _port; }
-            set { _port = value; }
-        }
+        public int Port { get; set; }
 
         /// <summary>
         /// Хост

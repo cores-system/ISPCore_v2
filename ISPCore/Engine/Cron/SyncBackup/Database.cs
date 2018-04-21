@@ -64,7 +64,7 @@ namespace ISPCore.Engine.Cron.SyncBackup
             SqlToMode.SetMode(SqlMode.Read);
 
             // Получаем весь список заданий
-            var Alltasks = coreDB.SyncBackup_db_Tasks.Include(i => i.Conf).Include(i => i.MySQL).ToList();
+            var Alltasks = coreDB.SyncBackup_db_Tasks.Include(i => i.DumpConf).Include(i => i.ConnectionConf).ToList();
 
             // Меняем режим доступа к SQL
             SqlToMode.SetMode(SqlMode.ReadOrWrite);
@@ -86,7 +86,7 @@ namespace ISPCore.Engine.Cron.SyncBackup
                 coreDB.SyncBackup_db_Reports.Add(new Report()
                 {
                     TaskId = task.Id,
-                    Category = $"{task.TypeDb.ToString()} Dump",
+                    Category = $"{task.TypeDb.ToString()}",
                     Msg = $"Задание: {task.Description}",
                     Time = DateTime.Now,
                     Status = IsOk ? "Задание выполнено без ошибок" : "Задание выполнено с ошибками",
@@ -118,10 +118,20 @@ namespace ISPCore.Engine.Cron.SyncBackup
             ErrorMsg = null;
 
             // Файл логов
-            string fileLog = $"{Folders.Temp.SyncBackup}/MysqlDump-{DateTime.Now.ToBinary()}.log";
+            string fileLog = $"{Folders.Temp.SyncBackup}/{task.TypeDb.ToString()}.dump-{DateTime.Now.ToBinary()}.log";
 
-            // Список баз
-            string dbs = new Bash().Run($"mysql -P{task.MySQL.Port} -h{task.MySQL.Host} -u{task.MySQL.User} -p{task.MySQL.Password} -N -e 'show databases' 2>{fileLog}" + " | awk '{print $1}'");
+            #region Список баз
+            string dbs = string.Empty;
+            switch (task.TypeDb)
+            {
+                case TypeDb.MySQL:
+                    dbs = new Bash().Run($"mysql -P{task.ConnectionConf.Port} -h{task.ConnectionConf.Host} -u{task.ConnectionConf.User} -p{task.ConnectionConf.Password} -N -e 'show databases' 2>{fileLog}" + " | awk '{print $1}'");
+                    break;
+                case TypeDb.PostgreSQL:
+                    dbs = new Bash().Run($@"PGPASSWORD={task.ConnectionConf.Password} psql -p {task.ConnectionConf.Port} -h {task.ConnectionConf.Host} -U {task.ConnectionConf.User} -qAntc '\l' | cut -d\| -f1 " + " | grep -v \"=\"");
+                    break;
+            }
+            #endregion
 
             // Проходим каждую базу отдельно
             foreach (string dbName in dbs.Split('\n'))
@@ -131,21 +141,30 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     continue;
 
                 // Список игнорируемых баз 
-                if (task.Conf.IgnoreDatabases != null && task.Conf.IgnoreDatabases.Contains(dbName))
+                if (task.DumpConf.IgnoreDatabases != null && task.DumpConf.IgnoreDatabases.Contains(dbName))
                     continue;
 
                 // Список экспортируемых баз 
-                if (!string.IsNullOrWhiteSpace(task.Conf.DumpDatabases) && !task.Conf.DumpDatabases.Contains(dbName))
+                if (!string.IsNullOrWhiteSpace(task.DumpConf.DumpDatabases) && !task.DumpConf.DumpDatabases.Contains(dbName))
                     continue;
 
                 // Файл SQL
-                string dumpTime = task.Conf.AddBackupTime ? $"_{DateTime.Now.ToString("dd.MM.yyy_HH-mm")}" : "";
-                string dumpCompression = task.Conf.Compression == CompressionType.GZip ? ".gz" : "";
-                string outSQL = $"{Regex.Replace(task.Conf.Whence, "/$", "")}/{dbName}{dumpTime}.sql{dumpCompression}";
+                string dumpTime = task.DumpConf.AddBackupTime ? $"_{DateTime.Now.ToString("dd.MM.yyy_HH-mm")}" : "";
+                string dumpCompression = task.DumpConf.Compression == CompressionType.GZip ? ".gz" : "";
+                string outSQL = $"{Regex.Replace(task.DumpConf.Whence, "/$", "")}/{dbName}{dumpTime}.sql{dumpCompression}";
 
-                // Dump SQL
-                string bashCompression = task.Conf.Compression == CompressionType.GZip ? "| gzip" : "";
-                new Bash().Run($"mysqldump --port={task.MySQL.Port} --host={task.MySQL.Host} --user={task.MySQL.User} --password={task.MySQL.Password} --ignore-table=mysql.event {dbName} 2>>{fileLog} {bashCompression} > {outSQL}");
+                #region Dump SQL
+                string bashCompression = task.DumpConf.Compression == CompressionType.GZip ? "| gzip" : "";
+                switch (task.TypeDb)
+                {
+                    case TypeDb.MySQL:
+                        new Bash().Run($"mysqldump --port={task.ConnectionConf.Port} --host={task.ConnectionConf.Host} --user={task.ConnectionConf.User} --password={task.ConnectionConf.Password} --ignore-table=mysql.event {dbName} 2>>{fileLog} {bashCompression} > {outSQL}");
+                        break;
+                    case TypeDb.PostgreSQL:
+                        new Bash().Run($"PGPASSWORD={task.ConnectionConf.Password} pg_dump {dbName} -p {task.ConnectionConf.Port} -h {task.ConnectionConf.Host} -U {task.ConnectionConf.User} 2>>{fileLog} {bashCompression} > {outSQL}");
+                        break;
+                }
+                #endregion
             }
 
             // Ошибки

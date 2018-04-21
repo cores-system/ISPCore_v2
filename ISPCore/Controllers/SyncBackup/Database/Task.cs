@@ -21,7 +21,7 @@ namespace ISPCore.Controllers
 
         #region Save
         [HttpPost]
-        public JsonResult Save(Task task, DumpConf conf, MySQL mysql)
+        public JsonResult Save(Task task, DumpConf dumpConf, ConnectionConf connectionConf)
         {
             #region Демо режим
             if (Platform.IsDemo)
@@ -32,23 +32,24 @@ namespace ISPCore.Controllers
             if (string.IsNullOrWhiteSpace(task.Description))
                 return Json(new Text("Имя задания не может быть пустым"));
 
-            if (string.IsNullOrWhiteSpace(conf.Whence))
+            if (string.IsNullOrWhiteSpace(dumpConf.Whence))
                 return Json(new Text("Локальный каталог не может быть пустым"));
 
             switch (task.TypeDb)
             {
                 case TypeDb.MySQL:
+                case TypeDb.PostgreSQL:
                     {
-                        if (string.IsNullOrWhiteSpace(mysql.Host) || string.IsNullOrWhiteSpace(mysql.User) || (task.Id == 0 && string.IsNullOrWhiteSpace(mysql.Password)))
-                            return Json(new Text("Настройки 'MySQL' имеют недопустимое значение"));
+                        if (string.IsNullOrWhiteSpace(connectionConf.Host) || string.IsNullOrWhiteSpace(connectionConf.User) || (task.Id == 0 && string.IsNullOrWhiteSpace(connectionConf.Password)))
+                            return Json(new Text($"Настройки '{task.TypeDb.ToString()}' имеют недопустимое значение"));
                         break;
                     }
             }
             #endregion
 
             // Настройки
-            task.Conf = conf;
-            task.MySQL = mysql;
+            task.DumpConf = dumpConf;
+            task.ConnectionConf = connectionConf;
 
             // Новое задание 
             if (task.Id == 0)
@@ -70,16 +71,17 @@ namespace ISPCore.Controllers
                 if (coreDB.SyncBackup_db_Tasks.FindAndInclude(task.Id) is var FindTask && FindTask == null)
                     return Json(new Text("Задание не найдено"));
 
-                #region Используем старый пароль для 'MySQL'
+                #region Используем старый пароль для 'MySQL/PostgreSQL'
                 switch (task.TypeDb)
                 {
                     case TypeDb.MySQL:
+                    case TypeDb.PostgreSQL:
                         {
-                            if (string.IsNullOrWhiteSpace(task.MySQL.Password))
+                            if (string.IsNullOrWhiteSpace(task.ConnectionConf.Password))
                             {
-                                if (!string.IsNullOrWhiteSpace(FindTask.MySQL.Password))
+                                if (!string.IsNullOrWhiteSpace(FindTask.ConnectionConf.Password))
                                 {
-                                    task.MySQL.Password = FindTask.MySQL.Password;
+                                    task.ConnectionConf.Password = FindTask.ConnectionConf.Password;
                                 }
                                 else
                                 {

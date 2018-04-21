@@ -40,13 +40,13 @@ namespace ISPCore.Models.SyncBackup.Database
         }
 
         /// <summary>
-        /// Настройки
+        /// Настройки экспорта
         /// </summary>
-        public DumpConf Conf { get; set; } = new DumpConf();
+        public DumpConf DumpConf { get; set; } = new DumpConf();
 
         /// <summary>
-        /// Настройки для подключения к MySQL
+        /// Настройки для подключения к MySQL/PostgreSQL
         /// </summary>
-        public MySQL MySQL { get; set; } = new MySQL();
+        public ConnectionConf ConnectionConf { get; set; } = new ConnectionConf();
     }
 }

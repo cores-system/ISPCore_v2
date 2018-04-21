@@ -57,13 +57,13 @@
 
                                     <div class="form-group">
                                         <label>Локальный<span>каталог</span></label>
-                                        <input type="text" name="conf.Whence" value="@Model?.Conf.Whence" class="form-control" />
+                                        <input type="text" name="dumpConf.Whence" value="@Model?.DumpConf.Whence" class="form-control" />
                                     </div>
 
                                     <div class="form-group">
                                         <label>Использовать<span>сжатие данных</span></label>
-                                        <select class="form-control selectpicker" name="conf.Compression">
-                                            @Html.Raw(SelectPickerTo.Enum(Model == null ? CompressionType.None : Model.Conf.Compression,
+                                        <select class="form-control selectpicker" name="dumpConf.Compression">
+                                            @Html.Raw(SelectPickerTo.Enum(Model == null ? CompressionType.None : Model.DumpConf.Compression,
                                                   (CompressionType.None, "Нет"),
                                                   (CompressionType.GZip, "GZip")
                                             ))
@@ -72,35 +72,42 @@
 
                                     <div class="form-group">
                                         <label>Дописывать<span>время к бекапу</span></label>
-                                        <select class="form-control selectpicker" name="conf.AddBackupTime">
-                                            @Html.Raw(SelectPickerTo.Bool(Model != null && Model.Conf.AddBackupTime, "Да", "Нет"))
+                                        <select class="form-control selectpicker" name="dumpConf.AddBackupTime">
+                                            @Html.Raw(SelectPickerTo.Bool(Model != null && Model.DumpConf.AddBackupTime, "Да", "Нет"))
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6 col-lg-offset-1">
-                                    <div class="form-group typeDav">
+                                    <div class="form-group">
+                                        <label>База<span>данных</span></label>
+                                        <select class="form-control selectpicker" name="task.TypeDb">
+                                            @Html.Raw(SelectPickerTo.Enum(Model == null ? TypeDb.MySQL : Model.TypeDb,
+                                                  (TypeDb.MySQL, "MySQL / MariaDB"),
+                                                  (TypeDb.PostgreSQL, "PostgreSQL")
+                                            ))
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label>Сервер<span>базы данных</span></label>
-                                        <input type="text" name="mysql.Host"
-                                               value="@(Model == null || Model.MySQL.Host == "localhost" ? "" : Model.MySQL.Host)"
+                                        <input type="text" name="connectionConf.Host"
+                                               value="@(Model == null || Model.ConnectionConf.Host == "localhost" ? "" : Model.ConnectionConf.Host)"
                                                class="form-control" placeholder="По умолчанию: localhost" />
                                     </div>
 
                                     <div class="form-group">
                                         <label>Порт<span>для подключения</span></label>
-                                        <input type="number" pattern="^[0-9]+$" name="mysql.Port"
-                                               value="@(Model != null && Model.MySQL.Port != 3306 ? Model.MySQL.Port.ToString() : "")"
-                                               class="form-control" placeholder="По умолчанию: 3306" />
+                                        <input type="number" pattern="^[0-9]+$" name="connectionConf.Port" value="@Model?.ConnectionConf.Port" class="form-control" placeholder="Укажите порт для подключения" />
                                     </div>
 
-                                    <div class="form-group typeDav">
+                                    <div class="form-group">
                                         <label>Имя<span>пользователя</span></label>
-                                        <input type="text" name="mysql.User" value="@Model?.MySQL.User" class="form-control" placeholder="root" />
+                                        <input type="text" name="connectionConf.User" value="@Model?.ConnectionConf.User" class="form-control" placeholder="root" />
                                     </div>
 
-                                    <div class="form-group typeDav">
+                                    <div class="form-group">
                                         <label>Пароль<span>от базы</span></label>
-                                        <input type="text" name="mysql.Password" class="form-control" placeholder="Укажите пароль" />
+                                        <input type="text" name="connectionConf.Password" class="form-control" placeholder="Укажите пароль" />
                                     </div>
                                 </div>
 
@@ -110,14 +117,14 @@
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label>Список<span>игнорируемых баз (по одной в строке)</span></label>
-                                        <textarea class="form-control" placeholder="performance_schema" style="height: 220px" name="conf.IgnoreDatabases">@Model?.Conf.IgnoreDatabases</textarea>
+                                        <textarea class="form-control" placeholder="performance_schema" style="height: 220px" name="dumpConf.IgnoreDatabases">@Model?.DumpConf.IgnoreDatabases</textarea>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6 col-md-offset-1">
                                     <div class="form-group">
                                         <label>Список<span>экспортируемых баз (по одной в строке)</span></label>
-                                        <textarea class="form-control" placeholder="По умолчанию сохраняются все базы" style="height: 220px" name="conf.DumpDatabases">@Model?.Conf.DumpDatabases</textarea>
+                                        <textarea class="form-control" placeholder="По умолчанию сохраняются все базы" style="height: 220px" name="dumpConf.DumpDatabases">@Model?.DumpConf.DumpDatabases</textarea>
                                     </div>
                                 </div>
                             </div>

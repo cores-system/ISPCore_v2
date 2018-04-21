@@ -33,7 +33,7 @@ namespace ISPCore.Controllers
         public JsonResult Task(Task task)
         {
             // Поиск задания
-            if (coreDB.SyncBackup_db_Tasks.Where(i => i.Id == task.Id).Include(i => i.Conf).Include(i => i.MySQL).FirstOrDefault() is Task item)
+            if (coreDB.SyncBackup_db_Tasks.Where(i => i.Id == task.Id).Include(i => i.DumpConf).Include(i => i.ConnectionConf).FirstOrDefault() is Task item)
             {
                 #region Проверка данных
                 if (string.IsNullOrWhiteSpace(task.Description))
@@ -43,8 +43,8 @@ namespace ISPCore.Controllers
                 {
                     case TypeDb.MySQL:
                         {
-                            if (string.IsNullOrWhiteSpace(item.MySQL.Host) || string.IsNullOrWhiteSpace(item.MySQL.User) || string.IsNullOrWhiteSpace(item.MySQL.Password))
-                                return Json(new Text("Настройки 'MySQL' имеют недопустимое значение"));
+                            if (string.IsNullOrWhiteSpace(item.ConnectionConf.Host) || string.IsNullOrWhiteSpace(item.ConnectionConf.User) || string.IsNullOrWhiteSpace(item.ConnectionConf.Password))
+                                return Json(new Text($"Настройки '{task.TypeDb}' имеют недопустимое значение"));
                             break;
                         }
                 }
@@ -61,30 +61,30 @@ namespace ISPCore.Controllers
         public JsonResult DumpConf(int Id, DumpConf conf)
         {
             // Поиск задания
-            if (coreDB.SyncBackup_db_Tasks.Where(i => i.Id == Id).Include(i => i.Conf).FirstOrDefault() is Task item)
+            if (coreDB.SyncBackup_db_Tasks.Where(i => i.Id == Id).Include(i => i.DumpConf).FirstOrDefault() is Task item)
             {
                 // Проверка данных
                 if (string.IsNullOrWhiteSpace(conf.Whence))
                     return Json(new Text("Локальный каталог не может быть пустым"));
 
-                return Edit(item.Conf, conf);
+                return Edit(item.DumpConf, conf);
             }
 
             return Json(new Text("Задание не найдено"));
         }
         #endregion
 
-        #region MySQL
-        public JsonResult MySQL(int Id, MySQL mysql)
+        #region ConnectionConf
+        public JsonResult ConnectionConf(int Id, ConnectionConf conf)
         {
             // Поиск задания
-            if (coreDB.SyncBackup_db_Tasks.Where(i => i.Id == Id).Include(i => i.MySQL).FirstOrDefault() is Task item)
+            if (coreDB.SyncBackup_db_Tasks.Where(i => i.Id == Id).Include(i => i.ConnectionConf).FirstOrDefault() is Task item)
             {
                 // Проверка данных
-                if (string.IsNullOrWhiteSpace(mysql.Host) || string.IsNullOrWhiteSpace(mysql.User) || string.IsNullOrWhiteSpace(mysql.Password))
-                    return Json(new Text("Настройки 'MySQL' имеют недопустимое значение"));
+                if (string.IsNullOrWhiteSpace(conf.Host) || string.IsNullOrWhiteSpace(conf.User) || string.IsNullOrWhiteSpace(conf.Password))
+                    return Json(new Text($"Настройки '{item.TypeDb.ToString()}' имеют недопустимое значение"));
 
-                return Edit(item.MySQL, mysql);
+                return Edit(item.ConnectionConf, conf);
             }
 
             return Json(new Text("Задание не найдено"));

@@ -7,9 +7,9 @@ namespace ISPCore.Controllers
 {
     public class ApiAddBackupDatabase : ControllerToDB
     {
-        public JsonResult Task(Task tk, DumpConf conf, MySQL mysql)
+        public JsonResult Task(Task tk, DumpConf dumpConf, ConnectionConf connectionConf)
         {
-            return new SyncBackupDatabaseToTask().Save(tk, conf, mysql);
+            return new SyncBackupDatabaseToTask().Save(tk, dumpConf, connectionConf);
         }
     }
 }
