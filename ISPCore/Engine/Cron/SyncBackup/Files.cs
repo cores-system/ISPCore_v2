@@ -15,6 +15,7 @@ using ISPCore.Models.SyncBackup.Tasks;
 using ISPCore.Models.Databases;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
+using System.Text;
 
 namespace ISPCore.Engine.Cron.SyncBackup
 {
@@ -55,7 +56,7 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     SqlToMode.SetMode(SqlMode.ReadOrWrite);
 
                     // Удаляем старые файлы
-                    foreach (var intFile in Directory.GetFiles(Folders.ReportSync, "*.json"))
+                    foreach (var intFile in Directory.GetFiles(Folders.ReportSync, "*.*"))
                     {
                         try
                         {
@@ -215,6 +216,10 @@ namespace ISPCore.Engine.Cron.SyncBackup
 
                 // Общий размер переданых файлов в byte
                 long CountUploadToBytes = 0;
+
+                // Отчет загруженных файлов
+                string FileNameToUploadFiles = $"tk-{task.Id}_{DateTime.Now.ToString("dd-MM-yyy_HH-mm")}-{Generate.Passwd(6)}.files.txt";
+                StreamWriter ReportToUploadFiles = new StreamWriter($"{Folders.ReportSync}/{FileNameToUploadFiles}", false, Encoding.UTF8);
                 #endregion
 
                 // Получаем список всех папок
@@ -301,8 +306,12 @@ namespace ISPCore.Engine.Cron.SyncBackup
                         Tools.DeleteFilesToErrorUpload(md, ref ListRemoteServer.Files, SyncRemoveFileAddExtension);
 
                         // Загружаем файлы на удаленный сервер - (если файла нету на сервере)
-                        Tools.UploadToFiles(md, ListRemoteServer.Files, ListLocalFilesToName, task.EncryptionAES, task.PasswdAES, ref CountUploadToFilesOK, ref CountUploadToFilesAll, ref CountUploadToBytes);
-                        
+                        foreach (string uploadFile in Tools.UploadToFiles(md, ListRemoteServer.Files, ListLocalFilesToName, task.EncryptionAES, task.PasswdAES, ref CountUploadToFilesOK, ref CountUploadToFilesAll, ref CountUploadToBytes))
+                        {
+                            // Сохраняем список загруженных файлов
+                            ReportToUploadFiles.WriteLine(uploadFile);
+                        }
+
                         #region Очистка старых бекапов
                         if (task.CountActiveBackup >= 1)
                         {
@@ -339,6 +348,9 @@ namespace ISPCore.Engine.Cron.SyncBackup
                         #endregion
                     }
                 }
+
+                // Закрываем поток
+                ReportToUploadFiles.Dispose();
 
                 // Сохраняем новый список папок с ошибками, вместо старого
                 File.WriteAllText(PathSyncToErrorLocalFolder, JsonConvert.SerializeObject(NewListErrorLocalFolders));
@@ -379,14 +391,14 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     new More("Проверено объектов", $"{CountToCheckedObject:N0}")
                 };
 
-                if (CountUploadToFilesAll > 0)
-                {
-                    NameAndValue.Add(new More("Передано данных", ToSize(CountUploadToBytes)));
-                    NameAndValue.Add(new More("Загружено файлов", $"{CountUploadToFilesOK:N0} из {CountUploadToFilesAll:N0}"));
-                }
-
                 if (CountCreateToDirectoryAll > 0)
                     NameAndValue.Add(new More("Создано папок", $"{CountCreateToDirectoryOk:N0} из {CountCreateToDirectoryAll:N0}"));
+
+                if (CountUploadToFilesAll > 0)
+                {
+                    NameAndValue.Add(new More("Загружено файлов", $"<a href='/reports/sync/{FileNameToUploadFiles}' target='_blank'>{CountUploadToFilesOK:N0} из {CountUploadToFilesAll:N0}</a>"));
+                    NameAndValue.Add(new More("Передано данных", ToSize(CountUploadToBytes)));
+                }
                 #endregion
 
                 IsOk = true;

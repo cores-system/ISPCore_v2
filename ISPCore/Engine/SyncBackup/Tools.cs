@@ -431,11 +431,13 @@ namespace ISPCore.Engine.SyncBackup
         /// <param name="CountUploadToFilesOK">Количиство успешно загруженых файлов на уделеный сервер</param>
         /// <param name="CountUploadToFilesAll">Общее количиство файлов, которые нужно было загрузить на удаленый сервер</param>
         /// <param name="CountUploadToBytes">Общий размер переданых файлов в byte</param>
-        public static void UploadToFiles(ToolsModel md, List<FileModel> ListRemoteFiles, List<string> ListLocalFilesToName, bool EncryptionAES, string PasswdAES, 
+        public static List<string> UploadToFiles(ToolsModel md, List<FileModel> ListRemoteFiles, List<string> ListLocalFilesToName, bool EncryptionAES, string PasswdAES, 
                                          ref int CountUploadToFilesOK, ref int CountUploadToFilesAll, ref long CountUploadToBytes)
         {
             long CountUploadToBytesTmp = 0;
             int CountUploadToFilesOKTmp = 0, CountUploadToFilesAllTmp = 0;
+            List<string> uploadFiles = new List<string>();
+
             Parallel.ForEach(ListLocalFilesToName, new ParallelOptions { MaxDegreeOfParallelism = md.ActiveConnections }, FileName =>
             {
                 string LocalFile = $"{md.LocalFolder}{FileName}";                                                           // Полный путь к локальному файлу
@@ -451,6 +453,7 @@ namespace ISPCore.Engine.SyncBackup
                     {
                         CountUploadToFilesOKTmp++;
                         CountUploadToBytesTmp += FileSizeToAES == -1 ? InfoLocalFile.Length : FileSizeToAES;
+                        uploadFiles.Add(LocalFile);
                     }
                     CountUploadToFilesAllTmp++;
                 }
@@ -461,6 +464,9 @@ namespace ISPCore.Engine.SyncBackup
             
             if (CountUploadToFilesOKTmp != CountUploadToFilesAllTmp)                           // Если не все файлы залиты на удаленный сервер
                 AddToListErrorLocalFolders(md.LocalFolder, ref md.NewListErrorLocalFolders);   // Добовляем папку в список папок с ошибкой синхронизаци
+
+            // Список загруженных файлов
+            return uploadFiles;
         }
         #endregion
 

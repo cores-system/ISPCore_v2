@@ -40,7 +40,7 @@ namespace ISPCore.Engine.SyncBackup
                     // Заполняем ResponseNameAndValue
                     ResponseNameAndValue.Add(new More()
                     {
-                        Name = "Отчет",
+                        Name = "Ошибки",
                         Value = $"<a href='/reports/sync/{FileName}' target='_blank'>{FileName}</a>"
                     });
                 }
