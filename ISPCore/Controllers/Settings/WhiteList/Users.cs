@@ -14,13 +14,13 @@ using ISPCore.Models.Auth;
 
 namespace ISPCore.Controllers
 {
-    public class SettingsToWhiteListController : ControllerToDB
+    public class SettingsToUserWhiteList : ControllerToDB
     {
         [HttpGet]
         public IActionResult Index(bool ajax)
         {
             ViewData["ajax"] = ajax;
-            return View("/Views/Settings/WhiteList.cshtml", jsonDB);
+            return View("/Views/Settings/WhiteList/Users.cshtml", jsonDB);
         }
 
         #region Save
@@ -54,9 +54,9 @@ namespace ISPCore.Controllers
         }
         #endregion
 
-        #region RemoveWhiteList
+        #region Remove
         [HttpPost]
-        public JsonResult RemoveWhiteList(int Id)
+        public JsonResult Remove(int Id)
         {
             #region Демо режим
             if (Platform.IsDemo)

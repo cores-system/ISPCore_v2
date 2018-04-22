@@ -1,0 +1,69 @@
+﻿@model IEnumerable<ISPCore.Models.Base.WhitePtrIP>
+
+@{
+    if ((bool)ViewData["ajax"]) {
+        Layout = null;
+    }
+}
+
+<div class="wrapper wrapper-page">
+    <form id="form" method="POST">
+
+        <div class="container-tabbed">
+            <ul class="container-tabs">
+                <li><a href="/settings/whitelist" onclick="return loadPage(this)">Пользовательский</a></li>
+                <li><a href="#" class="active">Системный</a></li>
+            </ul>
+        </div>
+
+        <div class="wrapper wrapper-white" style="padding: 0px">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="add-gray-table">
+                        <div class="panel-heading clearfix">
+                            <div class="page-subtitle margin-top-10">
+                                <div class="t_over">
+                                    <h3>Белый список</h3>
+                                    <p>Системный список IP-адресов которые прошли проверку PTR</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive table-visible">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>IPv4/6</th>
+                                            <th>PTR</th>
+                                            <th class="text-center" style="width: 170px;">До</th>
+                                            <th class="text-right" style="width: 38px;">#&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr class="elemDelete">
+                                                <td class="text-left">@item.IPv4Or6</td>
+                                                <td class="text-left">@item.PTR</td>
+                                                <td class="text-center">@item.Expires.ToString("dd.MM.yyyy H:mm")</td>
+
+                                                <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                                    <a onclick="return deleteElement(this,'/settings/remove/whitelist/system',{Id:'@item.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)

@@ -3,7 +3,7 @@
 }
 
 
-<h2><i class="fa fa-gear"></i>Белый список</h2>
+<h2><i class="fa fa-gear"></i>Белый список - Пользовательский</h2>
 <div class="faq-item">
     <div class="faq-title"><span class="fa fa-angle-down"></span>Добавить значение</div>
     <div class="faq-text">
@@ -38,7 +38,53 @@
                 <td style="width: 150px;">
                     <strong>url:</strong>
                 </td>
-                <td>/api/remove/whitelist</td>
+                <td>/api/remove/whitelist/user</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>Id</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>result=bool</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<h2><i class="fa fa-gear"></i>Белый список - Системный</h2>
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Получить список</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/list/whitelist/system</td>
+            </tr>
+            <tr>
+                <td><strong>Параметры Int:</strong></td>
+                <td>page, pageSize</td>
+            </tr>
+            <tr>
+                <td><strong>Ответ:</strong></td>
+                <td>Models.WhitePtrIPs</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-title"><span class="fa fa-angle-down"></span>Удалить значение</div>
+    <div class="faq-text">
+        <table class="table margin-bottom-0 table-bordered text-left">
+            <tr>
+                <td style="width: 150px;">
+                    <strong>url:</strong>
+                </td>
+                <td>/api/remove/whitelist/system</td>
             </tr>
             <tr>
                 <td><strong>Параметры Int:</strong></td>

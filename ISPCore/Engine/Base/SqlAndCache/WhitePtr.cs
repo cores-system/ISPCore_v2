@@ -25,8 +25,9 @@ namespace ISPCore.Engine.Base.SqlAndCache
         /// Добавить IP-адрес
         /// </summary>
         /// <param name="IPv4Or6">IP-адрес</param>
+        /// <param name="ptr">PTR-адрес</param>
         /// <param name="Expires"></param>
-        public static void Add(string IPv4Or6, DateTime Expires)
+        public static void Add(string IPv4Or6, string ptr, DateTime Expires)
         {
             if (IsWhiteIP(IPv4Or6))
                 return;
@@ -44,6 +45,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
                 coreDB.WhitePtrIPs.Add(new WhitePtrIP()
                 {
                     IPv4Or6 = IPv4Or6,
+                    PTR = ptr,
                     Expires = Expires
                 });
 

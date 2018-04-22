@@ -189,7 +189,7 @@ namespace ISPCore.Engine.core.Check
                                         if (Regex.IsMatch(DnsHost.HostName, WhitePtrRegex, RegexOptions.IgnoreCase))
                                         {
                                             // Добовляем IP в белый список на 9 дней
-                                            WhitePtr.Add(IP, DateTime.Now.AddDays(9));
+                                            WhitePtr.Add(IP, DnsHost.HostName, DateTime.Now.AddDays(9));
                                             memoryCache.Remove(KeyLimitRequestToBlockedWait);
                                             return true;
                                         }

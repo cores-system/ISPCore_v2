@@ -377,8 +377,14 @@ namespace ISPCore.Engine.Databases
 
                                     case 6:
                                         {
-                                            // Миграция на 7
-                                            //goto case 7;
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [WhitePtrIPs] ADD [PTR] TEXT NULL ;");
+                                            goto case 7;
+                                        }
+
+                                    case 7:
+                                        {
+                                            // Миграция на 8
+                                            //goto case 8;
                                             break;
                                         }
                                 }

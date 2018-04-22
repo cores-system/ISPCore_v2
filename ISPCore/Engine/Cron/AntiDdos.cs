@@ -303,7 +303,7 @@ namespace ISPCore.Engine.Cron
                                     if (Regex.IsMatch(host.HostName, whiteList.PtrRegex, RegexOptions.IgnoreCase))
                                     {
                                         // Добовляем IP в белый список на неделю
-                                        WhitePtr.Add(IP, DateTime.Now.AddDays(7));
+                                        WhitePtr.Add(IP, host.HostName, DateTime.Now.AddDays(7));
 
                                         // Удаляем временное значение с кеша
                                         memoryCache.Remove($"AntiDdosCheckBlockedIP-{IP}");

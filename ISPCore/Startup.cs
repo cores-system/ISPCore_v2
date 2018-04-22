@@ -47,14 +47,14 @@ namespace ISPCore
         #region version
         public static LatestVersion version => new LatestVersion()
         {
-            Version = 2.1,
-            Patch = 9
+            Version = 2.2,
+            Patch = 0
         };
 
         public static LatestVersion vSql => new LatestVersion()
         {
             Version = 0.1,
-            Patch = 6
+            Patch = 7
         };
         #endregion
 
@@ -264,6 +264,8 @@ namespace ISPCore
                     routes.MapRoute(null, "api/list/notifications", new { controller = "ApiListNotifications", action = "Jurnal" });
                     routes.MapRoute(null, "api/list/jsondb", new { controller = "ApiListJsonDB", action = "Get" });
 
+                    routes.MapRoute(null, "api/list/whitelist/system", new { controller = "ApiListWhitelistTo", action = "Systems" });
+
                     routes.MapRoute(null, "api/list/security/anti-ddos/stats/day", new { controller = "ApiListAntiDdos", action = "StatsDay" });
                     routes.MapRoute(null, "api/list/security/anti-ddos/stats/month", new { controller = "ApiListAntiDdos", action = "StatsMonth" });
                     routes.MapRoute(null, "api/list/security/anti-ddos/jurnal", new { controller = "ApiListAntiDdos", action = "Jurnal" });
@@ -317,7 +319,9 @@ namespace ISPCore
                 #region API - Remove
                 app.UseMvc(routes =>
                 {
-                    routes.MapRoute(null, "api/remove/whitelist", new { controller = "ApiRemoveWhiteList", action = "Base" });
+                    routes.MapRoute(null, "api/remove/whitelist/user", new { controller = "ApiRemoveWhiteList", action = "Users" });
+                    routes.MapRoute(null, "api/remove/whitelist/system", new { controller = "ApiRemoveWhiteList", action = "Systems" });
+
                     routes.MapRoute(null, "api/remove/security/iptables", new { controller = "ApiRemoveIptables", action = "BlockedsIP" });
                     routes.MapRoute(null, "api/remove/security/antivirus", new { controller = "ApiRemoveAntivirus", action = "Base" });
 
@@ -428,9 +432,12 @@ namespace ISPCore
                 routes.MapRoute(null, "settings", new { controller = "SettingsToBase", action = "Index" });
                 routes.MapRoute(null, "settings/save/base", new { controller = "SettingsToBase", action = "Save" });
 
-                routes.MapRoute(null, "settings/whitelist", new { controller = "SettingsToWhiteList", action = "Index" });
-                routes.MapRoute(null, "settings/save/whitelist", new { controller = "SettingsToWhiteList", action = "Save" });
-                routes.MapRoute(null, "settings/remove/whitelist", new { controller = "SettingsToWhiteList", action = "RemoveWhiteList" });
+                routes.MapRoute(null, "settings/whitelist", new { controller = "SettingsToUserWhiteList", action = "Index" });
+                routes.MapRoute(null, "settings/save/whitelist", new { controller = "SettingsToUserWhiteList", action = "Save" });
+                routes.MapRoute(null, "settings/remove/whitelist", new { controller = "SettingsToUserWhiteList", action = "Remove" });
+
+                routes.MapRoute(null, "settings/whitelist/system", new { controller = "SettingsToSystemWhiteList", action = "Index" });
+                routes.MapRoute(null, "settings/remove/whitelist/system", new { controller = "SettingsToSystemWhiteList", action = "Remove" });
 
                 routes.MapRoute(null, "settings/service", new { controller = "SettingsToService", action = "Index" });
                 routes.MapRoute(null, "settings/save/service", new { controller = "SettingsToService", action = "Save" });

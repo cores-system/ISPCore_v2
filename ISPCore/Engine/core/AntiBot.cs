@@ -155,7 +155,7 @@ namespace ISPCore.Engine.core
                                 if (Regex.IsMatch(host.HostName, @".*\.(yandex.(ru|net|com)|googlebot.com|google.com|mail.ru|search.msn.com)$", RegexOptions.IgnoreCase))
                                 {
                                     // Добовляем IP в белый
-                                    WhitePtr.Add(IP, DateTime.Now.AddHours(IsGlobalConf() ? antiBotToGlobalConf.conf.HourCacheToBot : domain.AntiBot.HourCacheToBot));
+                                    WhitePtr.Add(IP, host.HostName, DateTime.Now.AddHours(IsGlobalConf() ? antiBotToGlobalConf.conf.HourCacheToBot : domain.AntiBot.HourCacheToBot));
                                     return true;
                                 }
                             }

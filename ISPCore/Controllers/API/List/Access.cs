@@ -7,6 +7,9 @@ namespace ISPCore.Controllers
 {
     public class ApiListAccess : Controller
     {
-        public JsonResult Get(int page = 1, int pageSize = 20, string search = null) => Json(AccessIP.List().Where(i => search == null || i.IP.Contains(search) || i.host.Contains(search)));
+        public JsonResult Get(int page = 1, int pageSize = 20, string search = null)
+        {
+            return Json(AccessIP.List().Where(i => search == null || i.IP.Contains(search) || i.host.Contains(search)).Skip((page * pageSize) - pageSize).Take(pageSize));
+        }
     }
 }
