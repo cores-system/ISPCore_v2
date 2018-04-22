@@ -32,7 +32,7 @@ namespace ISPCore.Controllers
             if (Platform.IsDemo)
                 return Json(new Text("Операция недоступна в демо-режиме"));
             #endregion
-
+            
             DateTime DateRecovery = default(DateTime);
 
             #region Проверка данных
@@ -88,6 +88,11 @@ namespace ISPCore.Controllers
             CoreDB.SyncBackupWorkNote.Add(WorkNoteNotation, cancellationToken);
             #endregion
 
+            // Искать файлы только в текущем каталоге
+            bool SearchToCurrentDirectory = false;
+            if (nameAndValue.TryGetValue("SearchOption", out string SearchOption) && SearchOption == "CurrentDirectory")
+                SearchToCurrentDirectory = true;
+
             // Выполняем задание в потоке
             ThreadPool.QueueUserWorkItem(ob =>
             {
@@ -95,7 +100,7 @@ namespace ISPCore.Controllers
                 Report report = new Report(task);
 
                 // Выполняем задание
-                Tools.Recovery(task, new RemoteServer(task.TypeSunc, task.FTP, task.WebDav, task.OneDrive, report, out _), WorkNoteNotation, out List<More> ResponseNameAndValue, typeRecovery, DateRecovery);
+                Tools.Recovery(task, new RemoteServer(task.TypeSunc, task.FTP, task.WebDav, task.OneDrive, report, out _), WorkNoteNotation, out List<More> ResponseNameAndValue, typeRecovery, DateRecovery, SearchToCurrentDirectory);
 
                 // Сохраняем отчет об ошибках (если есть ошибки)
                 report.SaveAndDispose(ref ResponseNameAndValue);

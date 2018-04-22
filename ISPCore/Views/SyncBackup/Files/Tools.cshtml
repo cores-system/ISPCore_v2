@@ -39,6 +39,14 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <label>Режим<span>поиска файлов</span></label>
+                                        <select class="form-control selectpicker" name="nameAndValue[SearchOption]">
+                                            <option value="IncludeAllSubdirectories">Включить все подкаталоги</option>
+                                            <option value="CurrentDirectory">Только текущий каталог</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
                                         <label>Файлы<span>зашифрованы в AES-256</span></label>
                                         <select class="form-control selectpicker showAESPassword" onchange="showAESPassword(this)" name="task.EncryptionAES">
                                             @Html.Raw(SelectPickerTo.Bool(true, "Да", "Нет"))
@@ -48,16 +56,6 @@
                                     <div class="form-group aesPassword">
                                         <label>Пароль<span>шифрования для AES-256</span></label>
                                         <input type="text" name="task.PasswdAES" class="form-control" placeholder="Пароль AES-256" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Удаленный<span>сервер</span></label>
-                                        <select class="form-control selectpicker changeTypeFTP" onchange="changeTypeFTP(this)" name="task.TypeSunc" id="TypeSuncSelect">
-                                            <option value="2">SFTP</option>
-                                            <option value="1">FTP/FTPS</option>
-                                            <option value="0">WebDav</option>
-                                            <option value="3">OneDrive</option>
-                                        </select>
                                     </div>
 
                                     <div class="form-group">
@@ -78,6 +76,16 @@
 
 
                                 <div class="col-md-7" style="float: right">
+                                    <div class="form-group">
+                                        <label>Удаленный<span>сервер</span></label>
+                                        <select class="form-control selectpicker changeTypeFTP" onchange="changeTypeFTP(this)" name="task.TypeSunc" id="TypeSuncSelect">
+                                            <option value="2">SFTP</option>
+                                            <option value="1">FTP/FTPS</option>
+                                            <option value="0">WebDav</option>
+                                            <option value="3">OneDrive</option>
+                                        </select>
+                                    </div>
+
                                     <div class="form-group typeDav">
                                         <label>Адрес<span>WebDav</span></label>
                                         <input type="text" name="task.WebDav.url" class="form-control" placeholder="HostOrIP" />

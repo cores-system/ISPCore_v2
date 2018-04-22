@@ -4,7 +4,7 @@ using ISPCore.Models.Databases;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ISPCore.Controllers.API.List
+namespace ISPCore.Controllers
 {
     public class ApiListWhitelistTo : ControllerToDB
     {

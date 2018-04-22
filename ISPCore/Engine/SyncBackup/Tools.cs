@@ -24,7 +24,8 @@ namespace ISPCore.Engine.SyncBackup
         /// <param name="NameAndValue">Колекция для ответа в журнал</param>
         /// <param name="typeRecovery">Режим востановления файлов</param>
         /// <param name="DateRecovery">Отметка бекапа для востановления по дате</param>
-        public static void Recovery(Models.SyncBackup.Tasks.Task task, RemoteServer serv, Notation WorkNoteNotation, out List<More> NameAndValue, TypeRecovery typeRecovery, DateTime DateRecovery)
+        /// <param name="SearchToCurrentDirectory">Искать файлы только в текущем каталоге</param>
+        public static void Recovery(Models.SyncBackup.Tasks.Task task, RemoteServer serv, Notation WorkNoteNotation, out List<More> NameAndValue, TypeRecovery typeRecovery, DateTime DateRecovery, bool SearchToCurrentDirectory)
         {
             try
             {
@@ -42,7 +43,8 @@ namespace ISPCore.Engine.SyncBackup
                 long CountDownloadToBytes = 0;
                 #endregion
 
-                #region Получаем список всех папок
+                #region Получаем список папок
+                // Текущая папка
                 var RemoteFolders = new List<DirectoryModel>();
                 RemoteFolders.Add(new DirectoryModel()
                 {
@@ -50,7 +52,10 @@ namespace ISPCore.Engine.SyncBackup
                     RemoteCreated = default(DateTime),
                     RemoteLastModified = DateTime.Now,
                 });
-                serv.ListAllDirectory(task.Where, ref RemoteFolders);
+
+                // Все подкаталоги
+                if (!SearchToCurrentDirectory)
+                    serv.ListAllDirectory(task.Where, ref RemoteFolders);
                 #endregion
 
                 // Проходим список всех папок
