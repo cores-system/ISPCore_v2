@@ -44,8 +44,8 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     // Чистим базу
                     foreach (var note in coreDB.SyncBackup_Notations.AsNoTracking())
                     {
-                        // Если записи больше 7 дней
-                        if ((DateTime.Now - note.Time).TotalDays > 7)
+                        // Если записи больше 30 дней
+                        if ((DateTime.Now - note.Time).TotalDays > 30)
                         {
                             // Удаляем заметку
                             coreDB.SyncBackup_Notations.RemoveAttach(coreDB, note.Id);
@@ -60,7 +60,7 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     {
                         try
                         {
-                            if ((DateTime.Now - File.GetLastWriteTime(intFile)).TotalDays > 7)
+                            if ((DateTime.Now - File.GetLastWriteTime(intFile)).TotalDays > 30)
                                 File.Delete(intFile);
                         }
                         catch { }
@@ -217,9 +217,13 @@ namespace ISPCore.Engine.Cron.SyncBackup
                 // Общий размер переданых файлов в byte
                 long CountUploadToBytes = 0;
 
+                // Отчет созданных папок
+                string ReportNameToCreateFolders = $"tk-{task.Id}_{DateTime.Now.ToString("dd-MM-yyy_HH-mm")}-{Generate.Passwd(6)}.folders.txt";
+                StreamWriter ReportToCreateFolders = new StreamWriter($"{Folders.ReportSync}/{ReportNameToCreateFolders}", false, Encoding.UTF8);
+
                 // Отчет загруженных файлов
-                string FileNameToUploadFiles = $"tk-{task.Id}_{DateTime.Now.ToString("dd-MM-yyy_HH-mm")}-{Generate.Passwd(6)}.files.txt";
-                StreamWriter ReportToUploadFiles = new StreamWriter($"{Folders.ReportSync}/{FileNameToUploadFiles}", false, Encoding.UTF8);
+                string ReportNameToUploadFiles = $"tk-{task.Id}_{DateTime.Now.ToString("dd-MM-yyy_HH-mm")}-{Generate.Passwd(6)}.files.txt";
+                StreamWriter ReportToUploadFiles = new StreamWriter($"{Folders.ReportSync}/{ReportNameToUploadFiles}", false, Encoding.UTF8);
                 #endregion
 
                 // Получаем список всех папок
@@ -300,7 +304,11 @@ namespace ISPCore.Engine.Cron.SyncBackup
                         Tools.RenameToRemoveFiles(md, ListRemoteServer.Files, SyncRemoveFileAddExtension);
 
                         // Создаем папки на удаленом сервере - (папки есть на локальном но нету на удаленом сервере)
-                        Tools.CreateToDirectory(md, ListRemoteServer.Directory, ListLocalDirectoryToName, ref CountCreateToDirectoryOk, ref CountCreateToDirectoryAll, ListNewLocalFolders);
+                        foreach (string createFolder in Tools.CreateToDirectory(md, ListRemoteServer.Directory, ListLocalDirectoryToName, ref CountCreateToDirectoryOk, ref CountCreateToDirectoryAll, ListNewLocalFolders))
+                        {
+                            // Сохраняем список созданных папок
+                            ReportToCreateFolders.WriteLine(createFolder);
+                        }
 
                         // Удаляем файлы которые не до конца загружены
                         Tools.DeleteFilesToErrorUpload(md, ref ListRemoteServer.Files, SyncRemoveFileAddExtension);
@@ -349,7 +357,8 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     }
                 }
 
-                // Закрываем поток
+                // Закрываем потоки
+                ReportToCreateFolders.Dispose();
                 ReportToUploadFiles.Dispose();
 
                 // Сохраняем новый список папок с ошибками, вместо старого
@@ -392,11 +401,11 @@ namespace ISPCore.Engine.Cron.SyncBackup
                 };
 
                 if (CountCreateToDirectoryAll > 0)
-                    NameAndValue.Add(new More("Создано папок", $"{CountCreateToDirectoryOk:N0} из {CountCreateToDirectoryAll:N0}"));
+                    NameAndValue.Add(new More("Создано папок", $"<a href='/reports/sync/{ReportNameToCreateFolders}' target='_blank'>{CountCreateToDirectoryOk:N0} из {CountCreateToDirectoryAll:N0}</a>"));
 
                 if (CountUploadToFilesAll > 0)
                 {
-                    NameAndValue.Add(new More("Загружено файлов", $"<a href='/reports/sync/{FileNameToUploadFiles}' target='_blank'>{CountUploadToFilesOK:N0} из {CountUploadToFilesAll:N0}</a>"));
+                    NameAndValue.Add(new More("Загружено файлов", $"<a href='/reports/sync/{ReportNameToUploadFiles}' target='_blank'>{CountUploadToFilesOK:N0} из {CountUploadToFilesAll:N0}</a>"));
                     NameAndValue.Add(new More("Передано данных", ToSize(CountUploadToBytes)));
                 }
                 #endregion

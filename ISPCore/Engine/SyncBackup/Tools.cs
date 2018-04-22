@@ -342,9 +342,10 @@ namespace ISPCore.Engine.SyncBackup
         /// <param name="CountCreateToDirectoryOK">Количиство успешно созданных папок</param>
         /// <param name="CountCreateToDirectoryAll">Общее количиство папок, которые нужно было создать</param>
         /// <param name="ListNewLocalFolders">Список новых папок - (обновляет список)</param>
-        public static void CreateToDirectory(ToolsModel md, List<string> ListRemoteDirectoryToName, List<string> ListLocalDirectoryToName, 
+        public static List<string> CreateToDirectory(ToolsModel md, List<string> ListRemoteDirectoryToName, List<string> ListLocalDirectoryToName, 
                                              ref int CountCreateToDirectoryOK, ref int CountCreateToDirectoryAll, List<string> ListNewLocalFolders)
         {
+            List<string> CreateFolders = new List<string>();
             int CountCreateToDirectoryOKTmp = 0, CountCreateToDirectoryAllTmp = 0;
 
             // Считываем список папок на локальном сервере
@@ -354,8 +355,13 @@ namespace ISPCore.Engine.SyncBackup
                 if (!ListRemoteDirectoryToName.Contains(LocalDirectoryName))
                 {
                     #region Создаем папку на сервере и обновляем NewListErrorLocalFolders
-                    if (md.serv.CreateDirectory($"{md.RemoteFolder}{LocalDirectoryName}"))                                    // Создаем папку в папке 'RemoteFolders' на удаленом сервере
-                        CountCreateToDirectoryOKTmp++;                                                                        // Успех
+                    // Создаем папку в папке 'RemoteFolders' на удаленом сервере
+                    if (md.serv.CreateDirectory($"{md.RemoteFolder}{LocalDirectoryName}"))
+                    {
+                        // Список созданных папок
+                        CreateFolders.Add($"{md.LocalFolder}{LocalDirectoryName} => {md.RemoteFolder}{LocalDirectoryName}");
+                        CountCreateToDirectoryOKTmp++;
+                    }
                     else
                     {
                         // Папка не создана, добовляем основную папку 'LocalFolders/LocalDirectoryName' в список папок с ошибкой синхронизации
@@ -377,6 +383,9 @@ namespace ISPCore.Engine.SyncBackup
 
             CountCreateToDirectoryOK += CountCreateToDirectoryOKTmp;
             CountCreateToDirectoryAll += CountCreateToDirectoryAllTmp;
+
+            // Список созданных папок
+            return CreateFolders;
         }
         #endregion
 
@@ -448,12 +457,15 @@ namespace ISPCore.Engine.SyncBackup
                 // Если локального файла нету на удаленом сервере
                 if (!ListRemoteFiles.Exists(i => i.Name.Contains($"{FileName}{SyncExtensionCheck}")))
                 {
+                    // Удаленный файл
+                    string RemoteFile = $"{md.RemoteFolder}{FileName}{SyncExtension}.{InfoLocalFile.Length}";
+
                     // Загружаем файл на сервер
-                    if (md.serv.UploadFile(LocalFile, $"{md.RemoteFolder}{FileName}{SyncExtension}.{InfoLocalFile.Length}", EncryptionAES, PasswdAES, out long FileSizeToAES))
+                    if (md.serv.UploadFile(LocalFile, RemoteFile, EncryptionAES, PasswdAES, out long FileSizeToAES))
                     {
                         CountUploadToFilesOKTmp++;
                         CountUploadToBytesTmp += FileSizeToAES == -1 ? InfoLocalFile.Length : FileSizeToAES;
-                        uploadFiles.Add(LocalFile);
+                        uploadFiles.Add($"{LocalFile} => {RemoteFile}");
                     }
                     CountUploadToFilesAllTmp++;
                 }
