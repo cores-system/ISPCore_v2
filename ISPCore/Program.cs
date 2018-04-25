@@ -12,6 +12,7 @@ using ISPCore.Engine;
 using ISPCore.Engine.Base;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
+using System.Text.RegularExpressions;
 
 namespace ISPCore
 {
@@ -20,7 +21,36 @@ namespace ISPCore
         public static void Main(string[] args)
         {
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
-            
+
+            #region Command Line
+            foreach (var line in args)
+            {
+                var g = new Regex("--([^=]+)(='?([^\n\r']+)'?)?").Match(line).Groups;
+                string comand = g[1].Value.ToLower();
+                string value = g[3].Value.ToLower();
+
+                switch (comand)
+                {
+                    case "platform":
+                        {
+                            switch (value)
+                            {
+                                case "docker":
+                                    Platform.Set(IsDocker: true);
+                                    break;
+                                case "demo":
+                                    Platform.Set(IsDemo: true);
+                                    break;
+                                case "debug":
+                                    Platform.Set(IsDebug: true);
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+            #endregion
+
             // Настройки сервера
             var host = WebHost.CreateDefaultBuilder(args)
                 .UseKestrel(op =>
