@@ -241,7 +241,7 @@ namespace ISPCore
             });
 
             // AntiBotHub
-            app.UseSignalR(routes => routes.MapHub<AntiBotHub>("core/AntiBotHub"));
+            app.UseSignalR(routes => routes.MapHub<AntiBotHub>("/core/AntiBotHub"));
 
             // Генерация скриптов
             app.UseMvc(routes => {
