@@ -1,9 +1,6 @@
-﻿using ISPCore.Engine;
-using ISPCore.Engine.Auth;
+﻿using ISPCore.Engine.Auth;
 using ISPCore.Engine.Hash;
-using ISPCore.Models.Databases.json;
 using Microsoft.AspNetCore.SignalR;
-using System;
 using System.Threading.Tasks;
 
 namespace ISPCore.Hubs
@@ -15,8 +12,8 @@ namespace ISPCore.Hubs
             // Делаем проверку IP
             if (hash != md5.text($"{IP}:{HourCacheToUser}:{PasswdTo.salt}"))
             {
-                await Clients.Client(Context.ConnectionId).InvokeAsync("OnError", "Что-то пошло не так, попробуйте обновить страницу");
-                Context.Connection.Abort();
+                await Clients.Client(Context.ConnectionId).SendAsync("OnError", "Что-то пошло не так, попробуйте обновить страницу");
+                Context.Abort();
                 return;
             }
 
@@ -24,8 +21,8 @@ namespace ISPCore.Hubs
             string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP);
 
             // Отдаем пользователю результат
-            await Clients.Client(Context.ConnectionId).InvokeAsync("OnCookie", cookie, HourCacheToUser);
-            Context.Connection.Abort();
+            await Clients.Client(Context.ConnectionId).SendAsync("OnCookie", cookie, HourCacheToUser);
+            Context.Abort();
         }
     }
 }

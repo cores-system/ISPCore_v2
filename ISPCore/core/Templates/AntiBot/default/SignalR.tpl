@@ -7,7 +7,7 @@
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css'>
     <link rel='stylesheet' href='/statics/antibot.css'>
     <script type='text/javascript' src='/statics/jquery.min.js'></script>
-	<script type='text/javascript' src='/statics/signalr-clientES5-1.0.0-alpha2-final.min.js'></script>
+	<script type='text/javascript' src='/statics/signalr.js'></script>
 </head>
 
 <body class='payment payment-secuses'>
