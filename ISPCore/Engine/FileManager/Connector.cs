@@ -1,20 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using elFinder.NetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ISPCore.Engine.FileManager
 {
-    #warning: Ждем Pull request + nuget > v1.0.1
-    /// <summary>
-    /// elFinder.NetCore.Root
-    /// elFinder.NetCore.FileSystemDriver - DuplicateAsync
-    /// "\\" на "/"
-    /// 
-    /// #fix: paste
-    /// </summary>
     public class Connector : elFinder.NetCore.Connector
     {
         private FileSystemDriver driver;
@@ -68,28 +59,6 @@ namespace ISPCore.Engine.FileManager
 
                             // Оригинал
                             return driver.PutAsync(target, content).Result;
-                        }
-
-                    case "paste":
-                        {
-                            IEnumerable<string> targets = GetTargetsArray(request);
-                            if (targets == null)
-                                return MissedParameter("targets");
-
-                            string dst = parameters.GetValueOrDefault("dst");
-                            if (string.IsNullOrEmpty(dst))
-                                return MissedParameter("dst");
-
-                            return driver.PasteAsync(null, dst, targets, parameters.GetValueOrDefault("cut") == "1").Result;
-                        }
-
-                    case "duplicate":
-                        {
-                            IEnumerable<string> targets = GetTargetsArray(request);
-                            if (targets == null)
-                                return MissedParameter("targets");
-
-                            return driver.DuplicateAsync(targets);
                         }
                 }
             }
