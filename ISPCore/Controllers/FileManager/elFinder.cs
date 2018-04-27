@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Extensions;
 using System;
 using System.IO;
 using ISPCore.Engine.Base;
 using ISPCore.Engine.FileManager;
+using ISPCore.Models.Base;
 
 namespace ISPCore.Controllers
 {
@@ -41,6 +40,7 @@ namespace ISPCore.Controllers
         private Connector GetConnector()
         {
             var driver = new FileSystemDriver();
+            driver.IsUnix = Platform.Get == PlatformOS.Unix;
 
             var root = new elFinder.NetCore.Root(
                 new DirectoryInfo(DirectoryRoot),
@@ -51,6 +51,7 @@ namespace ISPCore.Controllers
                 //Alias = "elFinder", // Beautiful name given to the root/home folder
                 MaxUploadSizeInKb = 200000, // Limit imposed to user uploaded file <= 200000 KB / 2GB
                 //LockedFolders = new List<string>(new string[] { "Folder1" })
+                IsUnix = Platform.Get == PlatformOS.Unix
             };
 
             driver.AddRoot(root);
