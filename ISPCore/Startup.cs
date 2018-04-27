@@ -48,7 +48,7 @@ namespace ISPCore
         public static LatestVersion version => new LatestVersion()
         {
             Version = 2.2,
-            Patch = 1
+            Patch = 2
         };
 
         public static LatestVersion vSql => new LatestVersion()
@@ -79,9 +79,6 @@ namespace ISPCore
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                // Страница для тестов
-                app.UseMvc(routes => routes.MapRoute("TestPage", "test", new { controller = "Test", action = "Index" }));
             }
             #endregion
 

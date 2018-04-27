@@ -13,6 +13,7 @@ using ISPCore.Engine.Base;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace ISPCore
 {
@@ -20,6 +21,7 @@ namespace ISPCore
     {
         public static void Main(string[] args)
         {
+            LogLevel logLevel = LogLevel.Information;
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
             #region Command Line
@@ -27,13 +29,13 @@ namespace ISPCore
             {
                 var g = new Regex("--([^=]+)(='?([^\n\r']+)'?)?").Match(line).Groups;
                 string comand = g[1].Value.ToLower();
-                string value = g[3].Value.ToLower();
+                string value = g[3].Value;
 
                 switch (comand)
                 {
                     case "platform":
                         {
-                            switch (value)
+                            switch (value.ToLower())
                             {
                                 case "docker":
                                     Platform.Set(IsDocker: true);
@@ -45,6 +47,12 @@ namespace ISPCore
                                     Platform.Set(IsDebug: true);
                                     break;
                             }
+                            break;
+                        }
+                    case "loglevel":
+                        {
+                            if (Enum.TryParse(typeof(LogLevel), value, out object res))
+                                logLevel = (LogLevel)res;
                         }
                         break;
                 }
@@ -74,6 +82,7 @@ namespace ISPCore
                 })
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
+                .ConfigureLogging(logging => logging.SetMinimumLevel(logLevel))
                 .Build();
 
             // Запускаем крон
