@@ -20,7 +20,6 @@ using ISPCore.Engine.RequestsFilter.Access;
 using ISPCore.Models.RequestsFilter.Access;
 using System.Net;
 using ISPCore.Engine.Databases;
-using System.Diagnostics;
 using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
@@ -210,23 +209,25 @@ namespace ISPCore
             // Core CheckRequest
             app.Map("/core/check/request", ap => ap.Run(context => 
             {
-                // Состояние потока
-                bool RanToCompletion = false;
-
-                // Завершаем подключение через 10 секунд
-                var token = new CancellationTokenSource(1000 * 10).Token;
-                token.Register(() =>
-                {
-                    if (!RanToCompletion)
-                        context.Abort();
-                });
-
-                // Проверка запроса
-                var task = Engine.core.Check.Request.Check(context);
-                RanToCompletion = task.Status == TaskStatus.RanToCompletion;
+                return Engine.core.Check.Request.Check(context);
                 
-                // Успех
-                return task;
+                //// Состояние потока
+                //bool RanToCompletion = false;
+
+                //// Завершаем подключение через 10 секунд
+                //var token = new CancellationTokenSource(1000 * 10).Token;
+                //token.Register(() =>
+                //{
+                //    if (!RanToCompletion)
+                //        context.Abort();
+                //});
+
+                //// Проверка запроса
+                //var task = Engine.core.Check.Request.Check(context);
+                //RanToCompletion = task.Status == TaskStatus.RanToCompletion;
+                
+                //// Успех
+                //return task;
             }));
 
             // Core API

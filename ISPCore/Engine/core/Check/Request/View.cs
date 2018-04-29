@@ -1,33 +1,12 @@
 ﻿using ISPCore.Engine.Auth;
-using ISPCore.Engine.Base;
-using ISPCore.Engine.Base.SqlAndCache;
-using ISPCore.Engine.core.Cache.CheckLink;
 using ISPCore.Engine.Hash;
-using ISPCore.Engine.Middleware;
 using ISPCore.Models.core;
-using ISPCore.Models.core.Cache.CheckLink.Common;
-using ISPCore.Models.Databases;
-using ISPCore.Models.Databases.json;
 using ISPCore.Models.RequestsFilter.Base.Enums;
-using ISPCore.Models.RequestsFilter.Domains;
-using ISPCore.Models.RequestsFilter.Domains.Log;
-using ISPCore.Models.RequestsFilter.Domains.Types;
-using ISPCore.Models.RequestsFilter.Monitoring;
-using ISPCore.Models.Security;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using ModelCache = ISPCore.Models.core.Cache.CheckLink;
 
 namespace ISPCore.Engine.core.Check
 {
@@ -73,6 +52,14 @@ namespace ISPCore.Engine.core.Check
         #region View
         public static Task View(HttpContext context, ViewBag viewBag, ActionCheckLink Model)
         {
+            #region Если режим дебага выключен
+            if (Model == ActionCheckLink.allow && !viewBag.IsErrorRule && !jsonDB.Base.DebugEnabled)
+            {
+                context.Response.StatusCode = 303;
+                return context.Response.WriteAsync("303", context.RequestAborted);
+            }
+            #endregion
+
             #region Код ответа
             if (viewBag.IsErrorRule)
             {

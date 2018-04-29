@@ -1,6 +1,5 @@
 ﻿using ISPCore.Models.Databases;
 using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Models.Base;
@@ -58,13 +57,13 @@ namespace ISPCore.Engine.core.Cache.CheckLink
         /// <returns>Id</returns>
         public static int DomainToID(string host)
         {
-            if (string.IsNullOrWhiteSpace(host))
+            if (host == string.Empty)
                 return 0;
 
             if (MassDomainToID == null)
                 ReloadDomainToID();
 
-            MassDomainToID.TryGetValue(Regex.Replace(host.ToLower().Trim(), "^www\\.", ""), out int Id);
+            MassDomainToID.TryGetValue(host, out int Id);
             return Id;
         }
     }

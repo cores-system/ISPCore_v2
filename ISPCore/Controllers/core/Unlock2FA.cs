@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using ISPCore.Models.Databases;
 using Microsoft.Extensions.Caching.Memory;
 using ISPCore.Engine.Auth;
 using ISPCore.Engine.Hash;
@@ -16,9 +15,7 @@ using ISPCore.Models.RequestsFilter.Monitoring;
 using ISPCore.Engine;
 using ISPCore.Models.RequestsFilter.Domains.Log;
 using ISPCore.Models.Security;
-using ISPCore.Models.Databases.json;
 using CheckRequest = ISPCore.Engine.core.Check.Request;
-using System.Threading;
 using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.RequestsFilter.Access;
 using ISPCore.Engine.Base.SqlAndCache;

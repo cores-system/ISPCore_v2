@@ -67,9 +67,7 @@ namespace ISPCore.Controllers.core.Gen
         #region JsToSignalR
         static string JsToSignalR(AntiBotBase conf, string IP, string CoreApiUrl, string HostConvert)
         {
-            bool RewriteToOriginalDomain = conf.RewriteToOriginalDomain && !HostConvert.EndsWith(".isp");
-
-            return Engine.core.AntiBot.JsToBase64(RewriteToOriginalDomain) + Engine.core.AntiBot.JsToRewriteUser(RewriteToOriginalDomain, HostConvert) + @"
+            return Engine.core.AntiBot.JsToBase64(conf.RewriteToOriginalDomain) + Engine.core.AntiBot.JsToRewriteUser(conf.RewriteToOriginalDomain, HostConvert) + @"
 {
     setTimeout(function()
     {

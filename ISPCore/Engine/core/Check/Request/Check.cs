@@ -15,8 +15,10 @@ using ISPCore.Models.RequestsFilter.Monitoring;
 using ISPCore.Models.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -33,21 +35,50 @@ namespace ISPCore.Engine.core.Check
         public static Task Check(HttpContext context)
         {
             #region Получаем параметры запроса
-            var gRequest = new Regex(@"^(\?ip=([^&]+)&|\?)method=([^&]+)&host=([^&]+)&uri=([^\n\r]+)").Match(context.Request.QueryString.Value).Groups;
-            string IP = gRequest[2].Value, method = gRequest[3].Value.ToUpper(), host = Regex.Replace(gRequest[4].Value, @"^www\.", "", RegexOptions.IgnoreCase), uri = WebUtility.UrlDecode(gRequest[5].Value);
+            StringBuilder tmp_uri = new StringBuilder();
+            string IP = string.Empty, uri = string.Empty, host = string.Empty, method = string.Empty;
 
-            // Проверяем правильно ли мы спарсили данные 
-            if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(uri))
+            #region Локальный метод - "AddArgsToUri"
+            void AddArgsToUri(string key, StringValues mass)
             {
-                context.Response.ContentType = "text/html; charset=utf-8";
-                return context.Response.WriteAsync("Не сохранен порядок запроса<br />Пример: /core/check/request?ip=127.0.0.1&method=GET&host=test.com&uri=/", context.RequestAborted);
+                if (mass.Count > 1)
+                {
+                    foreach (string value in mass.Skip(1))
+                        tmp_uri.Append($"&{key}={value}");
+                }
             }
-
-            // IP адрес пользователя
-            if (string.IsNullOrWhiteSpace(IP))
-                IP = context.Connection.RemoteIpAddress.ToString();
             #endregion
-
+            
+            foreach (var item in context.Request.Query)
+            {
+                switch (item.Key)
+                {
+                    case "ip":
+                        IP = item.Value.First();
+                        AddArgsToUri(item.Key, item.Value);
+                        break;
+                    case "method":
+                        method = item.Value.First().ToUpper();
+                        AddArgsToUri(item.Key, item.Value);
+                        break;
+                    case "host":
+                        host = Regex.Replace(item.Value.First().ToLower(), @"^www\.", "", RegexOptions.IgnoreCase);
+                        AddArgsToUri(item.Key, item.Value);
+                        break;
+                    case "uri":
+                        uri = item.Value.First();
+                        AddArgsToUri(item.Key, item.Value);
+                        break;
+                    default:
+                        tmp_uri.Append($"&{item.Key}={item.Value}");
+                        break;
+                }
+            }
+            
+            // Форматируем url
+            uri = WebUtility.UrlDecode(uri + tmp_uri.ToString());
+            #endregion
+            
             #region Получаем параметры POST запроса
             string FormData = string.Empty;
             if (context.Request.Method == "POST")
@@ -72,7 +103,7 @@ namespace ISPCore.Engine.core.Check
             viewBag.DebugEnabled = jsonDB.Base.DebugEnabled;       // Режим дебага, выводит json правил
             viewBag.IsErrorRule = false;                           // Переменная для ловли ошибок regex
             #endregion
-
+            
             // Если домена нету в базе, то выдаем 303 или заглушку
             if (ISPCache.DomainToID(host) is int DomainID && DomainID == 0)
                 return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow);
@@ -130,26 +161,17 @@ namespace ISPCore.Engine.core.Check
             }
             #endregion
 
+            // Что-бы лишний раз не дергать WhiteList
+            AntiBotType antiBotType = (antiBotToGlobalConf.conf.Enabled || Domain.AntiBot.UseGlobalConf) ? antiBotToGlobalConf.conf.type : Domain.AntiBot.type;
+            bool LimitRequestEnabled = Domain.limitRequest.IsEnabled || antiBotToGlobalConf.conf.limitRequest.IsEnabled;
+
+            // IP нету в системном белом списке
             // IP нету в пользовательском белом списке
-            // IP нету в глобальном белом списке
-            if (!Regex.IsMatch(IP, whiteList.IpRegex) &&
-                !WhitePtr.IsWhiteIP(IP))
+            if ((antiBotType != AntiBotType.Off || LimitRequestEnabled) &&
+                !WhitePtr.IsWhiteIP(IP) && !Regex.IsMatch(IP, whiteList.IpRegex))
             {
-                #region AntiBot
-                if (!AntiBot.ValidRequest(((antiBotToGlobalConf.conf.Enabled || Domain.AntiBot.UseGlobalConf) ? antiBotToGlobalConf.conf.type : Domain.AntiBot.type), host, method, uri, context, Domain, out string outHtml))
-                {
-                    // Логируем пользователя
-                    AddJurnalTo200(IsAntiBot: true);
-                    SetCountRequestToHour(TypeRequest._200, host, Domain.confToLog.EnableCountRequest);
-
-                    // Выводим html пользователю
-                    context.Response.ContentType = "text/html; charset=utf-8";
-                    return context.Response.WriteAsync(outHtml, context.RequestAborted);
-                }
-                #endregion
-
                 #region Лимит запросов
-                if (Domain.limitRequest.IsEnabled || antiBotToGlobalConf.conf.limitRequest.IsEnabled)
+                if (LimitRequestEnabled)
                 {
                     // Настройки лимита запросов
                     var limitRequest = (antiBotToGlobalConf.conf.limitRequest.IsEnabled || Domain.limitRequest.UseGlobalConf) ? antiBotToGlobalConf.conf.limitRequest : Domain.limitRequest;
@@ -157,7 +179,7 @@ namespace ISPCore.Engine.core.Check
                     // Проверяем белый список UserAgent
                     if (!Regex.IsMatch(userAgent, whiteList.UserAgentRegex, RegexOptions.IgnoreCase))
                     {
-                        #region IsWhitePtr
+                        #region Локальный метод - "IsWhitePtr"
                         bool IsWhitePtr(out string PtrHostName)
                         {
                             PtrHostName = null;
@@ -391,6 +413,19 @@ namespace ISPCore.Engine.core.Check
                     }
                 }
                 #endregion
+
+                #region AntiBot
+                if (!AntiBot.ValidRequest(IP, antiBotType, host, method, uri, context, Domain, out string outHtml))
+                {
+                    // Логируем пользователя
+                    AddJurnalTo200(IsAntiBot: true);
+                    SetCountRequestToHour(TypeRequest._200, host, Domain.confToLog.EnableCountRequest);
+
+                    // Выводим html пользователю
+                    context.Response.ContentType = "text/html; charset=utf-8";
+                    return context.Response.WriteAsync(outHtml, context.RequestAborted);
+                }
+                #endregion
             }
 
             #region Защита от Brute Force
@@ -478,10 +513,10 @@ namespace ISPCore.Engine.core.Check
             viewBag.method = method;
             viewBag.host = host;
             viewBag.uri = uri;
-            viewBag.Referer = context.Request.Headers["Referer"];
+            viewBag.Referer = Referer;
             viewBag.UserAgent = userAgent;
             #endregion
-
+            
             #region Замена ответа - 302/код
             try
             {
@@ -639,13 +674,6 @@ namespace ISPCore.Engine.core.Check
                     // Записываем данные пользователя
                     AddJurnalTo403And303(Is303: true);
                     SetCountRequestToHour(TypeRequest._303, host, Domain.confToLog.EnableCountRequest);
-
-                    // Если режим дебага выключен
-                    if (!jsonDB.Base.DebugEnabled)
-                    {
-                        context.Response.StatusCode = 303;
-                        return context.Response.WriteAsync("303", context.RequestAborted);
-                    }
 
                     // Разрешаем запрос
                     return View(context, viewBag, ActionCheckLink.allow);
@@ -906,7 +934,7 @@ namespace ISPCore.Engine.core.Check
             void AddJurnalTo200(bool IsAntiBot = false, bool Is2FA = false, bool IsIPtables = false)
             {
                 // Игнорирование логов
-                if (Domain.confToLog.IsActive && !Regex.IsMatch(uri, Domain.IgnoreLogToRegex, RegexOptions.IgnoreCase))
+                if (Domain.confToLog.IsActive && Domain.confToLog.Jurn200 != WriteLogMode.off && !Regex.IsMatch(uri, Domain.IgnoreLogToRegex, RegexOptions.IgnoreCase))
                 {
                     ThreadPool.QueueUserWorkItem(ob =>
                     {
@@ -964,6 +992,10 @@ namespace ISPCore.Engine.core.Check
             #region Локальный метод - "SetBlockedToIPtables"
             void SetBlockedToIPtables(string Msg, DateTime Expires, string PtrHostName)
             {
+                // Если IP уже заблокирован
+                if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(IP, host), out _))
+                    return;
+
                 // Данные для статистики
                 SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
 
@@ -1028,7 +1060,7 @@ namespace ISPCore.Engine.core.Check
                     return true;
 
                 // IP для проверки в формате /24
-                string ipCache = Regex.Replace(IP, @"\.[0-9]+$", ""); ;
+                string ipCache = Regex.Replace(IP, @"\.[0-9]+$", "");
 
                 // Глобальный доступ для IP ко всем сайтам
                 // Глобальный доступ для IP в этому сайту

@@ -16,9 +16,16 @@ namespace ISPCore.Engine.Middleware
 {
     public class IPtablesMiddleware
     {
-        #region CheckIP 
+        #region CheckIP
         public static bool CheckIP(string RemoteIpAddress, IMemoryCache memoryCache, out IPtables data, string BlockedHost = null)
         {
+            // Результат кеша
+            string memKey = $"IPtablesMiddleware.CheckIP:local-{RemoteIpAddress}:{BlockedHost}";
+            if (memoryCache.TryGetValue(memKey, out bool cacheResult)) {
+                data = new IPtables();
+                return cacheResult;
+            }
+
             string[] mass;
             string patch, tmp = "";
 
@@ -43,16 +50,23 @@ namespace ISPCore.Engine.Middleware
                 if (BlockedHost == null)
                 {
                     if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(tmp.Remove(0, 1)), out data))
+                    {
+                        memoryCache.Set(memKey, true, TimeSpan.FromMilliseconds(300));
                         return true;
+                    }
                 }
                 else
                 {
                     if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(tmp.Remove(0, 1), BlockedHost), out data))
+                    {
+                        memoryCache.Set(memKey, true, TimeSpan.FromMilliseconds(300));
                         return true;
+                    }
                 }
             }
 
             data = new IPtables();
+            memoryCache.Set(memKey, false, TimeSpan.FromMilliseconds(300));
             return false;
         }
         #endregion
@@ -70,7 +84,12 @@ namespace ISPCore.Engine.Middleware
         public static bool CheckUserAgent(string userAgent)
         {
             if (userAgentsRegex != null)
+            {
+                if (userAgentsRegex == "^$")
+                    return false;
+
                 return Regex.IsMatch(userAgent, userAgentsRegex, RegexOptions.IgnoreCase);
+            }
 
             // Меняем режим доступа к SQL
             SqlToMode.SetMode(SqlMode.Read);

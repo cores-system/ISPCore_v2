@@ -21,7 +21,6 @@ using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Diagnostics;
 
 namespace ISPCore.Engine.core
 {
@@ -93,7 +92,7 @@ namespace ISPCore.Engine.core
         /// <param name="HttpContext"></param>
         /// <param name="domain"></param>
         /// <param name="outHtml"></param>
-        public static bool ValidRequest(AntiBotType antiBotType, string HostConvert, string method, string uri, HttpContext HttpContext, Models.core.Cache.CheckLink.Domain domain, out string outHtml)
+        public static bool ValidRequest(string IP, AntiBotType antiBotType, string HostConvert, string method, string uri, HttpContext HttpContext, Models.core.Cache.CheckLink.Domain domain, out string outHtml)
         {
             // По умолчанию null
             outHtml = null;
@@ -102,15 +101,12 @@ namespace ISPCore.Engine.core
             if (antiBotType == AntiBotType.Off)
                 return true;
 
-            //IMemoryCache
-            var memoryCache = Service.Get<IMemoryCache>();
-
-            // IP адрес
-            string IP = HttpContext.Connection.RemoteIpAddress.ToString();
-
             // Проверка Cookie
             if (IsValidCookie(HttpContext, IP))
                 return true;
+
+            //IMemoryCache
+            var memoryCache = Service.Get<IMemoryCache>();
 
             // База
             var jsonDB = Service.Get<JsonDB>();
@@ -119,7 +115,9 @@ namespace ISPCore.Engine.core
             var antiBotToGlobalConf = GlobalConf(jsonDB.AntiBot);
 
             #region Проверка User-Agent
-            string SearchBot = "(" +
+            if (HttpContext.Request.Headers.TryGetValue("User-Agent", out var userAgent))
+            {
+                string SearchBot = "(" +
                 // https://yandex.ru/support/webmaster/robot-workings/check-yandex-robots.html
                 "YandexBot|YandexAccessibilityBot|YandexMobileBot|YandexDirectDyn|YandexScreenshotBot|YandexImages|YandexVideo|YandexVideoParser|YandexMedia|YandexBlogs|YandexFavicons|YandexWebmaster|YandexPagechecker|YandexImageResizer|YandexAdNet|YandexDirect|YaDirectFetcher|YandexCalendar|YandexSitelinks|YandexMetrika|YandexNews|YandexCatalog|YandexMarket|YandexVertis|YandexForDomain|YandexSpravBot|YandexSearchShop|YandexMedianaBot|YandexOntoDB|YandexVerticals" +
                 "|" +
@@ -131,9 +129,6 @@ namespace ISPCore.Engine.core
                 "Mail.RU_Bot|Bingbot|msnbot" +
                 ")";
 
-            // Достаем User-Agent
-            if (HttpContext.Request.Headers.TryGetValue("User-Agent", out var userAgent))
-            {
                 // Проверка User-Agent на поискового бота
                 if (Regex.IsMatch(userAgent, SearchBot, RegexOptions.IgnoreCase))
                 {
@@ -261,7 +256,7 @@ namespace ISPCore.Engine.core
             // Если капча установлена глобально, то нужно проверить домен в списке
             if (IsRecaptcha && IsGlobalConf() && antiBotToGlobalConf.conf.type == AntiBotType.reCAPTCHA)
                 IsRecaptcha = Regex.IsMatch(HostConvert, antiBotToGlobalConf.DomainsToreCaptchaRegex, RegexOptions.IgnoreCase);
-
+            
             // Выбираем настройки какого конфига использовать
             AntiBotBase antiBotConf = IsGlobalConf() ? (AntiBotBase)antiBotToGlobalConf.conf : (AntiBotBase)domain.AntiBot;
 
@@ -376,6 +371,7 @@ namespace ISPCore.Engine.core
         /// Кеш шаблонов tpl
         /// </summary>
         static ConcurrentDictionary<string, (DateTime, string)> HtmlCache = new ConcurrentDictionary<string, (DateTime, string)>();
+        
 
         /// <summary>
         /// 
@@ -388,7 +384,7 @@ namespace ISPCore.Engine.core
         static string Html(string tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey)
         {
             #region Кеш шаблона
-            // Путь к шаблону
+                // Путь к шаблону
             string SourceFile = $"{Folders.Tpl.AntiBot}/{tplName}.tpl";
             if (!File.Exists(SourceFile))
                 SourceFile = $"{Folders.Tpl.AntiBot}/default/{tplName}.tpl";
@@ -417,10 +413,10 @@ namespace ISPCore.Engine.core
                         return JsToTimer(conf.WaitUser);
 
                     case "JsToBase64":
-                        return $"<script>{JsToBase64(conf.RewriteToOriginalDomain && !HostConvert.EndsWith(".isp"))}</script>";
+                        return $"<script>{JsToBase64(conf.RewriteToOriginalDomain)}</script>";
 
                     case "JsToRewriteUser":
-                        return JsToRewriteUser(conf.RewriteToOriginalDomain && !HostConvert.EndsWith(".isp"), HostConvert);
+                        return JsToRewriteUser(conf.RewriteToOriginalDomain, HostConvert);
 
                     case "CoreApiUrl":
                         return CoreApiUrl;
