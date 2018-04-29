@@ -19,9 +19,7 @@ using ISPCore.Models.RequestsFilter.Domains.Log;
 using System.Linq;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
-using System.Collections.Concurrent;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace ISPCore.Engine.core
@@ -109,6 +107,14 @@ namespace ISPCore.Engine.core
 
             //IMemoryCache
             var memoryCache = Service.Get<IMemoryCache>();
+
+            #region Отдаем данные с кеша
+            if (Startup.cmd.Cache.AntiBot != 0 && memoryCache.TryGetValue(KeyToMemoryCache.AntiBotToCache(IP), out (string tplToUrl, string json) _cache))
+            {
+                outHtml = Html(_cache.tplToUrl, _cache.json);
+                return false;
+            }
+            #endregion
 
             // База
             var jsonDB = Service.Get<JsonDB>();
@@ -440,8 +446,20 @@ if (xhr.status == 200) {
             }
             #endregion
 
+            // Сериализуем данные
+            string json = JsonConvert.SerializeObject(mass);
 
-            return Html(tplToUrl, JsonConvert.SerializeObject(mass));
+            #region Создаем кеш
+            if (Startup.cmd.Cache.AntiBot != 0)
+            {
+                //IMemoryCache
+                var memoryCache = Service.Get<IMemoryCache>();
+                memoryCache.Set(KeyToMemoryCache.AntiBotToCache(IP), (tplToUrl, json), TimeSpan.FromMilliseconds(Startup.cmd.Cache.AntiBot));
+            }
+            #endregion
+
+            // Успех
+            return Html(tplToUrl, json);
         }
         #endregion
 
