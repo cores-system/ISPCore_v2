@@ -141,8 +141,12 @@ namespace ISPCore.Engine.core.Check
                 AddJurnalTo200(IsIPtables: true);
                 SetCountRequestToHour(TypeRequest._200, host, Domain.confToLog.EnableCountRequest);
 
-                // Отдаем ответ
+                // StatusCode
                 context.Response.StatusCode = 401;
+                if (Startup.cmd.StatusCode.IPtables)
+                    return Task.FromResult(true);
+
+                // Отдаем html
                 context.Response.ContentType = "text/html; charset=utf-8";
                 return context.Response.WriteAsync(IPtablesMiddleware.BlockedToHtml(IP, BlockedData.Description, BlockedData.TimeExpires), context.RequestAborted);
             }
@@ -154,8 +158,12 @@ namespace ISPCore.Engine.core.Check
                 AddJurnalTo200(IsIPtables: true);
                 SetCountRequestToHour(TypeRequest._200, host, Domain.confToLog.EnableCountRequest);
 
-                // Отдаем ответ
+                // Код ответа
                 context.Response.StatusCode = 401;
+                if (Startup.cmd.StatusCode.IPtables)
+                    return Task.FromResult(true);
+
+                // Отдаем html
                 context.Response.ContentType = "text/html; charset=utf-8";
                 return context.Response.WriteAsync(IPtablesMiddleware.BlockedHtmlToUserAgent(userAgent), context.RequestAborted);
             }

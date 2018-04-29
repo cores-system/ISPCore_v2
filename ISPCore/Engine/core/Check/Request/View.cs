@@ -52,14 +52,6 @@ namespace ISPCore.Engine.core.Check
         #region View
         public static Task View(HttpContext context, ViewBag viewBag, ActionCheckLink Model)
         {
-            #region Если режим дебага выключен
-            if (Model == ActionCheckLink.allow && !viewBag.IsErrorRule && !jsonDB.Base.DebugEnabled)
-            {
-                context.Response.StatusCode = 303;
-                return context.Response.WriteAsync("303", context.RequestAborted);
-            }
-            #endregion
-
             #region Код ответа
             if (viewBag.IsErrorRule)
             {
@@ -95,6 +87,11 @@ namespace ISPCore.Engine.core.Check
                 }
             }
             #endregion
+
+            // Отдавать html ненужно
+            if ((Startup.cmd.StatusCode.Checklink && context.Response.StatusCode != 200) || 
+                (context.Response.StatusCode == 303 && !jsonDB.Base.DebugEnabled))
+                return Task.FromResult(true);
 
             #region Локальный метод - "RenderTitle"
             string RenderTitle()

@@ -202,6 +202,9 @@ namespace ISPCore.Engine.Middleware
             if (CheckIP(httpContext.Connection.RemoteIpAddress.ToString(), memoryCache, out IPtables data))
             {
                 httpContext.Response.StatusCode = 401;
+                if (Startup.cmd.StatusCode.IPtables)
+                    return Task.FromResult(true);
+
                 httpContext.Response.ContentType = "text/html";
                 return httpContext.Response.WriteAsync(BlockedToHtml(httpContext.Connection.RemoteIpAddress.ToString(), data.Description, data.TimeExpires));
             }

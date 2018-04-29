@@ -1,15 +1,15 @@
 ﻿namespace ISPCore.Models.Command_Line
 {
-    public class cmd
+    public class StatusCode
     {
         /// <summary>
         /// 
         /// </summary>
-        public Timeout Timeout { get; set; } = new Timeout();
+        public bool IPtables { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public StatusCode StatusCode { get; set; } = new StatusCode();
+        public bool Checklink { get; set; }
     }
 }

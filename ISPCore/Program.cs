@@ -35,6 +35,7 @@ namespace ISPCore
 
                 switch (comand)
                 {
+                    #region platform
                     case "platform":
                         {
                             switch (value.ToLower())
@@ -51,19 +52,44 @@ namespace ISPCore
                             }
                             break;
                         }
+                    #endregion
+
+                    #region loglevel
                     case "loglevel":
                         {
                             if (Enum.TryParse(typeof(LogLevel), value, out object res))
                                 logLevel = (LogLevel)res;
                             break;
                         }
+                    #endregion
 
+                    #region timeout
                     case "timeout:core":
                         {
                             if (int.TryParse(value, out int res))
                                 cmd.Timeout.core = res;
                             break;
                         }
+                    #endregion
+
+                    #region statuscode
+                    case "statuscode":
+                        {
+                            foreach (var item in value.ToLower().Split(','))
+                            {
+                                switch (item)
+                                {
+                                    case "iptables":
+                                        cmd.StatusCode.IPtables = true;
+                                        break;
+                                    case "checklink":
+                                        cmd.StatusCode.Checklink = true;
+                                        break;
+                                }
+                            }
+                            break;
+                        }
+                    #endregion
                 }
             }
             
