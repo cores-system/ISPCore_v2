@@ -1,6 +1,7 @@
 ﻿using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Models.RequestsFilter.Domains.Log;
+using System;
 using System.Collections.Generic;
 using ModelCache = ISPCore.Models.core.Cache.CheckLink.Rules;
 
@@ -94,6 +95,11 @@ namespace ISPCore.Models.core.Cache.CheckLink
         /// Защита сайта от ботов
         /// </summary>
         public AntiBot AntiBot { get; set; } = new AntiBot();
+
+        /// <summary>
+        /// Время создания кеша 
+        /// </summary>
+        public DateTime CreateTime { get; set; } = DateTime.Now;
 
 
         public bool CheckRuleToBase { get; set; }

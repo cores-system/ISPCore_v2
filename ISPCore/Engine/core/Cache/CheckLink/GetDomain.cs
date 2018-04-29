@@ -60,7 +60,7 @@ namespace ISPCore.Engine.core.Cache.CheckLink
                 var domain = coreDB.RequestsFilter_Domains.FindAndInclude(Id, AsNoTracking: true);
                 if (domain == null)
                 {
-                    // Отдаем пустой кеш без  правил
+                    // Отдаем пустой кеш без правил
                     SqlToMode.SetMode(SqlMode.ReadOrWrite);
                     return cache;
                 }

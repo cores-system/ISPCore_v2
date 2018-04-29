@@ -7,6 +7,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
         public static string CheckLinkWhitelistTo2FA(string host, string IP) => $"CheckLinkWhitelistTo2FA-{IP}_{host}";
         public static string CheckLinkWhitelistToAll(string host, string IP) => $"CheckLinkWhitelistToAll-{IP}_{host}";
         public static string CheckLinkWhitelistToAllDomain(string IP) => $"CheckLinkWhitelistToAllDomain-{IP}";
+        public static string CheckLinkToCache(string method, string host, string uri) => $"KeyToMem:CheckLinkToCache-{method}:{host}{uri}";
 
         public static string LimitRequestToreCAPTCHA(string IP) => $"KeyToMem:LimitRequestToreCAPTCHA-{IP}";
 

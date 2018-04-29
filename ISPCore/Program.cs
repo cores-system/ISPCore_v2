@@ -23,7 +23,7 @@ namespace ISPCore
         public static void Main(string[] args)
         {
             cmd cmd = new cmd();
-            LogLevel logLevel = LogLevel.Information;
+            LogLevel logLevel = LogLevel.None;
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
             #region Command Line
@@ -95,6 +95,15 @@ namespace ISPCore
                                         break;
                                 }
                             }
+                            break;
+                        }
+                    #endregion
+
+                    #region cache
+                    case "cache:checklink":
+                        {
+                            if (int.TryParse(value, out int res))
+                                cmd.Cache.Checklink = res;
                             break;
                         }
                     #endregion

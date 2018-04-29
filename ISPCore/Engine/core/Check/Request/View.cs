@@ -1,8 +1,13 @@
 ﻿using ISPCore.Engine.Auth;
+using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Engine.Hash;
 using ISPCore.Models.core;
+using ISPCore.Models.core.Cache.CheckLink;
 using ISPCore.Models.RequestsFilter.Base.Enums;
+using ISPCore.Models.RequestsFilter.Monitoring;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -50,7 +55,7 @@ namespace ISPCore.Engine.core.Check
         #endregion
 
         #region View
-        public static Task View(HttpContext context, ViewBag viewBag, ActionCheckLink Model)
+        public static Task View(HttpContext context, ViewBag viewBag, ActionCheckLink Model, TypeRequest typeRequest)
         {
             #region Код ответа
             if (viewBag.IsErrorRule)
@@ -87,11 +92,6 @@ namespace ISPCore.Engine.core.Check
                 }
             }
             #endregion
-
-            // Отдавать html ненужно
-            if ((Startup.cmd.StatusCode.Checklink && context.Response.StatusCode != 200) || 
-                (context.Response.StatusCode == 303 && !jsonDB.Base.DebugEnabled))
-                return Task.FromResult(true);
 
             #region Локальный метод - "RenderTitle"
             string RenderTitle()
@@ -240,13 +240,14 @@ namespace ISPCore.Engine.core.Check
 
                     return @"
 <!--
-IP:         " + viewBag?.IP + @"
-UserAgent:  " + viewBag?.UserAgent + @"
-method:     " + viewBag?.method + @"
-host:       " + viewBag?.host + @"
-uri:        " + viewBag?.uri + @"
-FormData:   " + viewBag?.FormData + @"
-Referer:    " + viewBag?.Referer + @"
+IP:          " + viewBag?.IP + @"
+UserAgent:   " + viewBag?.UserAgent + @"
+method:      " + viewBag?.method + @"
+host:        " + viewBag?.host + @"
+uri:         " + viewBag?.uri + @"
+FormData:    " + viewBag?.FormData + @"
+Referer:     " + viewBag?.Referer + @"
+IsCacheView: " + viewBag.IsCacheView + @"
 
 " + viewBag.antiBotToGlobalConf?.Replace("\\\\", "\\")?.Replace("<!--", "&lt;!--")?.Replace("-->", "--&gt;") + @"
 
@@ -257,6 +258,29 @@ Referer:    " + viewBag?.Referer + @"
                 }
 
                 return string.Empty;
+            }
+            #endregion
+
+            #region Кешируем ответ
+            if (Startup.cmd.Cache.Checklink != 0 && !viewBag.IsCacheView && context.Response.StatusCode != 200)
+            {
+                memoryCache.Set(KeyToMemoryCache.CheckLinkToCache(viewBag.method, viewBag.host, viewBag.uri), new ResponseView()
+                {
+                    ActionCheckLink = Model,
+                    TypeRequest = typeRequest,
+                    IsErrorRule = viewBag.IsErrorRule,
+                    CacheTime = viewBag.CreateCacheView
+
+                }, TimeSpan.FromMilliseconds(Startup.cmd.Cache.Checklink));
+            }
+            #endregion
+
+            #region Ответ без html
+            if (!jsonDB.Base.DebugEnabled)
+            {
+                // Отдавать html ненужно
+                if (context.Response.StatusCode == 303 || (Startup.cmd.StatusCode.Checklink && context.Response.StatusCode != 200))
+                    return Task.FromResult(true);
             }
             #endregion
 

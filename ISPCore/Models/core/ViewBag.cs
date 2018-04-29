@@ -1,4 +1,6 @@
-﻿namespace ISPCore.Models.core
+﻿using System;
+
+namespace ISPCore.Models.core
 {
     public class ViewBag
     {
@@ -19,5 +21,8 @@
         public string CoreAPI { get; set; }
         public string ErrorTitleException { get; set; }
         public string ErrorRuleException { get; set; }
+
+        public bool IsCacheView { get; set; }
+        public DateTime CreateCacheView { get; set; }
     }
 }

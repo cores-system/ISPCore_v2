@@ -5,6 +5,7 @@ using ISPCore.Engine.core.Cache.CheckLink;
 using ISPCore.Engine.Hash;
 using ISPCore.Engine.Middleware;
 using ISPCore.Models.core;
+using ISPCore.Models.core.Cache.CheckLink;
 using ISPCore.Models.core.Cache.CheckLink.Common;
 using ISPCore.Models.Databases;
 using ISPCore.Models.RequestsFilter.Base.Enums;
@@ -106,11 +107,11 @@ namespace ISPCore.Engine.core.Check
             
             // Если домена нету в базе, то выдаем 303 или заглушку
             if (ISPCache.DomainToID(host) is int DomainID && DomainID == 0)
-                return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow);
+                return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);
 
             // Если у IP есть полный доступ к сайтам или к сайту
             if (CheckLinkWhitelistToAllDomain())
-                return View(context, viewBag, ActionCheckLink.allow);
+                return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);
 
             #region Получаем User-Agent и Referer
             // User-Agent
@@ -517,14 +518,64 @@ namespace ISPCore.Engine.core.Check
                 viewBag.antiBotToGlobalConf = JsonConvert.SerializeObject(antiBotToGlobalConf, Formatting.Indented);
                 viewBag.FormData = FormData;
             }
-            
+
+            viewBag.CreateCacheView = Domain.CreateTime;
             viewBag.method = method;
             viewBag.host = host;
             viewBag.uri = uri;
             viewBag.Referer = Referer;
             viewBag.UserAgent = userAgent;
             #endregion
-            
+
+            #region Кеш ответа
+            if (Startup.cmd.Cache.Checklink != 0)
+            {
+                // Кеш есть и он валиден
+                if (memoryCache.TryGetValue(KeyToMemoryCache.CheckLinkToCache(method, host, uri), out ResponseView responseView) && responseView.CacheTime == Domain.CreateTime)
+                {
+                    #region Записываем данные запроса
+                    switch (responseView.TypeRequest)
+                    {
+                        case TypeRequest._200:
+                            AddJurnalTo200();
+                            break;
+                        case TypeRequest._303:
+                            AddJurnalTo403And303(Is303: true);
+                            break;
+                        case TypeRequest._403:
+                            AddJurnalTo403And303(Is403: true);
+                            break;
+                    }
+                    #endregion
+
+                    // Счетчик запросов
+                    SetCountRequestToHour(responseView.TypeRequest, host, Domain.confToLog.EnableCountRequest);
+
+                    #region Кеш - "Замена ответа"
+                    if (responseView.Is303)
+                    {
+                        if (string.IsNullOrEmpty(responseView.ResponceUri))
+                        {
+                            // Пользовательский код
+                            context.Response.ContentType = responseView.ContentType;
+                            return context.Response.WriteAsync(responseView.kode, context.RequestAborted);
+                        }
+                        else
+                        {
+                            // Редирект на указаный URL
+                            return RewriteTo.Local(context, responseView.ResponceUri);
+                        }
+                    }
+                    #endregion
+
+                    // Отдаем кеш
+                    viewBag.IsCacheView = true;
+                    viewBag.IsErrorRule = responseView.IsErrorRule;
+                    return View(context, viewBag, responseView.ActionCheckLink, responseView.TypeRequest);
+                }
+            }
+            #endregion
+
             #region Замена ответа - 302/код
             try
             {
@@ -594,6 +645,25 @@ namespace ISPCore.Engine.core.Check
                             #region Локальный метод - "ResponseContent"
                             Task ResponseContent(string _argsGet)
                             {
+                                #region Локальный метод - "SetCacheToView"
+                                void SetCacheToView(string _responceUri = null)
+                                {
+                                    if (Startup.cmd.Cache.Checklink != 0)
+                                    {
+                                        memoryCache.Set(KeyToMemoryCache.CheckLinkToCache(viewBag.method, viewBag.host, viewBag.uri), new ResponseView()
+                                        {
+                                            Is303 = true,
+                                            CacheTime = Domain.CreateTime,
+                                            TypeRequest = TypeRequest._200,
+                                            ContentType = rule.ContentType,
+                                            kode = rule.kode,
+                                            ResponceUri = _responceUri,
+
+                                        }, TimeSpan.FromMilliseconds(Startup.cmd.Cache.Checklink));
+                                    }
+                                }
+                                #endregion
+
                                 // Записываем данные пользователя
                                 AddJurnalTo200();
                                 SetCountRequestToHour(TypeRequest._200, host, Domain.confToLog.EnableCountRequest);
@@ -601,6 +671,9 @@ namespace ISPCore.Engine.core.Check
                                 // Тип ответа
                                 if (rule.TypeResponse == TypeResponseRule.kode)
                                 {
+                                    // Кеш
+                                    SetCacheToView();
+
                                     // Пользовательский код
                                     context.Response.ContentType = rule.ContentType;
                                     return context.Response.WriteAsync(rule.kode, context.RequestAborted);
@@ -609,13 +682,21 @@ namespace ISPCore.Engine.core.Check
                                 {
                                     if (string.IsNullOrWhiteSpace(rule.ResponceUri))
                                     {
+                                        // Кеш
+                                        string res = g[2].Value + Regex.Replace(_argsGet, "^&", "?");
+                                        SetCacheToView(res);
+
                                         // Если url для 302 не указан
-                                        return RewriteTo.Local(context, g[2].Value + Regex.Replace(_argsGet, "^&", "?"));
+                                        return RewriteTo.Local(context, res);
                                     }
                                     else
                                     {
+                                        // Кеш
+                                        string res = rule.ResponceUri.Replace("{arg}", Regex.Replace(_argsGet, "^&", "?"));
+                                        SetCacheToView(res);
+
                                         // Редирект на указаный URL
-                                        return RewriteTo.Local(context, rule.ResponceUri.Replace("{arg}", Regex.Replace(_argsGet, "^&", "?")));
+                                        return RewriteTo.Local(context, res);
                                     }
                                 }
                             }
@@ -654,7 +735,7 @@ namespace ISPCore.Engine.core.Check
                 viewBag.IsErrorRule = true;
                 viewBag.ErrorTitleException = "Ошибка в правиле";
                 viewBag.ErrorRuleException = jsonDB.Base.DebugEnabled ? ex.Message : "Данные ошибки доступны в журнале 500";
-                return View(context, viewBag, ActionCheckLink.deny);
+                return View(context, viewBag, ActionCheckLink.deny, TypeRequest._500);
             }
             #endregion
 
@@ -666,12 +747,12 @@ namespace ISPCore.Engine.core.Check
             if (Domain.CheckRuleToBase && OpenPageToRule(Domain.RuleAllow, Domain.Rule2FA, Domain.RuleDeny) is Task pageToRule)
                 return pageToRule;
 
-            // Записываем данные пользователя
+            // Записываем данные запроса
             AddJurnalTo403And303(Is303: true);
             SetCountRequestToHour(TypeRequest._303, host, Domain.confToLog.EnableCountRequest);
 
             // Если не одно правило не подошло
-            return View(context, viewBag, ActionCheckLink.allow);
+            return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);
 
             #region Локальный метод - "OpenPageToRule"
             Task OpenPageToRule(ModelCache.Rules.Rule RuleAllow, ModelCache.Rules.Rule Rule2FA, ModelCache.Rules.Rule RuleDeny)
@@ -684,7 +765,7 @@ namespace ISPCore.Engine.core.Check
                     SetCountRequestToHour(TypeRequest._303, host, Domain.confToLog.EnableCountRequest);
 
                     // Разрешаем запрос
-                    return View(context, viewBag, ActionCheckLink.allow);
+                    return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);
                 }
                 #endregion
 
@@ -697,11 +778,11 @@ namespace ISPCore.Engine.core.Check
 
                     // Если IP для 2FA уже есть
                     if (memoryCache.TryGetValue(KeyToMemoryCache.CheckLinkWhitelistTo2FA(host, IP), out byte _))
-                        return View(context, viewBag, ActionCheckLink.allow);
+                        return View(context, viewBag, ActionCheckLink.allow, TypeRequest._200);
 
                     // Просим пройти 2FA авторизацию
                     viewBag.CoreAPI = jsonDB.Base.CoreAPI;
-                    return View(context, viewBag, ActionCheckLink.Is2FA);
+                    return View(context, viewBag, ActionCheckLink.Is2FA, TypeRequest._200);
                 }
                 #endregion
 
@@ -713,7 +794,7 @@ namespace ISPCore.Engine.core.Check
                     SetCountRequestToHour(TypeRequest._403, host, Domain.confToLog.EnableCountRequest);
 
                     // Отдаем страницу 403
-                    return View(context, viewBag, ActionCheckLink.deny);
+                    return View(context, viewBag, ActionCheckLink.deny, TypeRequest._403);
                 }
                 #endregion
 
