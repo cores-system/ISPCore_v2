@@ -14,6 +14,7 @@ using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using ISPCore.Models.Command_Line;
 
 namespace ISPCore
 {
@@ -21,6 +22,7 @@ namespace ISPCore
     {
         public static void Main(string[] args)
         {
+            cmd cmd = new cmd();
             LogLevel logLevel = LogLevel.Information;
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
@@ -53,10 +55,19 @@ namespace ISPCore
                         {
                             if (Enum.TryParse(typeof(LogLevel), value, out object res))
                                 logLevel = (LogLevel)res;
+                            break;
                         }
-                        break;
+
+                    case "timeout:core":
+                        {
+                            if (int.TryParse(value, out int res))
+                                cmd.Timeout.core = res;
+                            break;
+                        }
                 }
             }
+            
+            Startup.cmd = cmd;
             #endregion
 
             // Настройки сервера

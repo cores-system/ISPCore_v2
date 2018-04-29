@@ -24,6 +24,7 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using ISPCore.Engine.Base.SqlAndCache;
+using ISPCore.Models.Command_Line;
 
 namespace ISPCore
 {
@@ -56,6 +57,8 @@ namespace ISPCore
             Patch = 7
         };
         #endregion
+        
+        public static cmd cmd;
 
         /// <summary>
         /// Через какое время можно повторно запросить данные с API на сервере
@@ -209,25 +212,26 @@ namespace ISPCore
             // Core CheckRequest
             app.Map("/core/check/request", ap => ap.Run(context => 
             {
-                return Engine.core.Check.Request.Check(context);
-                
-                //// Состояние потока
-                //bool RanToCompletion = false;
+                if (Startup.cmd.Timeout.core == 0)
+                    return Engine.core.Check.Request.Check(context);
 
-                //// Завершаем подключение через 10 секунд
-                //var token = new CancellationTokenSource(1000 * 10).Token;
-                //token.Register(() =>
-                //{
-                //    if (!RanToCompletion)
-                //        context.Abort();
-                //});
+                // Состояние потока
+                bool RanToCompletion = false;
 
-                //// Проверка запроса
-                //var task = Engine.core.Check.Request.Check(context);
-                //RanToCompletion = task.Status == TaskStatus.RanToCompletion;
-                
-                //// Успех
-                //return task;
+                // Завершаем подключение через ** секунд
+                var token = new CancellationTokenSource(1000 * Startup.cmd.Timeout.core).Token;
+                token.Register(() =>
+                {
+                    if (!RanToCompletion)
+                        context.Abort();
+                });
+
+                // Проверка запроса
+                var task = Engine.core.Check.Request.Check(context);
+                RanToCompletion = task.Status == TaskStatus.RanToCompletion;
+
+                // Успех
+                return task;
             }));
 
             // Core API
