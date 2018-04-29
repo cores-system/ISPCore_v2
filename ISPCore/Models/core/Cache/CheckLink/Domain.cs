@@ -94,5 +94,10 @@ namespace ISPCore.Models.core.Cache.CheckLink
         /// Защита сайта от ботов
         /// </summary>
         public AntiBot AntiBot { get; set; } = new AntiBot();
+
+
+        public bool CheckRuleToBase { get; set; }
+        public bool CheckRuleToOverride { get; set; }
+        public bool CheckRuleToReplace { get; set; }
     }
 } 

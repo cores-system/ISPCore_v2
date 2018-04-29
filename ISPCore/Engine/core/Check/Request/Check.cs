@@ -529,7 +529,7 @@ namespace ISPCore.Engine.core.Check
             try
             {
                 // Проверка url и GET аргументов
-                if (Regex.IsMatch(uri, Domain.RuleReplaces.RuleGetToRegex, RegexOptions.IgnoreCase))
+                if (Domain.CheckRuleToReplace && Regex.IsMatch(uri, Domain.RuleReplaces.RuleGetToRegex, RegexOptions.IgnoreCase))
                 {
                     // Проверка POST аргументов
                     if (method != "POST" || (method == "POST" && Regex.IsMatch($"{(new Regex(@"^(/[^\?\&]+)").Match(uri).Groups[1].Value)}{FormData}", Domain.RuleReplaces.RulePostToRegex, RegexOptions.IgnoreCase)))
@@ -659,11 +659,11 @@ namespace ISPCore.Engine.core.Check
             #endregion
 
             // Переопределенные правила
-            if (OpenPageToRule(Domain.RuleOverrideAllow, Domain.RuleOverride2FA, Domain.RuleOverrideDeny) is Task pageToRuleOverride)
+            if (Domain.CheckRuleToOverride && OpenPageToRule(Domain.RuleOverrideAllow, Domain.RuleOverride2FA, Domain.RuleOverrideDeny) is Task pageToRuleOverride)
                 return pageToRuleOverride;
 
             // Обычные правила
-            if (OpenPageToRule(Domain.RuleAllow, Domain.Rule2FA, Domain.RuleDeny) is Task pageToRule)
+            if (Domain.CheckRuleToBase && OpenPageToRule(Domain.RuleAllow, Domain.Rule2FA, Domain.RuleDeny) is Task pageToRule)
                 return pageToRule;
 
             // Записываем данные пользователя

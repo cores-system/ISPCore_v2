@@ -133,7 +133,7 @@ namespace ISPCore.Engine.core.Cache.CheckLink
                 RuleArgs.AddRange(domain.RuleArgs);
 
                 // Правила домена - "Замена ответа"
-                RulesReplace.AddRange(domain.RuleReplaces);
+                RulesReplace.AddRange(domain.RuleReplaces.Where(i => i.IsActive));
 
                 // Конвертируем Rule в ModelCache.Rule
                 ConvertToModelCache(RuleArgs, RulesAllow, cache.RuleAllow);
@@ -146,6 +146,11 @@ namespace ISPCore.Engine.core.Cache.CheckLink
                 // Конвертируем RuleReplace в ModelCache.RuleReplaces
                 ConvertRuleReplaceToModelCache(RulesReplace, cache.RuleReplaces);
 
+                // Нужно ли проверять правила
+                cache.CheckRuleToBase = RulesAllow.Count != 0 || RulesDeny.Count != 0 || Rules2FA.Count == 0;
+                cache.CheckRuleToOverride = RulesOverrideAllow.Count != 0 || RulesOverrideDeny.Count != 0 || RulesOverride2FA.Count != 0;
+                cache.CheckRuleToReplace = RulesReplace.Count != 0;
+
                 // Меняем режим доступа к SQL
                 SqlToMode.SetMode(SqlMode.ReadOrWrite);
 
@@ -157,35 +162,39 @@ namespace ISPCore.Engine.core.Cache.CheckLink
             #region Локальный метод SortToRule
             void SortToRule(IEnumerable<Rule> inRules, bool IsOverrides)
             {
-                foreach (var rile in inRules)
+                foreach (var rule in inRules)
                 {
+                    // Пропускаем неактивные правила
+                    if (!rule.IsActive || string.IsNullOrWhiteSpace(rule.rule))
+                        continue;
+
                     if (IsOverrides)
                     {
-                        switch (rile.order)
+                        switch (rule.order)
                         {
                             case ActionCheckLink.allow:
-                                RulesOverrideAllow.Add(rile);
+                                RulesOverrideAllow.Add(rule);
                                 break;
                             case ActionCheckLink.deny:
-                                RulesOverrideDeny.Add(rile);
+                                RulesOverrideDeny.Add(rule);
                                 break;
                             case ActionCheckLink.Is2FA:
-                                RulesOverride2FA.Add(rile);
+                                RulesOverride2FA.Add(rule);
                                 break;
                         }
                     }
                     else
                     {
-                        switch (rile.order)
+                        switch (rule.order)
                         {
                             case ActionCheckLink.allow:
-                                RulesAllow.Add(rile);
+                                RulesAllow.Add(rule);
                                 break;
                             case ActionCheckLink.deny:
-                                RulesDeny.Add(rile);
+                                RulesDeny.Add(rule);
                                 break;
                             case ActionCheckLink.Is2FA:
-                                Rules2FA.Add(rile);
+                                Rules2FA.Add(rule);
                                 break;
                         }
                     }
@@ -270,10 +279,6 @@ namespace ISPCore.Engine.core.Cache.CheckLink
 
             foreach (var rule in inRules)
             {
-                // Пропускаем неактивные правила
-                if (!rule.IsActive || string.IsNullOrWhiteSpace(rule.rule))
-                    continue;
-
                 // Удаляем коментарий
                 rule.rule = Regex.Replace(rule.rule, "^\"([^\"]+)?\";", "");
 
@@ -358,9 +363,6 @@ namespace ISPCore.Engine.core.Cache.CheckLink
             // Собираем правила
             foreach (var inRule in inRules)
             {
-                if (!inRule.IsActive)
-                    continue;
-
                 // Удаляем коментарий
                 string uri = Regex.Replace(inRule.uri, "^\"([^\"]+)?\";", "");
 
