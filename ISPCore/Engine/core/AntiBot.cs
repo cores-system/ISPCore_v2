@@ -539,7 +539,7 @@ var Base64 =
             }
 
             return @"
-                if (location.hostname.replace(/www./gi,'') != Base64.decode('" + base64.Encode(HostConvert) + @"')) {
+                if (" + $"!\"{HostConvert}\".match(/.isp$/) && " + " location.hostname.replace(/www./gi,'') != Base64.decode('" + base64.Encode(HostConvert) + @"')) {
                     window.location = Base64.decode('" + base64.Encode("http://" + HostConvert) + @"');
                 }
             ";
