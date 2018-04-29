@@ -63,6 +63,14 @@ namespace ISPCore
                         }
                     #endregion
 
+                    #region conf
+                    case "conf":
+                        {
+                            cmd = Newtonsoft.Json.JsonConvert.DeserializeObject<cmd>(value);
+                            break;
+                        }
+                    #endregion
+
                     #region timeout
                     case "timeout:core":
                         {
