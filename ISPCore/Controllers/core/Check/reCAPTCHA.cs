@@ -15,19 +15,19 @@ namespace ISPCore.Controllers.core
     {
         #region Base
         [HttpPost]
-        async public Task<JsonResult> Base(string recaptchaKey, int HourCacheToUser, string hash)
+        async public Task<JsonResult> Base(string recaptchaKey, string IP, int HourCacheToUser, string hash)
         {
             if (string.IsNullOrWhiteSpace(recaptchaKey))
                 return Json(new Text("recaptchaKey == null"));
 
-            if (hash != md5.text($"{HourCacheToUser}:{PasswdTo.salt}"))
+            if (hash != md5.text($"{IP}:{HourCacheToUser}:{PasswdTo.salt}"))
                 return Json(new Text("hash error"));
 
             // Проверяем reCAPTCHA
             if (await Recaptcha.Verify(recaptchaKey, jsonDB.Security.reCAPTCHASecret))
             {
                 // Валидные куки
-                string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, HttpContext.Connection.RemoteIpAddress.ToString());
+                string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP);
 
                 // Отдаем ответ
                 return Json(new { result = true, cookie = cookie, HourToCookie = HourCacheToUser });

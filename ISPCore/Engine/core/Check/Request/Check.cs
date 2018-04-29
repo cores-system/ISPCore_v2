@@ -238,12 +238,22 @@ namespace ISPCore.Engine.core.Check
                         #endregion
 
                         #region Локальный метод - "СheckingToreCAPTCHA"
-                        bool СheckingToreCAPTCHA(out Task content, int ExpiresToMinute)
+                        bool СheckingToreCAPTCHA(int ExpiresToMinute)
                         {
-                            content = null;
+                            #region Проверка Ptr
+                            string memKey = $"local-YnAqLmG:Request.Check:СheckingToreCAPTCHA-{IP}";
 
-                            if (IsWhitePtr(out _))
-                                return false;
+                            // Не чаще одного раза в сутки для IP
+                            if (!memoryCache.TryGetValue(memKey, out _))
+                            {
+                                // Проверяем Ptr
+                                if (IsWhitePtr(out _))
+                                    return false;
+
+                                // Запрещаем повторную проверку IP в течении суток
+                                memoryCache.Set(memKey, (byte)0, TimeSpan.FromDays(1));
+                            }
+                            #endregion
 
                             #region Валидный пользователь
                             if (memoryCache.TryGetValue(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), out (int countRequest, int ExpiresToMinute) item))
@@ -263,56 +273,15 @@ namespace ISPCore.Engine.core.Check
                             }
                             #endregion
 
-                            #region Кеш шаблона
                             // Путь к шаблону
-                            string SourceFile = $"{Folders.Tpl.LimitRequest}/reCAPTCHA.tpl";
-                            if (!File.Exists(SourceFile))
-                                SourceFile = $"{Folders.Tpl.LimitRequest}/default/reCAPTCHA.tpl";
+                            string tplToUrl = File.Exists($"{Folders.Tpl.LimitRequest}/reCAPTCHA.html") ? "/statics/tpl/LimitRequest/reCAPTCHA.html" : "/statics/tpl/LimitRequest/default/reCAPTCHA.html";
 
-                            // Время модификации файла
-                            DateTime LastWriteTimeToFile = File.GetLastWriteTime(SourceFile);
-
-                            // default value
-                            (DateTime LastWriteTime, string Source) cacheTpl = (DateTime.Now, "");
-
-                            // Обновляем кеш
-                            if (!memoryCache.TryGetValue("core.Check.Request:LimitRequest-tpl", out cacheTpl) || LastWriteTimeToFile != cacheTpl.LastWriteTime)
-                            {
-                                cacheTpl.LastWriteTime = LastWriteTimeToFile;
-                                cacheTpl.Source = File.ReadAllText(SourceFile);
-                                memoryCache.Set("core.Check.Request:LimitRequest-tpl", cacheTpl);
-                            }
-                            #endregion
-
-                            #region Замена полей
-                            string tpl = Regex.Replace(cacheTpl.Source, @"\{isp:([^\}]+)\}", key =>
-                            {
-                                switch (key.Groups[1].Value)
-                                {
-                                    case "CoreApiUrl":
-                                        return jsonDB.Base.CoreAPI;
-
-                                    case "reCAPTCHASitekey":
-                                        return jsonDB.Security.reCAPTCHASitekey;
-
-                                    case "IP":
-                                        return IP;
-
-                                    case "ExpiresToMinute":
-                                        return ExpiresToMinute.ToString();
-
-                                    case "hash":
-                                        return md5.text($"{IP}{ExpiresToMinute}:{PasswdTo.salt}");
-
-                                    default:
-                                        return string.Empty;
-                                }
-                            });
-                            #endregion
+                            // Параметры для замены полей
+                            string json = "{CoreApiUrl: '"+ jsonDB.Base.CoreAPI + "', reCAPTCHASitekey: '"+ jsonDB.Security.reCAPTCHASitekey + "', IP: '"+ IP + "', ExpiresToMinute: '" + ExpiresToMinute.ToString() + "', hash: '" + md5.text($"{IP}{ExpiresToMinute}:{PasswdTo.salt}") + "'}";                        
 
                             // Ответ
                             context.Response.ContentType = "text/html; charset=utf-8";
-                            content = context.Response.WriteAsync(tpl, context.RequestAborted);
+                            context.Response.WriteAsync(AntiBot.Html(tplToUrl, json), context.RequestAborted);
                             return true;
                         }
                         #endregion
@@ -373,8 +342,8 @@ namespace ISPCore.Engine.core.Check
                                     break;
                                 case LimitToBlockType.reCAPTCHA:
                                     {
-                                        if (СheckingToreCAPTCHA(out Task res, 2))
-                                            return res;
+                                        if (СheckingToreCAPTCHA(2))
+                                            return Task.FromResult(true);
                                     }
                                     break;
                             }
@@ -392,8 +361,8 @@ namespace ISPCore.Engine.core.Check
                                     break;
                                 case LimitToBlockType.reCAPTCHA:
                                     {
-                                        if (СheckingToreCAPTCHA(out Task res, 61))
-                                            return res;
+                                        if (СheckingToreCAPTCHA(61))
+                                            return Task.FromResult(true);
                                     }
                                     break;
                             }
@@ -412,8 +381,8 @@ namespace ISPCore.Engine.core.Check
                                     break;
                                 case LimitToBlockType.reCAPTCHA:
                                     {
-                                        if (СheckingToreCAPTCHA(out Task res, 1441))
-                                            return res;
+                                        if (СheckingToreCAPTCHA(1441))
+                                            return Task.FromResult(true);
                                     }
                                     break;
                             }

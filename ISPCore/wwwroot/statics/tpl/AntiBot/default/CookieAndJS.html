@@ -6,7 +6,8 @@
     <meta name='referrer' content='no-referrer' />
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css'>
     <link rel='stylesheet' href='/statics/antibot.css'>
-    <script type='text/javascript' src='/statics/jquery.min.js'></script>
+	<script type='text/javascript' src='/statics/jquery.min.js'></script>
+	<script type='text/javascript' src='/statics/base64.js'></script>
 </head>
 
 <body class='payment payment-secuses'>
@@ -37,9 +38,23 @@
         $('#FaError').hide()
     </script>
 
-{isp:JsToTimer}
+	<script>
+		var total = {isp:WaitUser};
+		$('.time').text(total);
 
-{isp:JsToBase64}
+		setInterval(function()
+		{
+			total -= 150;
+
+			if(total > 0){
+				$('.time').text(total);
+			}
+			else {
+				$('#timeText').text('перезагрузка страницы')
+			}
+
+		},150);
+	</script>
 
     <script>
         {isp:JsToRewriteUser}

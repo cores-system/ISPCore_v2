@@ -21,6 +21,8 @@ using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace ISPCore.Engine.core
 {
@@ -298,7 +300,7 @@ namespace ISPCore.Engine.core
             
             // reCAPTCHA, SignalR или JavaScript
             var tplName = (!IsRecaptcha && antiBotType == AntiBotType.reCAPTCHA) ? AntiBotType.SignalR : antiBotType;
-            outHtml = Html(tplName.ToString(), antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey);
+            outHtml = Html(tplName, antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey);
             return false;
 
             #region Локальный метод - "IsGlobalConf"
@@ -368,87 +370,78 @@ namespace ISPCore.Engine.core
 
         #region Html
         /// <summary>
-        /// Кеш шаблонов tpl
+        /// 
         /// </summary>
-        static ConcurrentDictionary<string, (DateTime, string)> HtmlCache = new ConcurrentDictionary<string, (DateTime, string)>();
-        
+        /// <param name="tplToUrl"></param>
+        /// <param name="json"></param>
+        public static string Html(string tplToUrl, string json)
+        {
+            return @"<!DOCTYPE html>
+<html><body>Please enable to JavaScript
+<script>
+var json = " + json + @";
+
+function FinReplace(html){
+	for(var i in json){
+		html = html.replace(new RegExp('{isp:'+i+'}','g'),json[i]);
+	}
+	return html;
+}
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', '" + tplToUrl + @"', false);
+xhr.send();
+if (xhr.status == 200) {
+	document.body.innerHTML = '';
+	document.write(FinReplace(xhr.responseText));
+}
+</script></body></html>";
+        }
+
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tplName">Имя шаблона "/core/Templates/AntiBot/name.tpl"</param>
+        /// <param name="tplName"></param>
         /// <param name="conf"></param>
+        /// <param name="CoreApiUrl"></param>
         /// <param name="IP"></param>
         /// <param name="HostConvert"></param>
-        /// <param name="CoreApiUrl"></param>
-        static string Html(string tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey)
+        /// <param name="reCAPTCHASitekey"></param>
+        static string Html(AntiBotType tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey)
         {
-            #region Кеш шаблона
-                // Путь к шаблону
-            string SourceFile = $"{Folders.Tpl.AntiBot}/{tplName}.tpl";
-            if (!File.Exists(SourceFile))
-                SourceFile = $"{Folders.Tpl.AntiBot}/default/{tplName}.tpl";
+            #region Базовые параметры
+            string tplToUrl = string.Empty;
+            var mass = new Dictionary<string, string>();
+            mass.Add("IP", IP);
+            mass.Add("CoreApiUrl", CoreApiUrl);
+            mass.Add("HourCacheToUser", conf.HourCacheToUser.ToString());
+            mass.Add("WaitUser", conf.WaitUser.ToString());
+            mass.Add("AddCodeToHtml", conf.AddCodeToHtml != null ? conf.AddCodeToHtml : string.Empty);
+            mass.Add("JsToRewriteUser", JsToRewriteUser(conf.RewriteToOriginalDomain, HostConvert));
+            #endregion
 
-            // Время модификации файла
-            DateTime LastWriteTimeToFile = File.GetLastWriteTime(SourceFile);
-
-            // default value
-            (DateTime LastWriteTime, string Source) cache = (DateTime.Now, "");
-
-            // Обновляем кеш
-            if (!HtmlCache.TryGetValue(tplName, out cache) || LastWriteTimeToFile != cache.LastWriteTime)
+            #region Хеш и куки
+            switch (tplName)
             {
-                cache.LastWriteTime = LastWriteTimeToFile;
-                cache.Source = File.ReadAllText(SourceFile);
-                HtmlCache.AddOrUpdate(tplName, cache, (d,s) => cache);
+                case AntiBotType.SignalR:
+                    mass.Add("HashToSignalR", md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdTo.salt}"));
+                    tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/SignalR.html" : "/statics/tpl/AntiBot/default/SignalR.html";
+                    break;
+                case AntiBotType.reCAPTCHA:
+                    mass.Add("reCAPTCHASitekey", reCAPTCHASitekey);
+                    mass.Add("HashToreCAPTCHA", md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdTo.salt}"));
+                    tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/reCAPTCHA.html" : "/statics/tpl/AntiBot/default/reCAPTCHA.html";
+                    break;
+                case AntiBotType.CookieAndJS:
+                    mass.Add("ValidCookie", GetValidCookie(conf.HourCacheToUser, IP));
+                    tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/CookieAndJS.html" : "/statics/tpl/AntiBot/default/CookieAndJS.html";
+                    break;
             }
             #endregion
 
-            // Замена полей
-            return Regex.Replace(cache.Source, @"\{isp:([^\}]+)\}", key => 
-            {
-                switch (key.Groups[1].Value)
-                {
-                    case "JsToTimer":
-                        return JsToTimer(conf.WaitUser);
 
-                    case "JsToBase64":
-                        return $"<script>{JsToBase64(conf.RewriteToOriginalDomain)}</script>";
-
-                    case "JsToRewriteUser":
-                        return JsToRewriteUser(conf.RewriteToOriginalDomain, HostConvert);
-
-                    case "CoreApiUrl":
-                        return CoreApiUrl;
-
-                    case "reCAPTCHASitekey":
-                        return reCAPTCHASitekey;
-
-                    case "HashToSignalR":
-                        return md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdTo.salt}");
-
-                    case "HashToreCAPTCHA":
-                        return md5.text($"{conf.HourCacheToUser}:{PasswdTo.salt}");
-
-                    case "ValidCookie":
-                        return GetValidCookie(conf.HourCacheToUser, IP);
-
-                    case "IP":
-                        return IP;
-
-                    case "HourCacheToUser":
-                        return conf.HourCacheToUser.ToString();
-
-                    case "WaitUser":
-                        return conf.WaitUser.ToString();
-
-                    case "AddCodeToHtml":
-                        return conf.AddCodeToHtml;
-
-                    default:
-                        return string.Empty;
-                }
-            });
+            return Html(tplToUrl, JsonConvert.SerializeObject(mass));
         }
         #endregion
 
@@ -538,36 +531,7 @@ var Base64 =
                 return "if (false) { }";
             }
 
-            return @"
-                if (" + $"!\"{HostConvert}\".match(/.isp$/) && " + " location.hostname.replace(/www./gi,'') != Base64.decode('" + base64.Encode(HostConvert) + @"')) {
-                    window.location = Base64.decode('" + base64.Encode("http://" + HostConvert) + @"');
-                }
-            ";
-        }
-        #endregion
-
-        #region JsToTimer
-        static string JsToTimer(int WaitUser)
-        {
-            return @"
-                <script>
-                    var total = " + WaitUser + @";
-                    $('.time').text(total);
-
-                    setInterval(function()
-                    {
-                        total -= 150;
-
-                        if(total > 0){
-                            $('.time').text(total);
-                        }
-                        else {
-                            $('#timeText').text('перезагрузка страницы')
-                        }
-
-                    },150);
-                </script>
-            ";
+            return @"if (" + $"!\"{HostConvert}\".match(/.isp$/) && " + " location.hostname.replace(/www./gi,'') != Base64.decode('" + base64.Encode(HostConvert) + @"')) { window.location = Base64.decode('" + base64.Encode("http://" + HostConvert) + @"'); }";
         }
         #endregion
     }
