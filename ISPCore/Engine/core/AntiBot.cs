@@ -144,6 +144,7 @@ namespace ISPCore.Engine.core
                     #region Локальный метод - "DNSLookup"
                     bool DNSLookup()
                     {
+                        string ptr = null;
                         try
                         {
                             // Получаем имя хоста по IP
@@ -151,6 +152,9 @@ namespace ISPCore.Engine.core
 
                             // Получаем IP хоста по имени
                             host = Dns.GetHostEntryAsync(host.HostName).Result;
+
+                            // Сохраняем PTR
+                            ptr = host.HostName;
 
                             // Проверяем имя хоста и IP на совпадение 
                             if (host.AddressList.Where(i => i.ToString() == IP).FirstOrDefault() != null)
@@ -200,7 +204,7 @@ namespace ISPCore.Engine.core
                                 Host = HostConvert,
                                 IP = IP,
                                 Msg = Msg,
-                                Ptr = null,
+                                Ptr = ptr,
                                 UserAgent = userAgent,
                                 Country = geoIP.Country,
                                 City = geoIP.City,

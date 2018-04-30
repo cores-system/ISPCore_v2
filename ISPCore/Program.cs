@@ -23,7 +23,7 @@ namespace ISPCore
         public static void Main(string[] args)
         {
             cmd cmd = new cmd();
-            LogLevel logLevel = LogLevel.Information;
+            LogLevel logLevel = LogLevel.Error;
             CultureInfo.CurrentCulture = new CultureInfo("ru-RU");
 
             #region Command Line
