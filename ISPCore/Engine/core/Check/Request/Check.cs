@@ -63,7 +63,7 @@ namespace ISPCore.Engine.core.Check
                         AddArgsToUri(item.Key, item.Value);
                         break;
                     case "host":
-                        host = Regex.Replace(item.Value.First().ToLower(), @"^www\.", "", RegexOptions.IgnoreCase);
+                        host = Regex.Replace(item.Value.First().ToLower(), @"^www\.", "", RegexOptions.IgnoreCase).Trim();
                         AddArgsToUri(item.Key, item.Value);
                         break;
                     case "uri":

@@ -21,6 +21,7 @@ using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using System.IO;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace ISPCore.Engine.core
 {
@@ -383,7 +384,8 @@ namespace ISPCore.Engine.core
         public static string Html(string tplToUrl, string json)
         {
             return @"<!DOCTYPE html>
-<html><body>Please enable to JavaScript
+<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head>
+<body>Please enable to JavaScript
 <script>
 var json = " + json + @";
 
