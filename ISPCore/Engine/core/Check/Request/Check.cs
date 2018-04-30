@@ -277,7 +277,7 @@ namespace ISPCore.Engine.core.Check
                             string tplToUrl = File.Exists($"{Folders.Tpl.LimitRequest}/reCAPTCHA.html") ? "/statics/tpl/LimitRequest/reCAPTCHA.html" : "/statics/tpl/LimitRequest/default/reCAPTCHA.html";
 
                             // Параметры для замены полей
-                            string json = "{CoreApiUrl: '"+ jsonDB.Base.CoreAPI + "', reCAPTCHASitekey: '"+ jsonDB.Security.reCAPTCHASitekey + "', IP: '"+ IP + "', ExpiresToMinute: '" + ExpiresToMinute.ToString() + "', hash: '" + md5.text($"{IP}{ExpiresToMinute}:{PasswdTo.salt}") + "'}";                        
+                            string json = "{CoreApiUrl: '"+ jsonDB.Base.CoreAPI + "', reCAPTCHASitekey: '"+ jsonDB.Security.reCAPTCHASitekey + "', IP: '"+ IP + "', ExpiresToMinute: '" + ExpiresToMinute.ToString() + "', hash: '" + md5.text($"{IP}:{ExpiresToMinute}:{PasswdTo.salt}") + "'}";                        
 
                             // Ответ
                             context.Response.ContentType = "text/html; charset=utf-8";

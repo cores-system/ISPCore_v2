@@ -17,14 +17,8 @@ namespace ISPCore.Controllers.core
         [HttpPost]
         async public Task<JsonResult> Base(string recaptchaKey, string IP, int HourCacheToUser, string hash)
         {
-            if (string.IsNullOrWhiteSpace(recaptchaKey))
-                return Json(new Text("recaptchaKey == null"));
-
-            if (hash != md5.text($"{IP}:{HourCacheToUser}:{PasswdTo.salt}"))
-                return Json(new Text("hash error"));
-
-            // Проверяем reCAPTCHA
-            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Security.reCAPTCHASecret))
+            var res = await Verify(recaptchaKey, IP, HourCacheToUser, hash);
+            if (res.res)
             {
                 // Валидные куки
                 string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP);
@@ -32,9 +26,9 @@ namespace ISPCore.Controllers.core
                 // Отдаем ответ
                 return Json(new { result = true, cookie = cookie, HourToCookie = HourCacheToUser });
             }
-            
+
             // Ошибка
-            return Json(new Text("Verify == false"));
+            return Json(res.ob);
         }
         #endregion
 
@@ -42,14 +36,8 @@ namespace ISPCore.Controllers.core
         [HttpPost]
         async public Task<JsonResult> LimitRequest(string recaptchaKey, string IP, int ExpiresToMinute, string hash)
         {
-            if (string.IsNullOrWhiteSpace(recaptchaKey))
-                return Json(new Text("recaptchaKey == null"));
-
-            if (hash != md5.text($"{IP}{ExpiresToMinute}:{PasswdTo.salt}"))
-                return Json(new Text("hash error"));
-
-            // Проверяем reCAPTCHA
-            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Security.reCAPTCHASecret))
+            var res = await Verify(recaptchaKey, IP, ExpiresToMinute, hash);
+            if (res.res)
             {
                 // Создаем кеш
                 memoryCache.Set(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), (0, ExpiresToMinute), TimeSpan.FromMinutes(ExpiresToMinute));
@@ -59,7 +47,31 @@ namespace ISPCore.Controllers.core
             }
 
             // Ошибка
-            return Json(new Text("Verify == false"));
+            return Json(res.ob);
+        }
+        #endregion
+
+
+        #region private - Verify
+        async Task<(bool res, object ob)> Verify(string recaptchaKey, string IP, int expires, string hash)
+        {
+            #region Проверка параметров
+            if (string.IsNullOrWhiteSpace(recaptchaKey))
+                return (false, new Text("recaptchaKey == null"));
+
+            if (string.IsNullOrWhiteSpace(IP))
+                IP = HttpContext.Connection.RemoteIpAddress.ToString();
+
+            if (hash != md5.text($"{IP}:{expires}:{PasswdTo.salt}"))
+                return (false, new Text("hash error"));
+            #endregion
+
+            // Проверяем reCAPTCHA
+            if (await Recaptcha.Verify(recaptchaKey, jsonDB.Security.reCAPTCHASecret))
+                return (true, null);
+
+            // Ошибка
+            return (false, new Text("Verify == false"));
         }
         #endregion
     }
