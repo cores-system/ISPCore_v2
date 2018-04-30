@@ -74,7 +74,7 @@ namespace ISPCore
                     #region timeout
                     case "timeout:core":
                         {
-                            if (int.TryParse(value, out int res))
+                            if (int.TryParse(value.Replace("s", ""), out int res))
                                 cmd.Timeout.core = res;
                             break;
                         }
@@ -102,14 +102,14 @@ namespace ISPCore
                     #region cache
                     case "cache:checklink":
                         {
-                            if (int.TryParse(value, out int res))
+                            if (int.TryParse(value.Replace("ms", ""), out int res))
                                 cmd.Cache.Checklink = res;
                             break;
                         }
 
                     case "cache:antibot":
                         {
-                            if (int.TryParse(value, out int res))
+                            if (int.TryParse(value.Replace("ms", ""), out int res))
                                 cmd.Cache.AntiBot = res;
                             break;
                         }
