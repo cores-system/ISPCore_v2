@@ -781,6 +781,7 @@ namespace ISPCore.Engine.core.Check
                     switch (method)
                     {
                         case "GET":
+                        case "HEAD":
                             return rule.RuleGetToRegex != "^$" && Regex.IsMatch(uri, rule.RuleGetToRegex, RegexOptions.IgnoreCase);
                         case "POST":
                             {

@@ -279,9 +279,9 @@ namespace ISPCore.Engine.core
                 // Ключ для проверки запросов
                 string memKey = $"Core:AntiBot/CountBackgroundRequest-{IP}";
 
-                if (method != "GET")
+                if (method != "GET" && method != "HEAD")
                 {
-                    // Если до этого был GET запрос
+                    // Если до этого был GET/HEAD запрос
                     if (memoryCache.TryGetValue(memKey, out _))
                         return true;
                 }
