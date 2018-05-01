@@ -1,7 +1,7 @@
-﻿@model IEnumerable<ISPCore.Models.Base.WhitePtrIP>
+﻿@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.Base.WhitePtrIP>
 
 @{
-    if ((bool)ViewData["ajax"]) {
+    if (Model.ajax) {
         Layout = null;
     }
 }
@@ -16,7 +16,7 @@
             </ul>
         </div>
 
-        <div class="wrapper wrapper-white" style="padding: 0px">
+        <div class="wrapper wrapper-white margin-bottom-20" style="padding: 0px">
             <div class="row">
                 <div class="col-md-12">
                     <div class="add-gray-table">
@@ -40,7 +40,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var item in Model)
+                                        @foreach (var item in Model.Page.GetItems())
                                         {
                                             <tr class="elemDelete">
                                                 <td class="text-left">@item.IPv4Or6</td>
@@ -61,6 +61,9 @@
             </div>
         </div>
     </form>
+
+
+    @Html.Raw(Model.Page.Nav())
 </div>
 
 
