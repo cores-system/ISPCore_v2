@@ -126,6 +126,13 @@ namespace ISPCore.Engine.core
             #region Проверка User-Agent
             if (HttpContext.Request.Headers.TryGetValue("User-Agent", out var userAgent))
             {
+                // Достаем настройки WhiteList из кеша
+                var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
+
+                // Проверка пользовательского User-Agent
+                if (Regex.IsMatch(userAgent, whiteList.UserAgentRegex, RegexOptions.IgnoreCase))
+                    return true;
+
                 string SearchBot = "(" +
                 // https://yandex.ru/support/webmaster/robot-workings/check-yandex-robots.html
                 "YandexBot|YandexAccessibilityBot|YandexMobileBot|YandexDirectDyn|YandexScreenshotBot|YandexImages|YandexVideo|YandexVideoParser|YandexMedia|YandexBlogs|YandexFavicons|YandexWebmaster|YandexPagechecker|YandexImageResizer|YandexAdNet|YandexDirect|YaDirectFetcher|YandexCalendar|YandexSitelinks|YandexMetrika|YandexNews|YandexCatalog|YandexMarket|YandexVertis|YandexForDomain|YandexSpravBot|YandexSearchShop|YandexMedianaBot|YandexOntoDB|YandexVerticals" +
@@ -170,64 +177,8 @@ namespace ISPCore.Engine.core
                         }
                         catch { }
 
-                        #region  Блокируем IP и записываем в журнал
-                        // Данные для статистики
-                        Check.Request.SetCountRequestToHour(TypeRequest._401, HostConvert, domain.confToLog.EnableCountRequest);
-
-                        // Информация по блокировке
-                        DateTime Expires = DateTime.Now.AddMinutes(40);
-                        string Msg = "AntiBot";
-
-                        // Записываем IP в кеш IPtables
-                        memoryCache.Set(KeyToMemoryCache.IPtables(IP, HostConvert), new IPtables(Msg, Expires), Expires);
-
-                        // Дублируем информацию в SQL
-                        WriteLogTo.SQL(new BlockedIP()
-                        {
-                            IP = IP,
-                            BlockingTime = Expires,
-                            Description = Msg,
-                            typeBlockIP = TypeBlockIP.domain,
-                            BlockedHost = HostConvert
-                        });
-
-                        // Лог запроса
-                        if (domain.confToLog.IsActive)
-                        {
-                            var geoIP = (Country: "Disabled", City: "Disabled", Region: "Disabled");
-                            if (domain.confToLog.EnableGeoIP)
-                                geoIP = GeoIP2.City(IP);
-
-                            // Модель
-                            Jurnal401 model = new Jurnal401()
-                            {
-                                Host = HostConvert,
-                                IP = IP,
-                                Msg = Msg,
-                                Ptr = ptr,
-                                UserAgent = userAgent,
-                                Country = geoIP.Country,
-                                City = geoIP.City,
-                                Region = geoIP.Region,
-                                Time = DateTime.Now
-                            };
-
-                            // Записываем данные в журнал
-                            switch (domain.confToLog.Jurn401)
-                            {
-                                case WriteLogMode.File:
-                                    WriteLogTo.FileStream(model);
-                                    break;
-                                case WriteLogMode.SQL:
-                                    WriteLogTo.SQL(model);
-                                    break;
-                                case WriteLogMode.all:
-                                    WriteLogTo.SQL(model);
-                                    WriteLogTo.FileStream(model);
-                                    break;
-                            }
-                        }
-                        #endregion
+                        // Записываем IP в кеш IPtables и журнал
+                        Check.Request.SetBlockedToIPtables(domain, IP, HostConvert, "AntiBot", DateTime.Now.AddMinutes(40), uri, userAgent, ptr);
 
                         // Не удалось проверить PTR-запись
                         return false;
@@ -253,13 +204,6 @@ namespace ISPCore.Engine.core
                     // Бот может зайти на сайт 
                     return true;
                 }
-
-                // Достаем настройки WhiteList из кеша
-                var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
-
-                // Проверка пользовательского User-Agent
-                if (Regex.IsMatch(userAgent, whiteList.UserAgentRegex, RegexOptions.IgnoreCase))
-                    return true;
             }
             #endregion
 

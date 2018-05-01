@@ -241,7 +241,7 @@ namespace ISPCore.Engine.core.Check
                         bool СheckingToreCAPTCHA(int ExpiresToMinute)
                         {
                             #region Проверка Ptr
-                            string memKey = $"local-YnAqLmG:Request.Check:СheckingToreCAPTCHA-{IP}";
+                            string memKey = $"local-YnAqLmG:СheckingToreCAPTCHA-{IP}";
 
                             // Не чаще одного раза в сутки для IP
                             if (!memoryCache.TryGetValue(memKey, out _))
@@ -314,7 +314,7 @@ namespace ISPCore.Engine.core.Check
                                 return;
 
                             // Записываем IP в кеш IPtables и журнал
-                            SetBlockedToIPtables(Msg, Expires, PtrHostName);
+                            SetBlockedToIPtables(Domain, IP, host, Msg, Expires, uri, userAgent, PtrHostName);
                         }
                         #endregion
 
@@ -440,7 +440,7 @@ namespace ISPCore.Engine.core.Check
                     memoryCache.Set(KeyLimitRequestToBlockedWait, (byte)0, TimeSpan.FromMinutes(5));
 
                     // Записываем IP в кеш IPtables и журнал
-                    SetBlockedToIPtables(Msg, Expires, null);
+                    SetBlockedToIPtables(Domain, IP, host, Msg, Expires, uri, userAgent, null);
 
                     // Сносим временную запись
                     memoryCache.Remove(KeyLimitRequestToBlockedWait);
@@ -1044,68 +1044,6 @@ namespace ISPCore.Engine.core.Check
                                 break;
                         }
                     });
-                }
-            }
-            #endregion
-
-            #region Локальный метод - "SetBlockedToIPtables"
-            void SetBlockedToIPtables(string Msg, DateTime Expires, string PtrHostName)
-            {
-                // Если IP уже заблокирован
-                if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(IP, host), out _))
-                    return;
-
-                // Данные для статистики
-                SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
-
-                // Записываем IP в кеш IPtables
-                memoryCache.Set(KeyToMemoryCache.IPtables(IP, host), new IPtables(Msg, Expires), Expires);
-
-                // Дублируем информацию в SQL
-                WriteLogTo.SQL(new BlockedIP()
-                {
-                    IP = IP,
-                    BlockingTime = Expires,
-                    Description = Msg,
-                    typeBlockIP = TypeBlockIP.domain,
-                    BlockedHost = host
-                });
-
-                // Игнорирование логов
-                if (Domain.confToLog.IsActive && !Regex.IsMatch(uri, Domain.IgnoreLogToRegex, RegexOptions.IgnoreCase))
-                {
-                    var geoIP = (Country: "Disabled", City: "Disabled", Region: "Disabled");
-                    if (Domain.confToLog.EnableGeoIP)
-                        geoIP = GeoIP2.City(IP);
-
-                    // Модель
-                    Jurnal401 model = new Jurnal401()
-                    {
-                        Host = host,
-                        IP = IP,
-                        Msg = Msg,
-                        Ptr = PtrHostName,
-                        UserAgent = userAgent,
-                        Country = geoIP.Country,
-                        City = geoIP.City,
-                        Region = geoIP.Region,
-                        Time = DateTime.Now
-                    };
-
-                    // Записываем данные в журнал
-                    switch (Domain.confToLog.Jurn401)
-                    {
-                        case WriteLogMode.File:
-                            WriteLogTo.FileStream(model);
-                            break;
-                        case WriteLogMode.SQL:
-                            WriteLogTo.SQL(model);
-                            break;
-                        case WriteLogMode.all:
-                            WriteLogTo.SQL(model);
-                            WriteLogTo.FileStream(model);
-                            break;
-                    }
                 }
             }
             #endregion

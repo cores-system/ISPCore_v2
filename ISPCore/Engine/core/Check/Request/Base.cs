@@ -1,9 +1,16 @@
-﻿using ISPCore.Engine.Base.SqlAndCache;
+﻿using ISPCore.Engine.Base;
+using ISPCore.Engine.Base.SqlAndCache;
+using ISPCore.Models.Databases;
 using ISPCore.Models.Databases.json;
+using ISPCore.Models.RequestsFilter.Domains;
+using ISPCore.Models.RequestsFilter.Domains.Log;
 using ISPCore.Models.RequestsFilter.Monitoring;
+using ISPCore.Models.Security;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using ModelCache = ISPCore.Models.core.Cache.CheckLink;
 
 namespace ISPCore.Engine.core.Check
 {
@@ -71,6 +78,85 @@ namespace ISPCore.Engine.core.Check
 
                     // Создаем кеш
                     memoryCache.Set(keyNumberOfRequestToHour, new Dictionary<string, NumberOfRequestHour>() { [host] = dt }, TimeSpan.FromHours(2));
+                }
+            }
+        }
+        #endregion
+
+        #region SetBlockedToIPtables
+        public static void SetBlockedToIPtables(ModelCache.Domain Domain, string IP, string host, string Msg, DateTime Expires, string uri, string userAgent, string PtrHostName)
+        {
+            if (Domain.typeBlockIP == TypeBlockIP.Triggers)
+            {
+                // Что-бы в статистике не считать лишний раз +1 к блокировке 
+                string memKey = $"local-fb482608:SetBlockedToIPtables-{IP}";
+                if (memoryCache.TryGetValue(memKey, out _))
+                    return;
+
+                // Данные для статистики
+                SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
+                memoryCache.Set(memKey, (byte)0, Expires);
+            }
+            else
+            {
+                // Режим блокировки
+                string memKey = Domain.typeBlockIP == TypeBlockIP.domain ? KeyToMemoryCache.IPtables(IP, host) : KeyToMemoryCache.IPtables(IP);
+
+                // Если IP уже заблокирован
+                if (memoryCache.TryGetValue(memKey, out _))
+                    return;
+
+                // Данные для статистики
+                SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
+
+                // Записываем IP в кеш IPtables
+                memoryCache.Set(memKey, new IPtables(Msg, Expires), Expires);
+
+                // Дублируем информацию в SQL
+                WriteLogTo.SQL(new BlockedIP()
+                {
+                    IP = IP,
+                    BlockingTime = Expires,
+                    Description = Msg,
+                    typeBlockIP = Domain.typeBlockIP,
+                    BlockedHost = host
+                });
+            }
+
+            // Игнорирование логов
+            if (Domain.confToLog.IsActive && !Regex.IsMatch(uri, Domain.IgnoreLogToRegex, RegexOptions.IgnoreCase))
+            {
+                var geoIP = (Country: "Disabled", City: "Disabled", Region: "Disabled");
+                if (Domain.confToLog.EnableGeoIP)
+                    geoIP = GeoIP2.City(IP);
+
+                // Модель
+                Jurnal401 model = new Jurnal401()
+                {
+                    Host = host,
+                    IP = IP,
+                    Msg = Msg,
+                    Ptr = PtrHostName,
+                    UserAgent = userAgent,
+                    Country = geoIP.Country,
+                    City = geoIP.City,
+                    Region = geoIP.Region,
+                    Time = DateTime.Now
+                };
+
+                // Записываем данные в журнал
+                switch (Domain.confToLog.Jurn401)
+                {
+                    case WriteLogMode.File:
+                        WriteLogTo.FileStream(model);
+                        break;
+                    case WriteLogMode.SQL:
+                        WriteLogTo.SQL(model);
+                        break;
+                    case WriteLogMode.all:
+                        WriteLogTo.SQL(model);
+                        WriteLogTo.FileStream(model);
+                        break;
                 }
             }
         }

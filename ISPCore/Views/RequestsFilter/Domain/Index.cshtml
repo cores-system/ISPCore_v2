@@ -56,7 +56,11 @@
                         <div class="form-group">
                             <label>Режим<span>блокировки IP в брандмауэр</span></label>
                             <select class="form-control selectpicker" name="domain.typeBlockIP">
-                                @Html.Raw(SelectPickerTo.Int(Model?.typeBlockIP == TypeBlockIP.domain, "По домену", "Глобально"))
+                                @Html.Raw(SelectPickerTo.Enum(Model == null ? TypeBlockIP.domain : Model.typeBlockIP,
+                                      (TypeBlockIP.domain, "По домену"),
+                                      (TypeBlockIP.global, "Глобально"),
+                                      (TypeBlockIP.Triggers, "Выполнить триггер")
+                                ))
                             </select>
                         </div>
 

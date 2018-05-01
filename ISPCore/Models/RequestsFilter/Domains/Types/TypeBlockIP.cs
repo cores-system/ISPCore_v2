@@ -4,6 +4,7 @@
     {
         global = 0,
         domain = 1,
-        UserAgent = 2
+        UserAgent = 2,
+        Triggers = 3,
     }
 }
