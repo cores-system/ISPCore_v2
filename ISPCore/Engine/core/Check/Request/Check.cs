@@ -191,12 +191,19 @@ namespace ISPCore.Engine.core.Check
                         #region Локальный метод - "IsWhitePtr"
                         bool IsWhitePtr(out string PtrHostName)
                         {
+                            #region Кеш ответа
+                            string memKey = $"local-YnAqLmG:IsWhitePtr-{IP}";
+                            if (memoryCache.TryGetValue(memKey, out (bool res, string PtrHostName, DateTime LastUpdateToConf) _cache) && whiteList.LastUpdateToConf == _cache.LastUpdateToConf)
+                            {
+                                PtrHostName = _cache.PtrHostName;
+                                return _cache.res;
+                            }
+                            #endregion
+                            
                             PtrHostName = null;
 
-                            string KeyLimitRequestToBlockedWait = $"LimitRequestToBlockedWait-{IP}_{host}";
-                            if (memoryCache.TryGetValue(KeyLimitRequestToBlockedWait, out _))
-                                return true;
-                            memoryCache.Set(KeyLimitRequestToBlockedWait, (byte)0, TimeSpan.FromMinutes(5));
+                            // На время проверки добавляем IP в белый список 
+                            memoryCache.Set(memKey, (true, PtrHostName, whiteList.LastUpdateToConf), TimeSpan.FromMinutes(5));
 
                             #region DNSLookup
                             try
@@ -221,7 +228,8 @@ namespace ISPCore.Engine.core.Check
                                         {
                                             // Добовляем IP в белый список на 9 дней
                                             WhitePtr.Add(IP, DnsHost.HostName, DateTime.Now.AddDays(9));
-                                            memoryCache.Remove(KeyLimitRequestToBlockedWait);
+
+                                            // Успех
                                             return true;
                                         }
                                     }
@@ -231,8 +239,10 @@ namespace ISPCore.Engine.core.Check
                             catch { }
                             #endregion
 
-                            // Сносим временную запись
-                            memoryCache.Remove(KeyLimitRequestToBlockedWait);
+                            // Запрещаем повторную проверку IP в течении 3х часов
+                            memoryCache.Set(memKey, (false, PtrHostName, whiteList.LastUpdateToConf), TimeSpan.FromHours(3));
+
+                            // IP нету в белом списке PTR
                             return false;
                         }
                         #endregion
@@ -240,20 +250,9 @@ namespace ISPCore.Engine.core.Check
                         #region Локальный метод - "СheckingToreCAPTCHA"
                         bool СheckingToreCAPTCHA(int ExpiresToMinute)
                         {
-                            #region Проверка Ptr
-                            string memKey = $"local-YnAqLmG:СheckingToreCAPTCHA-{IP}";
-
-                            // Не чаще одного раза в сутки для IP
-                            if (!memoryCache.TryGetValue(memKey, out _))
-                            {
-                                // Проверяем Ptr
-                                if (IsWhitePtr(out _))
-                                    return false;
-
-                                // Запрещаем повторную проверку IP в течении суток
-                                memoryCache.Set(memKey, (byte)0, TimeSpan.FromDays(1));
-                            }
-                            #endregion
+                            // Проверяем Ptr
+                            if (IsWhitePtr(out _))
+                                return false;
 
                             #region Валидный пользователь
                             if (memoryCache.TryGetValue(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), out (int countRequest, int ExpiresToMinute) item))

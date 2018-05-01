@@ -152,6 +152,13 @@ namespace ISPCore.Engine.core
                     bool DNSLookup()
                     {
                         string ptr = null;
+                        string memKey = $"local-fb23a52e:DNSLookup-{IP}";
+                        if (memoryCache.TryGetValue(memKey, out bool _cacheToDNSLookup))
+                            return _cacheToDNSLookup;
+
+                        // Создаем временный кеш на время проверки
+                        memoryCache.Set(memKey, true, TimeSpan.FromMinutes(5));
+
                         try
                         {
                             // Получаем имя хоста по IP
@@ -181,6 +188,7 @@ namespace ISPCore.Engine.core
                         Check.Request.SetBlockedToIPtables(domain, IP, HostConvert, "AntiBot", DateTime.Now.AddMinutes(40), uri, userAgent, ptr);
 
                         // Не удалось проверить PTR-запись
+                        memoryCache.Remove(memKey);
                         return false;
                     }
                     #endregion
