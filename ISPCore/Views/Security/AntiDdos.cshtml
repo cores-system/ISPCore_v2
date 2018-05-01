@@ -158,6 +158,13 @@ else
                                         @Html.Raw(SelectPickerTo.Bool(jsonDB.AntiDdos.DNSLookupEnabled, "Да", "Нет", "Нет", "Да"))
                                     </select>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Блокировать<span>в IPtables</span></label>
+                                    <select class="form-control selectpicker" name="antiDdos.BlockToIPtables">
+                                        @Html.Raw(SelectPickerTo.Bool(jsonDB.AntiDdos.BlockToIPtables, "Да", "Нет"))
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="col-md-6" style="float: right">

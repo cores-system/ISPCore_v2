@@ -51,7 +51,7 @@ namespace ISPCore.Controllers
             if (antiDdos.IsActive)
             {
                 // Проверяем iptables
-                if (string.IsNullOrWhiteSpace(new Bash().Run("iptables -V 2>/dev/null")))
+                if (jsonDB.AntiDdos.BlockToIPtables && string.IsNullOrWhiteSpace(new Bash().Run("iptables -V 2>/dev/null")))
                     return Json(new Text("В системе отсутствует iptables"));
 
                 // Проверяем tcpdump

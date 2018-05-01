@@ -91,7 +91,7 @@ namespace ISPCore.Engine.Cron
                         continue;
 
                     // Блокируем IP
-                    Blocked(memoryCache, Regex.Replace(IP, "[\n\r\t ]+", ""));
+                    Blocked(memoryCache, Regex.Replace(IP, "[\n\r\t ]+", ""), jsonDB.AntiDdos.BlockToIPtables);
                 }
                 #endregion
             }
@@ -217,35 +217,38 @@ namespace ISPCore.Engine.Cron
             #endregion
 
             #region Очистка IPTables/IP6Tables
-            Bash bash = new Bash();
-
-            foreach (var comandTables in "iptables,ip6tables".Split(','))
+            if (jsonDB.AntiDdos.BlockToIPtables)
             {
-                // Список IP
-                foreach (var line in bash.Run(comandTables + " -L INPUT -v --line-numbers | awk '{print $1,$2,$9,$12}'").Split('\n').Reverse())
-                {
-                    // Разбираем строку
-                    var gr = new Regex("^([0-9]+) ([^ ]+) [^ ]+ ISPCore_([^\n\r]+)$").Match(line).Groups;
-                    if (string.IsNullOrWhiteSpace(gr[1].Value) || !DateTime.TryParse(gr[3].Value, out DateTime time))
-                        continue;
+                Bash bash = new Bash();
 
-                    // Если время блокировки истекло
-                    if (DateTime.Now > time)
+                foreach (var comandTables in "iptables,ip6tables".Split(','))
+                {
+                    // Список IP
+                    foreach (var line in bash.Run(comandTables + " -L INPUT -v --line-numbers | awk '{print $1,$2,$9,$12}'").Split('\n').Reverse())
                     {
-                        if (jsonDB.AntiDdos.ActiveLockMode)
+                        // Разбираем строку
+                        var gr = new Regex("^([0-9]+) ([^ ]+) [^ ]+ ISPCore_([^\n\r]+)$").Match(line).Groups;
+                        if (string.IsNullOrWhiteSpace(gr[1].Value) || !DateTime.TryParse(gr[3].Value, out DateTime time))
+                            continue;
+
+                        // Если время блокировки истекло
+                        if (DateTime.Now > time)
                         {
-                            if (gr[2].Value == "0")
+                            if (jsonDB.AntiDdos.ActiveLockMode)
                             {
-                                bash.Run($"{comandTables} -D INPUT {gr[1].Value}");
+                                if (gr[2].Value == "0")
+                                {
+                                    bash.Run($"{comandTables} -D INPUT {gr[1].Value}");
+                                }
+                                else
+                                {
+                                    bash.Run($"{comandTables} -Z INPUT {gr[1].Value}");
+                                }
                             }
                             else
                             {
-                                bash.Run($"{comandTables} -Z INPUT {gr[1].Value}");
+                                bash.Run($"{comandTables} -D INPUT {gr[1].Value}");
                             }
-                        }
-                        else
-                        {
-                            bash.Run($"{comandTables} -D INPUT {gr[1].Value}");
                         }
                     }
                 }
@@ -351,18 +354,21 @@ namespace ISPCore.Engine.Cron
         #endregion
 
         #region Blocked
-        private static void Blocked(IMemoryCache memoryCache, string IP)
+        private static void Blocked(IMemoryCache memoryCache, string IP, bool BlockToIPtables)
         {
             byte bit = 0;
             string key = $"AntiDdosCheckBlockedIP-{IP}";
 
             if (!memoryCache.TryGetValue(key, out bit))
             {
-                // Пишем IP в кеш, что-бы два раза не писать в базу один и тот-же IP
-                memoryCache.Set(key, bit, TimeSpan.FromMinutes(30));
+                if (BlockToIPtables)
+                {
+                    // Пишем IP в кеш, что-бы два раза не писать в базу один и тот-же IP
+                    memoryCache.Set(key, bit, TimeSpan.FromMinutes(30));
 
-                // Добовляем IP в базу блокировок
-                BlockedIP.Enqueue(IP);
+                    // Добовляем IP в базу блокировок
+                    BlockedIP.Enqueue(IP);
+                }
 
                 // Записываем в кеш
                 if (dataHour != null)

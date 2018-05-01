@@ -216,6 +216,11 @@ namespace ISPCore.Models.Databases.json
         public bool DNSLookupEnabled { get; set; }
 
         /// <summary>
+        /// Выполнять блокировку в IPtables или нет
+        /// </summary>
+        public bool BlockToIPtables { get; set; } = true;
+
+        /// <summary>
         /// Время блокировки в минутах
         /// </summary>
         public int BlockingTime
