@@ -1,24 +1,40 @@
 ﻿using ISPCore.Engine.Network;
 using ISPCore.Models.Base.WhiteList;
 using ISPCore.Models.Databases.json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ISPCore.Engine.Base.SqlAndCache
 {
-    public class WhiteUserList
+    public static class WhiteUserList
     {
         #region WhiteUserList
         /// <summary>
         /// 
         /// </summary>
-        public static List<CidrToIPv4> IPv4ToRange = null;
+        static List<CidrToIPv4> IPv4ToRange = null;
 
         /// <summary>
-        /// 
+        /// Белый список IPv6/Regex
         /// </summary>
         static string IPv6ToRegex = "^$";
+
+        /// <summary>
+        /// Белый список PTR/Regex
+        /// </summary>
+        public static string PtrRegex { get; private set; } = "^$";
+
+        /// <summary>
+        /// Белый список UserAgent/Regex
+        /// </summary>
+        static string UserAgentRegex = "^$";
+
+        /// <summary>
+        /// Время обновления настроек
+        /// </summary>
+        public static DateTime LastUpdateCache { get; private set; }
         #endregion
 
         #region UpdateCache
@@ -55,7 +71,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
             IPv4ToMass.Add(IPNetwork.IPv4ToRange("192.168.0.1", "192.168.0.254"));
 
             // Пользовательский список IPv4/6
-            foreach (string IP in conf.Values.Where(i => i.Type == WhiteListType.IPv4Or6).Select(i => i.Value))
+            foreach (string IP in conf.Where(i => i.Type == WhiteListType.IPv4Or6).Select(i => i.Value))
             {
                 if (IP.Contains(":"))
                 {
@@ -79,7 +95,14 @@ namespace ISPCore.Engine.Base.SqlAndCache
             IPv6ToRegex = JoinMass(IPv6ToMass, IsIPv6: true);
             #endregion
 
+            // Базовый список PTR
+            List<string> PTRs = new List<string>(conf.Where(i => i.Type == WhiteListType.PTR).Select(i => i.Value).ToArray());
+            PTRs.Add(@".*\.(yandex.(ru|net|com)|googlebot.com|google.com|mail.ru|search.msn.com)");
 
+            // Создаем кеш
+            PtrRegex = JoinMass(PTRs);
+            UserAgentRegex = JoinMass(conf.Where(i => i.Type == WhiteListType.UserAgent).Select(i => i.Value).ToList(), IsUserAgent: true);
+            LastUpdateCache = DateTime.Now;
         }
         #endregion
 
@@ -101,6 +124,20 @@ namespace ISPCore.Engine.Base.SqlAndCache
 
             // IPv4
             return IPNetwork.CheckToIPv4(IP, IPv4ToRange);
+        }
+        #endregion
+
+        #region IsWhiteUserAgent
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userAgent"></param>
+        public static bool IsWhiteUserAgent(string userAgent)
+        {
+            if (UserAgentRegex == "^$")
+                return false;
+
+            return Regex.IsMatch(userAgent, UserAgentRegex, RegexOptions.IgnoreCase);
         }
         #endregion
     }

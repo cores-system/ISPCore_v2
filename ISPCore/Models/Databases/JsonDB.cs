@@ -17,7 +17,7 @@ namespace ISPCore.Models.Databases.json
         public Base Base { get; set; } = new Base();
         public API API { get; set; } = new API();
         public Security Security { get; set; } = new Security();
-        public WhiteList WhiteList { get; set; } = new WhiteList();
+        public List<WhiteListModel> WhiteList { get; set; } = new List<WhiteListModel>();
         public AntiDdos AntiDdos { get; set; } = new AntiDdos();
         public AntiVirus AntiVirus { get; set; } = new AntiVirus();
         public AntiBot AntiBot { get; set; } = new AntiBot();
@@ -282,19 +282,6 @@ namespace ISPCore.Models.Databases.json
         {
             return (AntiBot)this.MemberwiseClone();
         }
-    }
-
-    public class WhiteList
-    {
-        /// <summary>
-        /// Белый список пользовательских "IP/UserAgent/PTR"
-        /// </summary>
-        public List<WhiteListModel> Values { get; set; } = new List<WhiteListModel>();
-
-        /// <summary>
-        /// Время обновления настроек
-        /// </summary>
-        public DateTime LastUpdateToConf { get; set; } = DateTime.Now;
     }
 
     public class API

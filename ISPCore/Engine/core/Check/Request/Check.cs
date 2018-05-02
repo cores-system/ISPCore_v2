@@ -131,9 +131,6 @@ namespace ISPCore.Engine.core.Check
             // Достаем настройки AntiBot из кеша
             var antiBotToGlobalConf = AntiBot.GlobalConf(jsonDB.AntiBot);
 
-            // Достаем настройки WhiteList из кеша
-            var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
-
             #region Проверяем "IP/User-Agent" в блокировке IPtables
             // Проверяем IP в блокировке IPtables по домену
             if (IPtablesMiddleware.CheckIP(IP, memoryCache, out IPtables BlockedData, host))
@@ -186,14 +183,14 @@ namespace ISPCore.Engine.core.Check
                     var limitRequest = (antiBotToGlobalConf.conf.limitRequest.IsEnabled || Domain.limitRequest.UseGlobalConf) ? antiBotToGlobalConf.conf.limitRequest : Domain.limitRequest;
 
                     // Проверяем белый список UserAgent
-                    if (!Regex.IsMatch(userAgent, whiteList.UserAgentRegex, RegexOptions.IgnoreCase))
+                    if (!WhiteUserList.IsWhiteUserAgent(userAgent))
                     {
                         #region Локальный метод - "IsWhitePtr"
                         bool IsWhitePtr(out string PtrHostName)
                         {
                             #region Кеш ответа
                             string memKey = $"local-YnAqLmG:IsWhitePtr-{IP}";
-                            if (memoryCache.TryGetValue(memKey, out (bool res, string PtrHostName, DateTime LastUpdateToConf) _cache) && whiteList.LastUpdateToConf == _cache.LastUpdateToConf)
+                            if (memoryCache.TryGetValue(memKey, out (bool res, string PtrHostName, DateTime LastUpdateToConf) _cache) && WhiteUserList.LastUpdateCache == _cache.LastUpdateToConf)
                             {
                                 PtrHostName = _cache.PtrHostName;
                                 return _cache.res;
@@ -203,13 +200,13 @@ namespace ISPCore.Engine.core.Check
                             PtrHostName = null;
 
                             // На время проверки добавляем IP в белый список 
-                            memoryCache.Set(memKey, (true, PtrHostName, whiteList.LastUpdateToConf), TimeSpan.FromMinutes(5));
+                            memoryCache.Set(memKey, (true, PtrHostName, WhiteUserList.LastUpdateCache), TimeSpan.FromMinutes(5));
 
                             #region DNSLookup
                             try
                             {
                                 // Белый список Ptr
-                                string WhitePtrRegex = whiteList.PtrRegex;
+                                string WhitePtrRegex = WhiteUserList.PtrRegex;
                                 if (WhitePtrRegex != "^$" && !string.IsNullOrWhiteSpace(WhitePtrRegex))
                                 {
                                     // Получаем имя хоста по IP
@@ -240,7 +237,7 @@ namespace ISPCore.Engine.core.Check
                             #endregion
 
                             // Запрещаем повторную проверку IP в течении 3х часов
-                            memoryCache.Set(memKey, (false, PtrHostName, whiteList.LastUpdateToConf), TimeSpan.FromHours(3));
+                            memoryCache.Set(memKey, (false, PtrHostName, WhiteUserList.LastUpdateCache), TimeSpan.FromHours(3));
 
                             // IP нету в белом списке PTR
                             return false;

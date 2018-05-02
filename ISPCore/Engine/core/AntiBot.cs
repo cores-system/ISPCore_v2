@@ -126,11 +126,8 @@ namespace ISPCore.Engine.core
             #region Проверка User-Agent
             if (HttpContext.Request.Headers.TryGetValue("User-Agent", out var userAgent))
             {
-                // Достаем настройки WhiteList из кеша
-                var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
-
                 // Проверка пользовательского User-Agent
-                if (Regex.IsMatch(userAgent, whiteList.UserAgentRegex, RegexOptions.IgnoreCase))
+                if (WhiteUserList.IsWhiteUserAgent(userAgent))
                     return true;
 
                 string SearchBot = "(" +

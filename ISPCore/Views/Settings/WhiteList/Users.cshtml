@@ -57,7 +57,7 @@
 
 
 <script>
-    var WhiteList = @Html.Raw(JsonConvert.SerializeObject(Model.WhiteList.Values ?? new List<WhiteListModel>())) ;
+    var WhiteList = @Html.Raw(JsonConvert.SerializeObject(Model.WhiteList ?? new List<WhiteListModel>())) ;
     for (var i = 0; i < WhiteList.length; i++) {
         addWhiteList(WhiteList[i])
     }

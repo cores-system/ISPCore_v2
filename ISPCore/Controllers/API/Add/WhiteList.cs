@@ -1,6 +1,6 @@
 ﻿using ISPCore.Engine;
 using ISPCore.Engine.Base;
-using ISPCore.Models;
+using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Models.Base.WhiteList;
 using ISPCore.Models.Databases.json;
 using ISPCore.Models.Response;
@@ -21,10 +21,11 @@ namespace ISPCore.Controllers
             // Добавляем значение
             var md = new WhiteListModel(name, value, type);
             md.Id = int.Parse(Generate.Passwd(6, true));
-            jsonDB.WhiteList.Values.Add(md);
+            jsonDB.WhiteList.Add(md);
 
             // Успех
             jsonDB.Save();
+            WhiteUserList.UpdateCache();
             return Json(new TrueOrFalse(true));
         }
     }

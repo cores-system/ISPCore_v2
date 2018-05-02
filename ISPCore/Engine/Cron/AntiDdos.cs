@@ -299,11 +299,8 @@ namespace ISPCore.Engine.Cron
                                 {
                                     HostName = host.HostName;
 
-                                    // Достаем настройки WhiteList из кеша
-                                    var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
-
                                     // Проверяем имя хоста на белый список DNSLookup
-                                    if (Regex.IsMatch(host.HostName, whiteList.PtrRegex, RegexOptions.IgnoreCase))
+                                    if (Regex.IsMatch(host.HostName, WhiteUserList.PtrRegex, RegexOptions.IgnoreCase))
                                     {
                                         // Добовляем IP в белый список на неделю
                                         WhitePtr.Add(IP, host.HostName, DateTime.Now.AddDays(7));
@@ -386,9 +383,6 @@ namespace ISPCore.Engine.Cron
             // Глобальный список белых IP
             if (WhitePtr.IsWhiteIP(IP))
                 return true;
-
-            // Достаем настройки WhiteList из кеша
-            var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
 
             // Результат
             return WhiteUserList.IsWhiteIP(IP);

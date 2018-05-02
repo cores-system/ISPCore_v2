@@ -35,9 +35,6 @@ namespace ISPCore.Controllers.core.Gen
             // Настройки JsonDB
             var jsonDB = Service.Get<JsonDB>();
 
-            // Достаем настройки WhiteList из кеша
-            var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
-
             // IP находится в белом списке
             if (WhiteUserList.IsWhiteIP(IP) || WhitePtr.IsWhiteIP(IP))
                 return Content(string.Empty, "application/javascript");

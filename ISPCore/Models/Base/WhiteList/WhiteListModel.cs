@@ -1,5 +1,4 @@
-﻿using ISPCore.Engine.Base;
-using ISPCore.Models.Databases.Interface;
+﻿using ISPCore.Models.Databases.Interface;
 
 namespace ISPCore.Models.Base.WhiteList
 {

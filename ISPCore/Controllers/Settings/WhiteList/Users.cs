@@ -34,7 +34,7 @@ namespace ISPCore.Controllers
             IDictionary<string, IId> NewWhiteList = null;
 
             // Записываем даннные из whiteList
-            jsonDB.WhiteList.Values.UpdateOrAddRange(whiteList, out NewWhiteList);
+            jsonDB.WhiteList.UpdateOrAddRange(whiteList, out NewWhiteList);
 
             // Создаем новые Id
             foreach (var item in whiteList)
@@ -44,7 +44,6 @@ namespace ISPCore.Controllers
             }
 
             // Сохраняем значения
-            jsonDB.WhiteList.LastUpdateToConf = DateTime.Now;
             jsonDB.Save();
 
             // Кеш настроек WhiteList
@@ -68,8 +67,7 @@ namespace ISPCore.Controllers
             JsonDB jsonDB = Service.Get<JsonDB>();
 
             // Удаляем значение
-            jsonDB.WhiteList.Values.RemoveAll(i => i.Id == Id);
-            jsonDB.WhiteList.LastUpdateToConf = DateTime.Now;
+            jsonDB.WhiteList.RemoveAll(i => i.Id == Id);
             jsonDB.Save();
 
             // Кеш настроек WhiteList
