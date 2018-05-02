@@ -19,6 +19,10 @@ namespace ISPCore.Engine.Middleware
         #region CheckIP
         public static bool CheckIP(string RemoteIpAddress, IMemoryCache memoryCache, out IPtables data, string BlockedHost = null)
         {
+            // Блокировка по домену
+            if (BlockedHost != null)
+                return memoryCache.TryGetValue(KeyToMemoryCache.IPtables(RemoteIpAddress, BlockedHost), out data);
+            
             // Результат кеша
             string memKey = $"IPtablesMiddleware.CheckIP:local-{RemoteIpAddress}:{BlockedHost}";
             if (memoryCache.TryGetValue(memKey, out bool cacheResult)) {
@@ -47,21 +51,10 @@ namespace ISPCore.Engine.Middleware
             foreach (var ip in mass)
             {
                 tmp += patch + ip;
-                if (BlockedHost == null)
+                if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(tmp.Remove(0, 1)), out data))
                 {
-                    if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(tmp.Remove(0, 1)), out data))
-                    {
-                        memoryCache.Set(memKey, true, TimeSpan.FromMilliseconds(300));
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(tmp.Remove(0, 1), BlockedHost), out data))
-                    {
-                        memoryCache.Set(memKey, true, TimeSpan.FromMilliseconds(300));
-                        return true;
-                    }
+                    memoryCache.Set(memKey, true, TimeSpan.FromMilliseconds(300));
+                    return true;
                 }
             }
 

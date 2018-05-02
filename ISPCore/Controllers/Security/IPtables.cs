@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ISPCore.Models.Databases;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.EntityFrameworkCore;
 using ISPCore.Engine.Middleware;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Domains;
