@@ -9,6 +9,7 @@ using ISPCore.Models.Response;
 using ISPCore.Models.Databases.Interface;
 using ISPCore.Models.Databases;
 using ISPCore.Engine.Base.SqlAndCache;
+using ISPCore.Engine.Network;
 
 namespace ISPCore.Controllers
 {
@@ -29,7 +30,15 @@ namespace ISPCore.Controllers
             if (Platform.IsDemo)
                 return Json(new Text("Операция недоступна в демо-режиме"));
             #endregion
-            
+
+            #region Проверка IP-адресов
+            foreach (var item in whiteList)
+            {
+                if(!IPNetwork.CheckingSupportToIPv4Or6(item.Value.Value, out _))
+                    return Json(new Text($"Not supported format: {item.Value.Value}"));
+            }
+            #endregion
+
             // Список Id WhiteList
             IDictionary<string, IId> NewWhiteList = null;
 
