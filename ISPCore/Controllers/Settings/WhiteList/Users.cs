@@ -2,15 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using ISPCore.Models.Databases.json;
 using ISPCore.Engine;
-using ISPCore.Engine.Hash;
-using ISPCore.Engine.Auth;
 using ISPCore.Engine.Base;
 using System.Collections.Generic;
 using ISPCore.Models.Base.WhiteList;
 using ISPCore.Models.Response;
 using ISPCore.Models.Databases.Interface;
 using ISPCore.Models.Databases;
-using ISPCore.Models.Auth;
+using ISPCore.Engine.Base.SqlAndCache;
 
 namespace ISPCore.Controllers
 {
@@ -49,6 +47,9 @@ namespace ISPCore.Controllers
             jsonDB.WhiteList.LastUpdateToConf = DateTime.Now;
             jsonDB.Save();
 
+            // Кеш настроек WhiteList
+            WhiteUserList.UpdateCache();
+
             // Отдаем сообщение и Id новых настроек WhiteList
             return Json(new UpdateToIds("Настройки успешно сохранены", 0, NewWhiteList));
         }
@@ -69,9 +70,12 @@ namespace ISPCore.Controllers
             // Удаляем значение
             jsonDB.WhiteList.Values.RemoveAll(i => i.Id == Id);
             jsonDB.WhiteList.LastUpdateToConf = DateTime.Now;
+            jsonDB.Save();
+
+            // Кеш настроек WhiteList
+            WhiteUserList.UpdateCache();
 
             // Успех
-            jsonDB.Save();
             return Json(new TrueOrFalse(true));
         }
         #endregion

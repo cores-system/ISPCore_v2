@@ -25,6 +25,7 @@ using System.IO;
 using System.Threading.Tasks;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Models.Command_Line;
+using ISPCore.Models.Databases.json;
 
 namespace ISPCore
 {
@@ -164,6 +165,9 @@ namespace ISPCore
                 }
             }
             #endregion
+
+            // Кеш настроек WhiteList
+            WhiteUserList.UpdateCache();
 
             #region Загружаем список "Разрешенные доступы" в кеш
             foreach (var item in AccessIP.List())

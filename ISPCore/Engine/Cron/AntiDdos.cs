@@ -391,7 +391,7 @@ namespace ISPCore.Engine.Cron
             var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
 
             // Результат
-            return Regex.IsMatch(IP, whiteList.IpRegex);
+            return WhiteUserList.IsWhiteIP(IP);
         }
         #endregion  
     }

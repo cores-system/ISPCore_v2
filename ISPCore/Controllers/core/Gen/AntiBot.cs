@@ -39,7 +39,7 @@ namespace ISPCore.Controllers.core.Gen
             var whiteList = Engine.Base.SqlAndCache.WhiteList.GetCache(jsonDB.WhiteList);
 
             // IP находится в белом списке
-            if (Regex.IsMatch(IP, whiteList.IpRegex) || WhitePtr.IsWhiteIP(IP))
+            if (WhiteUserList.IsWhiteIP(IP) || WhitePtr.IsWhiteIP(IP))
                 return Content(string.Empty, "application/javascript");
             #endregion
 

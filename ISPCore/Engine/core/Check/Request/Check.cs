@@ -79,7 +79,7 @@ namespace ISPCore.Engine.core.Check
             // Форматируем url
             uri = WebUtility.UrlDecode(uri + tmp_uri.ToString());
             #endregion
-            
+
             #region Получаем параметры POST запроса
             string FormData = string.Empty;
             if (context.Request.Method == "POST")
@@ -177,7 +177,7 @@ namespace ISPCore.Engine.core.Check
             // IP нету в системном белом списке
             // IP нету в пользовательском белом списке
             if ((antiBotType != AntiBotType.Off || LimitRequestEnabled) &&
-                !WhitePtr.IsWhiteIP(IP) && !Regex.IsMatch(IP, whiteList.IpRegex))
+                !WhitePtr.IsWhiteIP(IP) && !WhiteUserList.IsWhiteIP(IP))
             {
                 #region Лимит запросов
                 if (LimitRequestEnabled)

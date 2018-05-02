@@ -12,7 +12,7 @@ namespace ISPCore.Models.Base.WhiteList
         /// <summary>
         /// Белый список IP/Regex
         /// </summary>
-        public string IpRegex = "^$";
+        //public string IpRegex = "^$";
 
         /// <summary>
         /// Белый список UserAgent/Regex
