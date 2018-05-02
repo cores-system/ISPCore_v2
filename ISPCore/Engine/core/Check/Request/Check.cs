@@ -4,22 +4,20 @@ using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Engine.core.Cache.CheckLink;
 using ISPCore.Engine.Hash;
 using ISPCore.Engine.Middleware;
+using ISPCore.Engine.Security;
 using ISPCore.Models.core;
 using ISPCore.Models.core.Cache.CheckLink;
 using ISPCore.Models.core.Cache.CheckLink.Common;
-using ISPCore.Models.Databases;
 using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Models.RequestsFilter.Domains.Log;
 using ISPCore.Models.RequestsFilter.Domains.Types;
 using ISPCore.Models.RequestsFilter.Monitoring;
-using ISPCore.Models.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -28,6 +26,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ModelCache = ISPCore.Models.core.Cache.CheckLink;
+using ModelIPtables = ISPCore.Models.Security.IPtables;
 
 namespace ISPCore.Engine.core.Check
 {
@@ -133,7 +132,7 @@ namespace ISPCore.Engine.core.Check
 
             #region Проверяем "IP/User-Agent" в блокировке IPtables
             // Проверяем IP в блокировке IPtables по домену
-            if (IPtablesMiddleware.CheckIP(IP, memoryCache, out IPtables BlockedData, host))
+            if (IPtables.CheckIP(IP, memoryCache, out ModelIPtables BlockedData, host))
             {
                 // Логируем пользователя
                 AddJurnalTo200(IsIPtables: true);
@@ -146,11 +145,11 @@ namespace ISPCore.Engine.core.Check
 
                 // Отдаем html
                 context.Response.ContentType = "text/html; charset=utf-8";
-                return context.Response.WriteAsync(IPtablesMiddleware.BlockedToHtml(IP, BlockedData.Description, BlockedData.TimeExpires), context.RequestAborted);
+                return context.Response.WriteAsync(IPtables.BlockedToHtml(IP, BlockedData.Description, BlockedData.TimeExpires), context.RequestAborted);
             }
 
             // Проверяем User-Agent в блокировке IPtables
-            if (IPtablesMiddleware.CheckUserAgent(userAgent))
+            if (IPtables.CheckUserAgent(userAgent))
             {
                 // Логируем пользователя
                 AddJurnalTo200(IsIPtables: true);
@@ -163,7 +162,7 @@ namespace ISPCore.Engine.core.Check
 
                 // Отдаем html
                 context.Response.ContentType = "text/html; charset=utf-8";
-                return context.Response.WriteAsync(IPtablesMiddleware.BlockedHtmlToUserAgent(userAgent), context.RequestAborted);
+                return context.Response.WriteAsync(IPtables.BlockedHtmlToUserAgent(userAgent), context.RequestAborted);
             }
             #endregion
 

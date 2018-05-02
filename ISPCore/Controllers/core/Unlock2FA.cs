@@ -10,15 +10,15 @@ using ISPCore.Engine.RequestsFilter.Access;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Domains;
 using ModelCache = ISPCore.Models.core.Cache.CheckLink;
-using ISPCore.Engine.Middleware;
 using ISPCore.Models.RequestsFilter.Monitoring;
 using ISPCore.Engine;
 using ISPCore.Models.RequestsFilter.Domains.Log;
-using ISPCore.Models.Security;
 using CheckRequest = ISPCore.Engine.core.Check.Request;
 using ISPCore.Models.RequestsFilter.Base.Enums;
 using ISPCore.Models.RequestsFilter.Access;
 using ISPCore.Engine.Base.SqlAndCache;
+using ModelIPtables = ISPCore.Models.Security.IPtables;
+using ISPCore.Engine.Security;
 
 namespace ISPCore.Controllers.core
 {
@@ -62,7 +62,7 @@ namespace ISPCore.Controllers.core
             #endregion
 
             #region Проверяем IP в блокировке IPtables по домену
-            if (IPtablesMiddleware.CheckIP(IP, memoryCache, out IPtables BlockedData, HostConvert))
+            if (IPtables.CheckIP(IP, memoryCache, out ModelIPtables BlockedData, HostConvert))
             {
                 // Логируем пользователя
                 AddJurnalToIPtables(domain, IP, host, method, userAgent, referer, uri);

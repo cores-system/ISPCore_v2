@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using ISPCore.Models.Databases;
 using Microsoft.Extensions.Caching.Memory;
-using ISPCore.Engine.Middleware;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Domains;
-using ISPCore.Models.Security;
 using ISPCore.Models.Response;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Engine.Common.Views;
+using ISPCore.Engine.Security;
+using ModelIPtables = ISPCore.Models.Security.IPtables;
 
 namespace ISPCore.Controllers
 {
@@ -49,7 +49,7 @@ namespace ISPCore.Controllers
 
             // Очистка кеша IPtables
             if (item.typeBlockIP == TypeBlockIP.UserAgent)
-                IPtablesMiddleware.ClearCache();
+                IPtables.ClearCache();
 
             // Отдаем результат
             return Json(new TrueOrFalse(true));
@@ -81,23 +81,23 @@ namespace ISPCore.Controllers
 
                 // Проверка IP
                 if (string.IsNullOrWhiteSpace(IP) || (!IP.Contains(".") && !IP.Contains(":")))
-                    return Json(new Models.Response.Text("Поле 'Значение' имеет недопустимое значение"));
+                    return Json(new Text("Поле 'Значение' имеет недопустимое значение"));
 
                 // IP для кеша и проверки
                 string IPshort = IP.Replace(".*", "").Replace(":*", "");
 
                 // Проверка IP на дубликат
-                if (IPtablesMiddleware.CheckIP(IPshort, memoryCache, out _))
-                    return Json(new Models.Response.Text("Данный IP-адрес уже заблокирован"));
+                if (IPtables.CheckIP(IPshort, memoryCache, out _))
+                    return Json(new Text("Данный IP-адрес уже заблокирован"));
 
                 // Записываем IP в кеш IPtables
-                memoryCache.Set(KeyToMemoryCache.IPtables(IPshort), new IPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)), TimeSpan.FromDays(BlockingTimeDay));
+                memoryCache.Set(KeyToMemoryCache.IPtables(IPshort), new ModelIPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)), TimeSpan.FromDays(BlockingTimeDay));
             }
             else
             {
                 // Проверка UserAgent
                 if (string.IsNullOrWhiteSpace(value))
-                    return Json(new Models.Response.Text("Поле 'Значение' имеет недопустимое значение"));
+                    return Json(new Text("Поле 'Значение' имеет недопустимое значение"));
             }
             #endregion
 
@@ -116,7 +116,7 @@ namespace ISPCore.Controllers
 
             // Очистка кеша IPtables
             if (typeBlockIP == TypeBlockIP.UserAgent)
-                IPtablesMiddleware.ClearCache();
+                IPtables.ClearCache();
 
             if (IsAPI)
                 return Json(new TrueOrFalse(true));
