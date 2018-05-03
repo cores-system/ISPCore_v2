@@ -441,6 +441,8 @@ namespace ISPCore
                 routes.MapRoute(null, "settings/whitelist", new { controller = "SettingsToUserWhiteList", action = "Index" });
                 routes.MapRoute(null, "settings/save/whitelist", new { controller = "SettingsToUserWhiteList", action = "Save" });
                 routes.MapRoute(null, "settings/remove/whitelist", new { controller = "SettingsToUserWhiteList", action = "Remove" });
+                routes.MapRoute(null, "settings/whitelist/export", new { controller = "SettingsToUserWhiteList", action = "Export" });
+                routes.MapRoute(null, "settings/whitelist/import", new { controller = "SettingsToUserWhiteList", action = "Import" });
 
                 routes.MapRoute(null, "settings/whitelist/system", new { controller = "SettingsToSystemWhiteList", action = "Index" });
                 routes.MapRoute(null, "settings/remove/whitelist/system", new { controller = "SettingsToSystemWhiteList", action = "Remove" });

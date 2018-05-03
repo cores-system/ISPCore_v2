@@ -3,7 +3,8 @@
 @model ISPCore.Models.Databases.json.JsonDB
 
 @{
-    if ((bool)ViewData["ajax"]) {
+    if ((bool)ViewData["ajax"])
+    {
         Layout = null;
     }
 }
@@ -24,11 +25,13 @@
                     <div class="add-gray-table">
                         <div class="panel-heading clearfix">
                             <div class="page-subtitle margin-top-10">
-                                <a class="btn btn-success t_right margin-left-10" onclick="saveEditSite(this, '/settings/save/whitelist')" style="margin-top: 10px;">Сохранить</a>
-                                <a class="btn btn-warning t_right" onclick="addWhiteList();" style="margin-top: 10px;">Добавить</a>
+                                <a class="btn btn-success t_right margin-left-10 margin-top-10" onclick="saveEditSite(this, '/settings/save/whitelist')">Сохранить</a>
+                                <a class="btn btn-warning t_right margin-left-10 margin-top-10" onclick="addWhiteList();">Добавить</a>
+                                <a class="btn btn-primary t_right margin-left-10 margin-top-10" href="/settings/whitelist/export" target="_blank">Экспорт</a>
+                                <a class="btn btn-primary t_right margin-top-10" onclick="$('#file').click(); return false;">Импорт</a>
                                 <div class="t_over">
                                     <h3>Белый список</h3>
-                                    <p>Список IP-адресов и ботов которые не блокируются в AntiBot/Anti-DDos</p>
+                                    <p>Список IP-адресов и ботов которые не блокируются в AntiBot/Anti-DDos/etc</p>
                                 </div>
                             </div>
                         </div>
@@ -39,7 +42,7 @@
                                         <tr>
                                             <th style="width: 160px;">Тип</th>
                                             <th style="width: 200px;">Описание</th>
-                                            <th style="min-width: 250px;">Правило / Regex</th>
+                                            <th style="min-width: 250px;">Правило</th>
                                             <th style="width: 40px;"></th>
                                         </tr>
                                     </thead>
@@ -61,6 +64,33 @@
     for (var i = 0; i < WhiteList.length; i++) {
         addWhiteList(WhiteList[i])
     }
+</script>
+
+
+<input type="file" id="file" name="file" style="display: none">
+<script>
+    $(function () {
+        $('#file').change(function () {
+
+            $(this).simpleUpload("/settings/whitelist/import", {
+
+                start: function (file) {
+                    //upload started
+                },
+                progress: function (progress) {
+                    //received progress
+                },
+                success: function (data) {
+                    //upload successful
+                    loadPage(null, '/settings/whitelist')
+                },
+                error: function (error) {
+                    //upload failed
+                }
+
+            });
+        });
+    });
 </script>
 
 

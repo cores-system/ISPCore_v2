@@ -10,6 +10,10 @@ using ISPCore.Models.Databases.Interface;
 using ISPCore.Models.Databases;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Engine.Network;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace ISPCore.Controllers
 {
@@ -84,6 +88,51 @@ namespace ISPCore.Controllers
 
             // Успех
             return Json(new TrueOrFalse(true));
+        }
+        #endregion
+
+        #region Export
+        [HttpGet]
+        public JsonResult Export()
+        {
+            return Json(jsonDB.WhiteList);
+        }
+        #endregion
+
+        #region Import
+        [HttpPost]
+        public JsonResult Import() => Json(Import(HttpContext));
+
+        public TrueOrFalse Import(HttpContext context)
+        {
+            #region Демо режим
+            if (Platform.IsDemo)
+                return new TrueOrFalse(false);
+            #endregion
+
+            bool res = false;
+            if (context.Request.Form.Files.Count == 1)
+            {
+                using (MemoryStream mem = new MemoryStream())
+                {
+                    // Получаем файл
+                    context.Request.Form.Files[0].CopyTo(mem);
+                    var mass = JsonConvert.DeserializeObject<List<WhiteListModel>>(Encoding.UTF8.GetString(mem.ToArray()));
+
+                    // Добовляем в базу
+                    jsonDB.WhiteList.AddRange(mass);
+
+                    // Сохраняем базу
+                    jsonDB.Save();
+                    res = true;
+
+                    // Кеш настроек WhiteList
+                    WhiteUserList.UpdateCache();
+                }
+            }
+
+            // Отдаем результат
+            return new TrueOrFalse(res);
         }
         #endregion
     }
