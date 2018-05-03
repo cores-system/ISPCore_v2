@@ -147,6 +147,9 @@ namespace ISPCore.Engine.Network
         /// <param name="arr"></param>
         private static bool BinarySearch(ulong val, List<CidrToIPv4> arr)
         {
+            if (arr == null || 1 >= arr.Count)
+                return false;
+
             int right = arr.Count - 1;
             int left = 0;
 
