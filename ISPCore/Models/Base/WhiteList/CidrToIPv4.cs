@@ -1,11 +1,13 @@
-﻿namespace ISPCore.Models.Base.WhiteList
+﻿using System;
+
+namespace ISPCore.Models.Base.WhiteList
 {
     public class CidrToIPv4
     {
-        public CidrToIPv4(ulong FirstUsable, ulong LastUsable)
+        public CidrToIPv4(ulong firstUsable, ulong lastUsable)
         {
-            this.FirstUsable = FirstUsable;
-            this.LastUsable = LastUsable;
+            this.FirstUsable = firstUsable;
+            this.LastUsable = lastUsable;
         }
 
         /// <summary>

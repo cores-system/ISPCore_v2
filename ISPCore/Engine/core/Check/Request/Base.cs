@@ -1,16 +1,17 @@
 ﻿using ISPCore.Engine.Base;
 using ISPCore.Engine.Base.SqlAndCache;
+using ISPCore.Engine.Security;
 using ISPCore.Models.Databases;
 using ISPCore.Models.Databases.json;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Models.RequestsFilter.Domains.Log;
 using ISPCore.Models.RequestsFilter.Monitoring;
-using ISPCore.Models.Security;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using ModelCache = ISPCore.Models.core.Cache.CheckLink;
+using ModelIPtables = ISPCore.Models.Security.IPtables;
 
 namespace ISPCore.Engine.core.Check
 {
@@ -99,18 +100,25 @@ namespace ISPCore.Engine.core.Check
             }
             else
             {
-                // Режим блокировки
-                string memKey = Domain.typeBlockIP == TypeBlockIP.domain ? KeyToMemoryCache.IPtables(IP, host) : KeyToMemoryCache.IPtables(IP);
-
                 // Если IP уже заблокирован
-                if (memoryCache.TryGetValue(memKey, out _))
+                if ((Domain.typeBlockIP == TypeBlockIP.domain && memoryCache.TryGetValue(KeyToMemoryCache.IPtables(IP, host), out _)) || 
+                    (Domain.typeBlockIP == TypeBlockIP.global && Engine.Security.IPtables.CheckIP(IP, memoryCache, out _)))
                     return;
 
                 // Данные для статистики
                 SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
 
-                // Записываем IP в кеш IPtables
-                memoryCache.Set(memKey, new IPtables(Msg, Expires), Expires);
+                #region Записываем IP в кеш IPtables
+                switch (Domain.typeBlockIP)
+                {
+                    case TypeBlockIP.global:
+                        IPtables.AddIPv4Or6(IP, new ModelIPtables(Msg, Expires), Expires);
+                        break;
+                    case TypeBlockIP.domain:
+                        memoryCache.Set(KeyToMemoryCache.IPtables(IP, host), new ModelIPtables(Msg, Expires), Expires);
+                        break;
+                }
+                #endregion
 
                 // Дублируем информацию в SQL
                 WriteLogTo.SQL(new BlockedIP()

@@ -13,7 +13,6 @@ using ISPCore.Engine.Middleware;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Engine;
-using ISPCore.Models.Security;
 using ISPCore.Models.Base;
 using ISPCore.Hubs;
 using ISPCore.Engine.RequestsFilter.Access;
@@ -25,7 +24,8 @@ using System.IO;
 using System.Threading.Tasks;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Models.Command_Line;
-using ISPCore.Models.Databases.json;
+using ModelIPtables = ISPCore.Models.Security.IPtables;
+using ISPCore.Engine.Security;
 
 namespace ISPCore
 {
@@ -132,22 +132,27 @@ namespace ISPCore
                     unlockip = File.ReadAllText($"{Folders.Tmp}/unlockip.root").Trim();
 
                 // Загружаем IP адреса
-                foreach (var blockedIP in coreDB.BlockedsIP.AsNoTracking())
+                foreach (var item in coreDB.BlockedsIP.AsNoTracking())
                 {
-                    if (blockedIP.BlockingTime > DateTime.Now && blockedIP.typeBlockIP != TypeBlockIP.UserAgent)
+                    if (item.BlockingTime > DateTime.Now && item.typeBlockIP != TypeBlockIP.UserAgent)
                     {
-                        // IP адрес
-                        string RemoteIpAddress = blockedIP.IP.Replace(".*", "").Replace(":*", "");
-
                         // Белый IP
-                        if (RemoteIpAddress.Contains(unlockip))
+                        if (item.IP.Contains(unlockip))
                             continue;
 
-                        // Где именно блокировать IP
-                        string keyIPtables = blockedIP.typeBlockIP == TypeBlockIP.domain ? KeyToMemoryCache.IPtables(RemoteIpAddress, blockedIP.BlockedHost) : KeyToMemoryCache.IPtables(RemoteIpAddress);
+                        // Модель
+                        var data = new ModelIPtables(item.Description, item.BlockingTime);
 
-                        // Записываем IP в кеш IPtables
-                        memoryCache.Set(keyIPtables, new IPtables(blockedIP.Description, blockedIP.BlockingTime), blockedIP.BlockingTime);
+                        // Где именно блокировать IP
+                        switch (item.typeBlockIP)
+                        {
+                            case TypeBlockIP.global:
+                                IPtables.AddIPv4Or6(item.IP, data, item.BlockingTime);
+                                break;
+                            case TypeBlockIP.domain:
+                                memoryCache.Set(KeyToMemoryCache.IPtables(item.IP, item.BlockedHost), data, item.BlockingTime);
+                                break;
+                        }
                     }
                 }
             }

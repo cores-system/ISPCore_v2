@@ -103,7 +103,7 @@ namespace ISPCore.Engine.core.Check
             viewBag.DebugEnabled = jsonDB.Base.DebugEnabled;       // Режим дебага, выводит json правил
             viewBag.IsErrorRule = false;                           // Переменная для ловли ошибок regex
             #endregion
-            
+
             // Если домена нету в базе, то выдаем 303 или заглушку
             if (ISPCache.DomainToID(host) is int DomainID && DomainID == 0)
                 return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow, TypeRequest._303, NotCache: true);
@@ -162,7 +162,7 @@ namespace ISPCore.Engine.core.Check
 
                 // Отдаем html
                 context.Response.ContentType = "text/html; charset=utf-8";
-                return context.Response.WriteAsync(IPtables.BlockedHtmlToUserAgent(userAgent), context.RequestAborted);
+                return context.Response.WriteAsync(IPtables.BlockedToHtml("Ваш User-Agent в списке запрещенных"), context.RequestAborted);
             }
             #endregion
 

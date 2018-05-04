@@ -99,11 +99,13 @@ namespace ISPCore.Engine.Network
         /// </summary>
         /// <param name="IP"></param>
         /// <param name="mass"></param>
-        public static bool CheckToIPv4(string IP, List<CidrToIPv4> mass)
+        /// <param name="FirstUsable"></param>
+        public static bool CheckToIPv4(string IP, List<CidrToIPv4> mass, out ulong FirstUsable)
         {
             if (ConvertIPv4(IP, out ulong val))
-                return BinarySearch(val, mass);
+                return BinarySearch(val, mass, out FirstUsable);
 
+            FirstUsable = 0;
             return false;
         }
         #endregion
@@ -114,7 +116,7 @@ namespace ISPCore.Engine.Network
         /// </summary>
         /// <param name="ip"></param>
         /// <param name="val"></param>
-        static bool ConvertIPv4(string ip, out ulong val)
+        public static bool ConvertIPv4(string ip, out ulong val)
         {
             StringBuilder res = new StringBuilder();
             foreach (var item in ip.Split('.'))
@@ -145,10 +147,15 @@ namespace ISPCore.Engine.Network
         /// </summary>
         /// <param name="val"></param>
         /// <param name="arr"></param>
-        private static bool BinarySearch(ulong val, List<CidrToIPv4> arr)
+        /// <param name="FirstUsable"></param>
+        private static bool BinarySearch(ulong val, List<CidrToIPv4> arr, out ulong FirstUsable)
         {
-            if (arr == null || 1 >= arr.Count)
+            FirstUsable = 0;
+            if (arr == null || arr.Count == 0)
                 return false;
+
+            if (1 == arr.Count)
+                return val >= arr[0].FirstUsable && arr[0].LastUsable >= val;
 
             int right = arr.Count - 1;
             int left = 0;
@@ -156,21 +163,30 @@ namespace ISPCore.Engine.Network
             if (arr[left].FirstUsable > val)
                 return false;
 
-            if (arr[right].FirstUsable < val)
+            if (arr[right].LastUsable < val)
                 return false;
 
             while (left < right)
             {
                 int mid = left + (right - left) / 2;
-                ulong FirstUsable = arr[mid].FirstUsable;
+                FirstUsable = arr[mid].FirstUsable;
                 ulong LastUsable = arr[mid].LastUsable;
 
                 if (val >= FirstUsable && LastUsable >= val)
                     return true;
 
-                if (val < FirstUsable) right = mid;
-                else if (val > FirstUsable) left = mid + 1;
-                else return true;
+                if (val < FirstUsable) {
+                    right = mid;
+                }
+                else if (val > FirstUsable)
+                {
+                    left = mid + 1;
+                    if (left >= right)
+                        return val >= arr[arr.Count - 1].FirstUsable && arr[arr.Count - 1].LastUsable >= val;
+                }
+                else {
+                    return true;
+                }
             }
 
             return false;

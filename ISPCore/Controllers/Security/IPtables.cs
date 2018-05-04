@@ -9,6 +9,7 @@ using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Engine.Common.Views;
 using ISPCore.Engine.Security;
 using ModelIPtables = ISPCore.Models.Security.IPtables;
+using ISPCore.Engine.Network;
 
 namespace ISPCore.Controllers
 {
@@ -35,11 +36,9 @@ namespace ISPCore.Controllers
             if (item == null)
                 return Json(new Text("Запись не найдена"));
 
-            string IP = item.IP.Replace(".*", "").Replace(":*", "");
-
             // Удаляем IP с кеша
-            memoryCache.Remove(KeyToMemoryCache.IPtables(IP));
-            memoryCache.Remove(KeyToMemoryCache.IPtables(IP, item.BlockedHost));
+            IPtables.RemoveIPv4Or6(item.IP);
+            memoryCache.Remove(KeyToMemoryCache.IPtables(item.IP, item.BlockedHost));
 
             // Удаляем IP
             coreDB.BlockedsIP.Remove(item);
@@ -80,18 +79,11 @@ namespace ISPCore.Controllers
                 string IP = value;
 
                 // Проверка IP
-                if (string.IsNullOrWhiteSpace(IP) || (!IP.Contains(".") && !IP.Contains(":")))
-                    return Json(new Text("Поле 'Значение' имеет недопустимое значение"));
-
-                // IP для кеша и проверки
-                string IPshort = IP.Replace(".*", "").Replace(":*", "");
-
-                // Проверка IP на дубликат
-                if (IPtables.CheckIP(IPshort, memoryCache, out _))
-                    return Json(new Text("Данный IP-адрес уже заблокирован"));
+                if (!IPNetwork.CheckingSupportToIPv4Or6(IP, out _))
+                    return Json(new Text($"Not supported format: {IP}"));
 
                 // Записываем IP в кеш IPtables
-                memoryCache.Set(KeyToMemoryCache.IPtables(IPshort), new ModelIPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)), TimeSpan.FromDays(BlockingTimeDay));
+                IPtables.AddIPv4Or6(IP, new ModelIPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)), DateTime.Now.AddDays(BlockingTimeDay));
             }
             else
             {

@@ -147,33 +147,47 @@ namespace ISPCore
                 .Build();
 
             // Запускаем крон
-            Timer cron = new Timer(new TimerCallback(Cron), null, 0, 1000 * 60);
-            Timer antiDdos = new Timer(new TimerCallback(AntiDdos), null, 0, 1000);
+            Timer cronMinutes = new Timer(new TimerCallback(CronMinutes), null, 0, 1000 * 60);
+            Timer cronSeconds = new Timer(new TimerCallback(CronSeconds), null, 0, 1000);
             Timer writeLogTo = new Timer(new TimerCallback(WriteLogTo.WriteLogToSql), null, 0, 1000);
 
             // Запускаем ASP.NET 
             host.Run();
 
             // Что-бы GC.Collect() не сносил таймеры
-            antiDdos.Dispose();
-            cron.Dispose();
+            cronSeconds.Dispose();
+            cronMinutes.Dispose();
             writeLogTo.Dispose();
         }
 
 
-        public static void AntiDdos(object ob)
+        #region CronSeconds
+        public static void CronSeconds(object ob)
         {
-            JsonDB jsonDB = Service.Get<JsonDB>();
-            if (!jsonDB.AntiDdos.IsActive || Platform.Get != PlatformOS.Unix)
-                return;
+            try
+            {
+                // Удаляем из базы старые IP адреса
+                Engine.Security.IPtables.ClearDbAndCacheToIPv4Or6();
 
-            var memoryCache = Service.Get<IMemoryCache>();
-            Engine.Cron.AntiDdos.RunSecond(jsonDB, memoryCache);
-            Engine.Cron.AntiDdos.RunBlocked(jsonDB, memoryCache); 
+                #region AntiDdos
+                JsonDB jsonDB = Service.Get<JsonDB>();
+                if (!jsonDB.AntiDdos.IsActive || Platform.Get != PlatformOS.Unix)
+                    return;
+
+                var memoryCache = Service.Get<IMemoryCache>();
+                Engine.Cron.AntiDdos.RunSecond(jsonDB, memoryCache);
+                Engine.Cron.AntiDdos.RunBlocked(jsonDB, memoryCache);
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
+            }
         }
+        #endregion
 
-        
-        public static void Cron(object ob)
+        #region CronMinutes
+        public static void CronMinutes(object ob)
         {
             try
             {
@@ -185,7 +199,6 @@ namespace ISPCore
                     Engine.Cron.Project.Run(coreDB, jsonDB, memoryCache);           // Получение новостей и списка изменений
                     Engine.Cron.UpdateAV.Run(coreDB, jsonDB, memoryCache);          // Обновление антивируса
                     
-                    Engine.Cron.BlockedIP.Run(coreDB, memoryCache);                 // Удаляем из базы старые IP адреса
                     Engine.Cron.WhitePtrIP.Run(coreDB, memoryCache);                // Удаляем из базы старые IP адреса
                     Engine.RequestsFilter.Access.AccessIP.Clear();                  // Очистка списка IP с разрешенным доступом
                     Engine.Cron.Home.Run(coreDB, memoryCache);                      // Очистка журнала посещений
@@ -209,5 +222,6 @@ namespace ISPCore
                 File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
             }
         }
+        #endregion
     }
 }

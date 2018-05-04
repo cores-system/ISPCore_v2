@@ -12,8 +12,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
         public static string LimitRequestToreCAPTCHA(string IP) => $"KeyToMem:LimitRequestToreCAPTCHA-{IP}";
 
         public static string AntiBotToCache(string IP) => $"KeyToMem:AntiBotToCache-{IP}";
-
-        public static string IPtables(string IP) => $"IPtables-{IP}";
+        
         public static string IPtables(string IP, string host) => $"IPtables-{IP}_{host}";
 
         public static string LimitLogin(string IP) => $"LimitLogin-{IP}";
