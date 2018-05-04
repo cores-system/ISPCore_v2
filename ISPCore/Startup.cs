@@ -147,7 +147,7 @@ namespace ISPCore
                         switch (item.typeBlockIP)
                         {
                             case TypeBlockIP.global:
-                                IPtables.AddIPv4Or6(item.IP, data, item.BlockingTime);
+                                IPtables.AddIPv4Or6(item.IP, data);
                                 break;
                             case TypeBlockIP.domain:
                                 memoryCache.Set(KeyToMemoryCache.IPtables(item.IP, item.BlockedHost), data, item.BlockingTime);

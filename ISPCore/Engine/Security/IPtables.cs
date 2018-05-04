@@ -19,12 +19,12 @@ namespace ISPCore.Engine.Security
     {
         #region IPtables
         /// <summary>
-        /// 
+        /// Список заблокированных IPv4
         /// </summary>
         static List<CidrToIPv4> IPv4ToRange = new List<CidrToIPv4>();
 
         /// <summary>
-        /// 
+        /// Время и причина блокировки для IP-адресов
         /// </summary>
         static ConcurrentDictionary<ulong, ModelIPtables> IPv4ToModels = new ConcurrentDictionary<ulong, ModelIPtables>();
 
@@ -39,19 +39,19 @@ namespace ISPCore.Engine.Security
         static string UserAgentRegex = "^$";
 
         /// <summary>
-        /// 
+        /// Время следующего вызова ClearDbAndCacheToIPv4Or6
         /// </summary>
         static DateTime NextTimeClearDbAndCacheToIPv4Or6 = DateTime.Now.AddHours(1);
         #endregion
 
         #region CheckIP
         /// <summary>
-        /// 
+        /// Проверить IPv4/6
         /// </summary>
-        /// <param name="RemoteIpAddress"></param>
+        /// <param name="RemoteIpAddress">IPv4/6</param>
         /// <param name="memoryCache"></param>
-        /// <param name="data"></param>
-        /// <param name="BlockedHost"></param>
+        /// <param name="data">Время и причина блокировки</param>
+        /// <param name="BlockedHost">Домен для которого делать проверку</param>
         public static bool CheckIP(string RemoteIpAddress, IMemoryCache memoryCache, out ModelIPtables data, string BlockedHost = null)
         {
             data = null;
@@ -89,18 +89,17 @@ namespace ISPCore.Engine.Security
 
         #region AddIPv4Or6
         /// <summary>
-        /// 
+        /// Заблокировать IPv4/6
         /// </summary>
-        /// <param name="IP"></param>
-        /// <param name="data"></param>
-        /// <param name="expires"></param>
-        public static void AddIPv4Or6(string IP, ModelIPtables data, DateTime expires)
+        /// <param name="IP">IPv4/6</param>
+        /// <param name="data">Время и причина блокировки</param>
+        public static void AddIPv4Or6(string IP, ModelIPtables data)
         {
             if (IPNetwork.CheckingSupportToIPv4Or6(IP, out var ipnetwork))
             {
                 // Крон нужно запустить раньше
-                if (NextTimeClearDbAndCacheToIPv4Or6 > expires)
-                    NextTimeClearDbAndCacheToIPv4Or6 = expires;
+                if (NextTimeClearDbAndCacheToIPv4Or6 > data.TimeExpires)
+                    NextTimeClearDbAndCacheToIPv4Or6 = data.TimeExpires;
 
                 // IPv6
                 if (IP.Contains(":"))
@@ -138,9 +137,9 @@ namespace ISPCore.Engine.Security
 
         #region RemoveIPv4Or6
         /// <summary>
-        /// 
+        /// Разблокировать IPv4/6
         /// </summary>
-        /// <param name="IP"></param>
+        /// <param name="IP">IPv4/6</param>
         public static void RemoveIPv4Or6(string IP)
         {
             if (IPNetwork.CheckingSupportToIPv4Or6(IP, out var ipnetwork))
@@ -202,9 +201,9 @@ namespace ISPCore.Engine.Security
 
         #region CheckUserAgent
         /// <summary>
-        /// 
+        /// Проверить UserAgent
         /// </summary>
-        /// <param name="userAgent"></param>
+        /// <param name="userAgent">UserAgent</param>
         public static bool CheckUserAgent(string userAgent)
         {
             if (UserAgentRegex == "^$")
@@ -242,6 +241,9 @@ namespace ISPCore.Engine.Security
         #endregion
 
         #region BlockedToHtml
+        /// <param name="RemoteIpAddress">IPv4/6</param>
+        /// <param name="description">Причина блокировки</param>
+        /// <param name="TimeExpires">Время блокировки</param>
         public static string BlockedToHtml(string RemoteIpAddress, string description, DateTime TimeExpires)
         {
             if (description == null && TimeExpires == default(DateTime))
@@ -249,7 +251,7 @@ namespace ISPCore.Engine.Security
 
             return BlockedToHtml($"Ваш IP {RemoteIpAddress} заблокирован<br />{description}" + $"<br /><br />Доступ будет открыт {TimeExpires.ToString("dd.MM.yyyy")} в {TimeExpires.AddMinutes(1).ToString("H:mm")}");
         }
-
+        
         public static string BlockedToHtml(string msg) => @"<!DOCTYPE html>
 <html lang='ru-RU'>
 <head>

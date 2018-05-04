@@ -83,7 +83,7 @@ namespace ISPCore.Controllers
                     return Json(new Text($"Not supported format: {IP}"));
 
                 // Записываем IP в кеш IPtables
-                IPtables.AddIPv4Or6(IP, new ModelIPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)), DateTime.Now.AddDays(BlockingTimeDay));
+                IPtables.AddIPv4Or6(IP, new ModelIPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)));
             }
             else
             {

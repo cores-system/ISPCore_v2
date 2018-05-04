@@ -68,7 +68,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
             IPv4ToMass.Add(IPNetwork.IPv4ToRange("127.0.0.1"));
             IPv4ToMass.Add(IPNetwork.IPv4ToRange("8.8.4.4"));
             IPv4ToMass.Add(IPNetwork.IPv4ToRange("8.8.8.8"));
-            IPv4ToMass.Add(IPNetwork.IPv4ToRange("192.168.0.1"));
+            IPv4ToMass.Add(IPNetwork.IPv4ToRange("192.168.0.1", "192.168.0.254"));
 
             // Пользовательский список IPv4/6
             foreach (string IP in conf.Where(i => i.Type == WhiteListType.IPv4Or6).Select(i => i.Value))

@@ -11,9 +11,9 @@ namespace ISPCore.Engine.Network
     {
         #region CheckingSupportToIPv4Or6
         /// <summary>
-        /// 
+        /// Проверка правильности CIDR
         /// </summary>
-        /// <param name="IPv4Or6"></param>
+        /// <param name="IPv4Or6">IP-адрес</param>
         /// <param name="ipnetwork"></param>
         public static bool CheckingSupportToIPv4Or6(string IPv4Or6, out (string FirstUsable, string LastUsable) ipnetwork)
         {
@@ -95,9 +95,9 @@ namespace ISPCore.Engine.Network
 
         #region CheckToIPv4
         /// <summary>
-        /// 
+        /// Проверка IPv4
         /// </summary>
-        /// <param name="IP"></param>
+        /// <param name="IP">IPv4/6</param>
         /// <param name="mass"></param>
         /// <param name="FirstUsable"></param>
         public static bool CheckToIPv4(string IP, List<CidrToIPv4> mass, out ulong FirstUsable)
@@ -112,10 +112,10 @@ namespace ISPCore.Engine.Network
 
         #region ConvertIPv4
         /// <summary>
-        /// 
+        /// Конверт IPv4 в ulong
         /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="val"></param>
+        /// <param name="ip">IPv4</param>
+        /// <param name="val">ulong</param>
         public static bool ConvertIPv4(string ip, out ulong val)
         {
             StringBuilder res = new StringBuilder();

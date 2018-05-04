@@ -112,7 +112,7 @@ namespace ISPCore.Engine.core.Check
                 switch (Domain.typeBlockIP)
                 {
                     case TypeBlockIP.global:
-                        IPtables.AddIPv4Or6(IP, new ModelIPtables(Msg, Expires), Expires);
+                        IPtables.AddIPv4Or6(IP, new ModelIPtables(Msg, Expires));
                         break;
                     case TypeBlockIP.domain:
                         memoryCache.Set(KeyToMemoryCache.IPtables(IP, host), new ModelIPtables(Msg, Expires), Expires);

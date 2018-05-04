@@ -40,7 +40,7 @@ namespace ISPCore.Engine.Auth
                     switch (typeBlockIP)
                     {
                         case TypeBlockIP.global:
-                            Engine.Security.IPtables.AddIPv4Or6(RemoteIpAddress, data, DateTime.Now.AddMinutes(jsonDB.Security.BlockingTime));
+                            Engine.Security.IPtables.AddIPv4Or6(RemoteIpAddress, data);
                             break;
                         case TypeBlockIP.domain:
                             memoryCache.Set(KeyToMemoryCache.IPtables(RemoteIpAddress, host), data, TimeSpan.FromMinutes(jsonDB.Security.BlockingTime));
