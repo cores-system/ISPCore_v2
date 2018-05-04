@@ -106,11 +106,11 @@ namespace ISPCore.Engine.core.Check
             
             // Если домена нету в базе, то выдаем 303 или заглушку
             if (ISPCache.DomainToID(host) is int DomainID && DomainID == 0)
-                return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);
+                return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow, TypeRequest._303, NotCache: true);
 
             // Если у IP есть полный доступ к сайтам или к сайту
             if (CheckLinkWhitelistToAllDomain())
-                return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);
+                return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303, NotCache: true);
 
             #region Получаем User-Agent и Referer
             // User-Agent

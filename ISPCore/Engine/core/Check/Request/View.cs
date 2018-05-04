@@ -55,7 +55,7 @@ namespace ISPCore.Engine.core.Check
         #endregion
 
         #region View
-        public static Task View(HttpContext context, ViewBag viewBag, ActionCheckLink Model, TypeRequest typeRequest)
+        public static Task View(HttpContext context, ViewBag viewBag, ActionCheckLink Model, TypeRequest typeRequest, bool NotCache = false)
         {
             #region Код ответа
             if (viewBag.IsErrorRule)
@@ -262,7 +262,7 @@ IsCacheView: " + viewBag.IsCacheView + @"
             #endregion
 
             #region Кешируем ответ
-            if (Startup.cmd.Cache.Checklink != 0 && !viewBag.IsCacheView && context.Response.StatusCode != 200)
+            if (Startup.cmd.Cache.Checklink != 0 && !NotCache && !viewBag.IsCacheView && context.Response.StatusCode != 200)
             {
                 memoryCache.Set(KeyToMemoryCache.CheckLinkToCache(viewBag.method, viewBag.host, viewBag.uri), new ResponseView()
                 {
