@@ -166,9 +166,6 @@ namespace ISPCore
             }
             #endregion
 
-            // Кеш настроек WhiteList
-            WhiteUserList.UpdateCache();
-
             #region Загружаем список "Разрешенные доступы" в кеш
             foreach (var item in AccessIP.List())
             {
@@ -188,6 +185,11 @@ namespace ISPCore
                         break;
                 }
             }
+            #endregion
+
+            #region Кеш  WhiteList / IPtables
+            WhiteUserList.UpdateCache();
+            Engine.Security.IPtables.UpdateCacheToUserAgent();
             #endregion
 
             // Статичиские файлы

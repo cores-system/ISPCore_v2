@@ -62,26 +62,21 @@ namespace ISPCore.Engine.Security
         }
         #endregion
 
-        #region ClearCache
-        public static void ClearCache()
-        {
-            userAgentsRegex = null;
-        }
-        #endregion
-
         #region CheckUserAgent
-        private static string userAgentsRegex = null;
+        private static string userAgentsRegex = "^$";
 
         public static bool CheckUserAgent(string userAgent)
         {
-            if (userAgentsRegex != null)
-            {
-                if (userAgentsRegex == "^$")
-                    return false;
+            if (userAgentsRegex == "^$")
+                return false;
 
-                return Regex.IsMatch(userAgent, userAgentsRegex, RegexOptions.IgnoreCase);
-            }
+            return Regex.IsMatch(userAgent, userAgentsRegex, RegexOptions.IgnoreCase);
+        }
+        #endregion
 
+        #region UpdateCacheToUserAgent
+        public static void UpdateCacheToUserAgent()
+        {
             // Меняем режим доступа к SQL
             SqlToMode.SetMode(SqlMode.Read);
 
@@ -103,9 +98,6 @@ namespace ISPCore.Engine.Security
 
             // Меняем режим доступа к SQL
             SqlToMode.SetMode(SqlMode.ReadOrWrite);
-
-            // Результат
-            return Regex.IsMatch(userAgent, userAgentsRegex, RegexOptions.IgnoreCase);
         }
         #endregion
 

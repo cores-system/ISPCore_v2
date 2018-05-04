@@ -47,9 +47,9 @@ namespace ISPCore.Controllers
             // Сохраняем базу
             coreDB.SaveChanges();
 
-            // Очистка кеша IPtables
+            // Кеш IPtables
             if (item.typeBlockIP == TypeBlockIP.UserAgent)
-                IPtables.ClearCache();
+                IPtables.UpdateCacheToUserAgent();
 
             // Отдаем результат
             return Json(new TrueOrFalse(true));
@@ -114,9 +114,9 @@ namespace ISPCore.Controllers
             // Сохраняем SQL
             coreDB.SaveChanges();
 
-            // Очистка кеша IPtables
+            // Кеш IPtables
             if (typeBlockIP == TypeBlockIP.UserAgent)
-                IPtables.ClearCache();
+                IPtables.UpdateCacheToUserAgent();
 
             if (IsAPI)
                 return Json(new TrueOrFalse(true));
