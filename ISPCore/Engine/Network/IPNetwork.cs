@@ -156,8 +156,8 @@ namespace ISPCore.Engine.Network
 
             if (1 == arr.Count)
             {
-                FirstUsable = arr[0].FirstUsable;
-                return val >= arr[0].FirstUsable && arr[0].LastUsable >= val;
+                var item = arr[0];
+                return val >= item.FirstUsable && item.LastUsable >= val;
             }
 
             int right = arr.Count - 1;
@@ -172,8 +172,10 @@ namespace ISPCore.Engine.Network
             while (left < right)
             {
                 int mid = left + (right - left) / 2;
-                FirstUsable = arr[mid].FirstUsable;
-                ulong LastUsable = arr[mid].LastUsable;
+                var item = arr[mid];
+
+                FirstUsable = item.FirstUsable;
+                ulong LastUsable = item.LastUsable;
 
                 if (val >= FirstUsable && LastUsable >= val)
                     return true;
@@ -186,8 +188,8 @@ namespace ISPCore.Engine.Network
                     left = mid + 1;
                     if (left >= right)
                     {
-                        FirstUsable = arr[arr.Count - 1].FirstUsable;
-                        return val >= arr[arr.Count - 1].FirstUsable && arr[arr.Count - 1].LastUsable >= val;
+                        item = arr[arr.Count - 1];
+                        return val >= item.FirstUsable && item.LastUsable >= val;
                     }
                 }
                 else {
