@@ -155,7 +155,10 @@ namespace ISPCore.Engine.Network
                 return false;
 
             if (1 == arr.Count)
+            {
+                FirstUsable = arr[0].FirstUsable;
                 return val >= arr[0].FirstUsable && arr[0].LastUsable >= val;
+            }
 
             int right = arr.Count - 1;
             int left = 0;
@@ -182,7 +185,10 @@ namespace ISPCore.Engine.Network
                 {
                     left = mid + 1;
                     if (left >= right)
+                    {
+                        FirstUsable = arr[arr.Count - 1].FirstUsable;
                         return val >= arr[arr.Count - 1].FirstUsable && arr[arr.Count - 1].LastUsable >= val;
+                    }
                 }
                 else {
                     return true;
