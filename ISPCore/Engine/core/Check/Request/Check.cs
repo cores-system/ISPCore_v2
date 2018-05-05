@@ -81,7 +81,7 @@ namespace ISPCore.Engine.core.Check
 
             #region Получаем параметры POST запроса
             string FormData = string.Empty;
-            if (context.Request.Method == "POST")
+            if (context.Request.Method == "POST" && context.Request.HasFormContentType)
             {
                 StringBuilder mass = new StringBuilder();
                 foreach (var arg in context.Request.Form)
