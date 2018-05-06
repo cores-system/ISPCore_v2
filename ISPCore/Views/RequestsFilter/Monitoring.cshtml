@@ -142,8 +142,15 @@ else
 
         <div class="tabs">
             <ul class="nav nav-tabs nav-tabs-arrowed" role="tablist">
-                <li class="active"><a href="#tab-stats" role="tab" data-toggle="tab">Статистика за месяц</a></li>
-                <li><a href="#tab-jurn200" role="tab" data-toggle="tab">Журнал 200</a></li>
+                @if (ShowHost == null)
+                {
+                    <li class="active"><a href="#tab-stats" role="tab" data-toggle="tab">Статистика за месяц</a></li>
+                    <li><a href="#tab-jurn200" role="tab" data-toggle="tab">Журнал 200</a></li>
+                }
+                else
+                {
+                    <li class="active"><a href="#tab-jurn200" role="tab" data-toggle="tab">Журнал 200</a></li>
+                }
                 <li><a href="#tab-jurn303" role="tab" data-toggle="tab">Журнал 303</a></li>
                 <li><a href="#tab-jurn403" role="tab" data-toggle="tab">Журнал 403</a></li>
                 <li><a href="#tab-jurn401" role="tab" data-toggle="tab">Журнал 401</a></li>
@@ -152,7 +159,7 @@ else
             </ul>
             <div class="panel-body tab-content">
 
-                <div class="tab-pane active" id="tab-stats">
+                <div class="tab-pane @(ShowHost == null ? "active" : "")" id="tab-stats">
                     <div class="page-subtitle">
                         <h3>Статистика</h3>
                         <p>Общая статистика всех запросов в сутки</p>
@@ -191,7 +198,7 @@ else
                     </div>
                 </div>
 
-                <div class="tab-pane" id="tab-jurn200">
+                <div class="tab-pane @(ShowHost != null ? "active" : "")" id="tab-jurn200">
                     @{
                         var navPage200 = new NavPage<Jurnal200>(mdJurn200, Context, pageSize, page);
                     }
