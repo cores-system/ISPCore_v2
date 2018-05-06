@@ -24,7 +24,7 @@ namespace ISPCore.Engine.Security
         static List<CidrToIPv4> IPv4ToRange = new List<CidrToIPv4>();
 
         /// <summary>
-        /// Время и причина блокировки для IP-адресов
+        /// Время и причина блокировки для IPv4-адресов
         /// </summary>
         static ConcurrentDictionary<ulong, ModelIPtables> IPv4ToModels = new ConcurrentDictionary<ulong, ModelIPtables>();
 
@@ -32,6 +32,11 @@ namespace ISPCore.Engine.Security
         /// Белый список IPv6/Regex
         /// </summary>
         static string IPv6ToRegex = "^$";
+
+        /// <summary>
+        /// Время и причина блокировки для IPv6-адресов
+        /// </summary>
+        static ConcurrentDictionary<string, ModelIPtables> IPv6ToModels = new ConcurrentDictionary<string, ModelIPtables>();
 
         /// <summary>
         /// Белый список UserAgent/Regex
@@ -63,9 +68,25 @@ namespace ISPCore.Engine.Security
             // IPv6
             if (RemoteIpAddress.Contains(":"))
             {
-                if (IPv6ToRegex != "^$" && Regex.IsMatch(RemoteIpAddress, IPv6ToRegex))
+                #region Локальный метод - "IsMatch"
+                bool IsMatch(out string matchIP)
                 {
-                    data = new ModelIPtables();
+                    var match = Regex.Match(RemoteIpAddress, IPv6ToRegex);
+                    if (match.Length > 0 && RemoteIpAddress.Contains(match.Groups[1].Value))
+                    {
+                        matchIP = match.Groups[1].Value;
+                        return true;
+                    }
+
+                    matchIP = null;
+                    return false;
+                }
+                #endregion
+
+                if (IPv6ToRegex != "^$" && IsMatch(out string matchIPv6))
+                {
+                    if (!IPv6ToModels.TryGetValue(matchIPv6, out data))
+                        data = new ModelIPtables();
                     return true;
                 }
 
@@ -104,13 +125,20 @@ namespace ISPCore.Engine.Security
                 // IPv6
                 if (IP.Contains(":"))
                 {
+                    string IPv6 = IPNetwork.IPv6ToRegex(ipnetwork.FirstUsable);
+
+                    // Время и причина блокировки
+                    IPv6ToModels.AddOrUpdate(IPv6, data, (s, e) => data);
+
+                    #region Обновляем IPv6ToRegex
                     if (IPv6ToRegex == "^$")
                     {
-                        IPv6ToRegex = $"^({IPNetwork.IPv6ToRegex(ipnetwork.FirstUsable)})";
-                        return;
+                        IPv6ToRegex = $"^({IPv6})";
                     }
-
-                    IPv6ToRegex = Regex.Replace(IPv6ToRegex, @"\)$", $"|{IPNetwork.IPv6ToRegex(ipnetwork.FirstUsable)})");
+                    else {
+                        IPv6ToRegex = Regex.Replace(IPv6ToRegex, @"\)$", $"|{IPv6})");
+                    }
+                    #endregion
                 }
 
                 // IPv4
@@ -152,6 +180,8 @@ namespace ISPCore.Engine.Security
                     IPv6ToRegex = Regex.Replace(IPv6ToRegex, $@"\|{ipRegex}", "");
                     if (IPv6ToRegex == "^()")
                         IPv6ToRegex = "^$";
+
+                    IPv6ToModels.TryRemove(ipRegex, out _);
                 }
 
                 // IPv4
