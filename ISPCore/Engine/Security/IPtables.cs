@@ -168,16 +168,20 @@ namespace ISPCore.Engine.Security
         #endregion
 
         #region ClearDbAndCacheToIPv4Or6
+        static bool IsRunClearDbAndCacheToIPv4Or6 = false;
         public static void ClearDbAndCacheToIPv4Or6()
         {
             // Время еще не настало
-            if (NextTimeClearDbAndCacheToIPv4Or6 > DateTime.Now)
+            if (IsRunClearDbAndCacheToIPv4Or6 || NextTimeClearDbAndCacheToIPv4Or6 > DateTime.Now)
                 return;
+            IsRunClearDbAndCacheToIPv4Or6 = true;
 
             // Блокируем выполнение кода на час
             NextTimeClearDbAndCacheToIPv4Or6 = DateTime.Now.AddHours(1);
 
             SqlToMode.SetMode(SqlMode.Read);
+
+            // Подключаемся к базе
             using (var coreDB = Service.Get<CoreDB>())
             {
                 foreach (var blockedIP in coreDB.BlockedsIP.AsNoTracking())
@@ -195,7 +199,13 @@ namespace ISPCore.Engine.Security
                     }
                 }
             }
+
+            // Не чаще одного раза в 20 секунд
+            if (DateTime.Now.AddSeconds(20) > NextTimeClearDbAndCacheToIPv4Or6)
+                NextTimeClearDbAndCacheToIPv4Or6 = DateTime.Now.AddSeconds(20);
+
             SqlToMode.SetMode(SqlMode.ReadOrWrite);
+            IsRunClearDbAndCacheToIPv4Or6 = false;
         }
         #endregion
 
