@@ -11,10 +11,5 @@
         /// 
         /// </summary>
         public StatusCode StatusCode { get; set; } = new StatusCode();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public Cache Cache { get; set; } = new Cache();
     }
 }

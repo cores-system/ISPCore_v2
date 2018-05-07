@@ -262,7 +262,7 @@ IsCacheView: " + viewBag.IsCacheView + @"
             #endregion
 
             #region Кешируем ответ
-            if (Startup.cmd.Cache.Checklink != 0 && !NotCache && !viewBag.IsCacheView && context.Response.StatusCode != 200)
+            if (jsonDB.Cache.Checklink != 0 && !NotCache && !viewBag.IsCacheView && context.Response.StatusCode != 200)
             {
                 memoryCache.Set(KeyToMemoryCache.CheckLinkToCache(viewBag.method, viewBag.host, viewBag.uri), new ResponseView()
                 {
@@ -271,7 +271,7 @@ IsCacheView: " + viewBag.IsCacheView + @"
                     IsErrorRule = viewBag.IsErrorRule,
                     CacheTime = viewBag.CreateCacheView
 
-                }, TimeSpan.FromMilliseconds(Startup.cmd.Cache.Checklink));
+                }, TimeSpan.FromMilliseconds(jsonDB.Cache.Checklink));
             }
             #endregion
 

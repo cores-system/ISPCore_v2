@@ -20,30 +20,37 @@ namespace ISPCore.Controllers
         public JsonResult API(API api)
         {
             CommonModels.Update(api, jsonDB.API, HttpContext, updateType: UpdateType.skip);
-            return new SettingsToBaseController().Save(jsonDB.Base, api, jsonDB.Security, jsonDB.BruteForceConf, null, IsAPI: true);
+            return new SettingsToBaseController().Save(jsonDB.Base, api, jsonDB.Security, jsonDB.Cache, jsonDB.BruteForceConf, null, IsAPI: true);
         }
         
 
         public JsonResult Base(Base bs)
         {
             CommonModels.Update(bs, jsonDB.Base, HttpContext, updateType: UpdateType.skip);
-            return new SettingsToBaseController().Save(bs, jsonDB.API, jsonDB.Security, jsonDB.BruteForceConf, null, IsAPI: true);
+            return new SettingsToBaseController().Save(bs, jsonDB.API, jsonDB.Security, jsonDB.Cache, jsonDB.BruteForceConf, null, IsAPI: true);
+        }
+
+
+        public JsonResult Cache(Cache cache)
+        {
+            CommonModels.Update(cache, jsonDB.Cache, HttpContext, updateType: UpdateType.skip);
+            return new SettingsToBaseController().Save(jsonDB.Base, jsonDB.API, jsonDB.Security, cache, jsonDB.BruteForceConf, null, IsAPI: true);
         }
 
 
         public JsonResult Security(Security sc)
         {
             CommonModels.Update(sc, jsonDB.Security, HttpContext, updateType: UpdateType.skip);
-            return new SettingsToBaseController().Save(jsonDB.Base, jsonDB.API, sc, jsonDB.BruteForceConf, null, IsAPI: true);
+            return new SettingsToBaseController().Save(jsonDB.Base, jsonDB.API, sc, jsonDB.Cache, jsonDB.BruteForceConf, null, IsAPI: true);
         }
 
         public JsonResult BruteForce(BruteForceConf conf)
         {
             CommonModels.Update(conf, jsonDB.BruteForceConf, HttpContext, updateType: UpdateType.skip);
-            return new SettingsToBaseController().Save(jsonDB.Base, jsonDB.API, jsonDB.Security, conf, null, IsAPI: true);
+            return new SettingsToBaseController().Save(jsonDB.Base, jsonDB.API, jsonDB.Security, jsonDB.Cache, conf, null, IsAPI: true);
         }
 
-        public JsonResult Passwd(string PasswdRoot, string Passwd2FA, string salt) => new SettingsToBaseController().Save(jsonDB.Base, jsonDB.API, jsonDB.Security, jsonDB.BruteForceConf, PasswdRoot, Passwd2FA, salt, IsAPI: true);
+        public JsonResult Passwd(string PasswdRoot, string Passwd2FA, string salt) => new SettingsToBaseController().Save(jsonDB.Base, jsonDB.API, jsonDB.Security, jsonDB.Cache, jsonDB.BruteForceConf, PasswdRoot, Passwd2FA, salt, IsAPI: true);
 
 
         public JsonResult AntiDdos(AntiDdos antiDdos)

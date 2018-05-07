@@ -106,19 +106,19 @@ namespace ISPCore.Engine.core
             if (IsValidCookie(HttpContext, IP))
                 return true;
 
-            //IMemoryCache
+            // IMemoryCache
             var memoryCache = Service.Get<IMemoryCache>();
 
+            // База
+            var jsonDB = Service.Get<JsonDB>();
+
             #region Отдаем данные с кеша
-            if (Startup.cmd.Cache.AntiBot != 0 && memoryCache.TryGetValue(KeyToMemoryCache.AntiBotToCache(IP), out (string tplToUrl, string json) _cache))
+            if (jsonDB.Cache.AntiBot != 0 && memoryCache.TryGetValue(KeyToMemoryCache.AntiBotToCache(IP), out (string tplToUrl, string json) _cache))
             {
                 outHtml = Html(_cache.tplToUrl, _cache.json);
                 return false;
             }
             #endregion
-
-            // База
-            var jsonDB = Service.Get<JsonDB>();
 
             // Достаем настройки AntiBot из кеша
             var antiBotToGlobalConf = GlobalConf(jsonDB.AntiBot);
@@ -260,7 +260,7 @@ namespace ISPCore.Engine.core
             
             // reCAPTCHA, SignalR или JavaScript
             var tplName = (!IsRecaptcha && antiBotType == AntiBotType.reCAPTCHA) ? AntiBotType.SignalR : antiBotType;
-            outHtml = Html(tplName, antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey);
+            outHtml = Html(tplName, antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey, jsonDB.Cache.AntiBot);
             return false;
 
             #region Локальный метод - "IsGlobalConf"
@@ -369,7 +369,7 @@ if (xhr.status == 200) {
         /// <param name="IP"></param>
         /// <param name="HostConvert"></param>
         /// <param name="reCAPTCHASitekey"></param>
-        static string Html(AntiBotType tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey)
+        static string Html(AntiBotType tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey, int CacheAntiBot)
         {
             #region Базовые параметры
             string tplToUrl = string.Empty;
@@ -405,11 +405,11 @@ if (xhr.status == 200) {
             string json = JsonConvert.SerializeObject(mass);
 
             #region Создаем кеш
-            if (Startup.cmd.Cache.AntiBot != 0)
+            if (CacheAntiBot != 0)
             {
                 //IMemoryCache
                 var memoryCache = Service.Get<IMemoryCache>();
-                memoryCache.Set(KeyToMemoryCache.AntiBotToCache(IP), (tplToUrl, json), TimeSpan.FromMilliseconds(Startup.cmd.Cache.AntiBot));
+                memoryCache.Set(KeyToMemoryCache.AntiBotToCache(IP), (tplToUrl, json), TimeSpan.FromMilliseconds(CacheAntiBot));
             }
             #endregion
 

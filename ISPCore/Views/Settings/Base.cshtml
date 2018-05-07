@@ -25,6 +25,7 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="active"><a href="#tab-base" role="tab" data-toggle="tab">Основное</a></li>
                             <li><a href="#tab-security" role="tab" data-toggle="tab">Безопасность</a></li>
+                            <li><a href="#tab-cache" role="tab" data-toggle="tab">Кеш</a></li>
                             <li><a href="#tab-StopBruteForce" role="tab" data-toggle="tab">Brute Force</a></li>
                             <li><a href="#tab-api" role="tab" data-toggle="tab">API</a></li>
                             <li><a href="#tab-faq" role="tab" data-toggle="tab">FAQ</a></li>
@@ -128,6 +129,25 @@
                                     <div class="form-group">
                                         <label>reCAPTCHA<span>Sitekey</span></label>
                                         <input type="text" name="sc.reCAPTCHASitekey" class="form-control" value="@Model.Security.reCAPTCHASitekey" placeholder="data-sitekey" />
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane row" id="tab-cache">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Время<span>кеша Checklink в ms</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="cache.Checklink"
+                                               @if (Model.Cache.Checklink != 0) { <text> value="@Model.Cache.Checklink" </text> }
+                                               class="form-control" placeholder="По умолчанию: без кеша" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Время<span>кеша AntiBot в ms</span></label>
+                                        <input type="number" pattern="^[0-9]+$" name="cache.AntiBot"
+                                               @if (Model.Cache.AntiBot != 0) { <text> value="@Model.Cache.AntiBot" </text> }
+                                               class="form-control" placeholder="По умолчанию: без кеша" />
                                     </div>
                                 </div>
                             </div>
@@ -293,6 +313,21 @@
                                             <div class="faq-title"><span class="fa fa-angle-down"></span>Соль криптография</div>
                                             <div class="faq-text">
                                                 <p>Генерируемое уникальное значение, которое используется для проверки авторизации, рекомендуем не менять без надобности</p>
+                                            </div>
+                                        </div>
+
+                                        <h2><i class="fa fa-cubes"></i>Кеш</h2>
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Время кеша Checklink</div>
+                                            <div class="faq-text">
+                                                <p>Настройки кеша для "/core/check/request"</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="faq-item">
+                                            <div class="faq-title"><span class="fa fa-angle-down"></span>Время кеша AntiBot</div>
+                                            <div class="faq-text">
+                                                <p>Настройки кеша для ответа AntiBot</p>
                                             </div>
                                         </div>
 

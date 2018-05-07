@@ -496,7 +496,7 @@ namespace ISPCore.Engine.core.Check
             #endregion
 
             #region Кеш ответа
-            if (Startup.cmd.Cache.Checklink != 0)
+            if (jsonDB.Cache.Checklink != 0)
             {
                 // Кеш есть и он валиден
                 if (memoryCache.TryGetValue(KeyToMemoryCache.CheckLinkToCache(method, host, uri), out ResponseView responseView) && responseView.CacheTime == Domain.CreateTime)
@@ -616,7 +616,7 @@ namespace ISPCore.Engine.core.Check
                                 #region Локальный метод - "SetCacheToView"
                                 void SetCacheToView(string _responceUri = null)
                                 {
-                                    if (Startup.cmd.Cache.Checklink != 0)
+                                    if (jsonDB.Cache.Checklink != 0)
                                     {
                                         memoryCache.Set(KeyToMemoryCache.CheckLinkToCache(viewBag.method, viewBag.host, viewBag.uri), new ResponseView()
                                         {
@@ -627,7 +627,7 @@ namespace ISPCore.Engine.core.Check
                                             kode = rule.kode,
                                             ResponceUri = _responceUri,
 
-                                        }, TimeSpan.FromMilliseconds(Startup.cmd.Cache.Checklink));
+                                        }, TimeSpan.FromMilliseconds(jsonDB.Cache.Checklink));
                                     }
                                 }
                                 #endregion

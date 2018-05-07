@@ -374,6 +374,7 @@ namespace ISPCore
                 app.UseMvc(routes =>
                 {
                     routes.MapRoute(null, "api/edit/settings/base", new { controller = "ApiEditSettingsToBase", action = "Base" });
+                    routes.MapRoute(null, "api/edit/settings/cache", new { controller = "ApiEditSettingsToBase", action = "Cache" });
                     routes.MapRoute(null, "api/edit/settings/api", new { controller = "ApiEditSettingsToBase", action = "API" });
                     routes.MapRoute(null, "api/edit/settings/security", new { controller = "ApiEditSettingsToBase", action = "Security" });
                     routes.MapRoute(null, "api/edit/settings/passwd", new { controller = "ApiEditSettingsToBase", action = "Passwd" });

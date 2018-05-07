@@ -15,6 +15,7 @@ namespace ISPCore.Models.Databases.json
     public class JsonDB
     {
         public Base Base { get; set; } = new Base();
+        public Cache Cache { get; set; } = new Cache();
         public API API { get; set; } = new API();
         public Security Security { get; set; } = new Security();
         public List<WhiteListModel> WhiteList { get; set; } = new List<WhiteListModel>();
@@ -45,6 +46,7 @@ namespace ISPCore.Models.Databases.json
             if (jsonDB != null)
             {
                 Base = jsonDB.Base;
+                Cache = jsonDB.Cache;
                 API = jsonDB.API;
                 Security = jsonDB.Security;
                 WhiteList = jsonDB.WhiteList;
@@ -355,6 +357,19 @@ namespace ISPCore.Models.Databases.json
             }
             set { _dayLimit = value; }
         }
+    }
+
+    public class Cache
+    {
+        /// <summary>
+        /// Время в милисекундах
+        /// </summary>
+        public int Checklink { get; set; }
+
+        /// <summary>
+        /// Время в милисекундах
+        /// </summary>
+        public int AntiBot { get; set; }
     }
 
 

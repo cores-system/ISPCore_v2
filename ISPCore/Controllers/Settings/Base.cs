@@ -28,7 +28,7 @@ namespace ISPCore.Controllers
 
 
         [HttpPost]
-        public JsonResult Save(Base bs, API api, Security sc, BruteForceConf BrutConf, string PasswdRoot = null, string Passwd2FA = null, string salt = null, bool IsAPI = false)
+        public JsonResult Save(Base bs, API api, Security sc, Cache cache, BruteForceConf BrutConf, string PasswdRoot = null, string Passwd2FA = null, string salt = null, bool IsAPI = false)
         {
             #region Демо режим
             if (Platform.IsDemo)
@@ -41,6 +41,7 @@ namespace ISPCore.Controllers
             #region Обновляем базу
             jsonDB.Base = bs;
             jsonDB.Security = sc;
+            jsonDB.Cache = cache;
             jsonDB.API = api;
             jsonDB.BruteForceConf = BrutConf;
             jsonDB.Save();
