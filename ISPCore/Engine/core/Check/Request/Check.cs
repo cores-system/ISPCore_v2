@@ -18,6 +18,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -126,9 +127,9 @@ namespace ISPCore.Engine.core.Check
 
             // Достаем данные домена
             var Domain = ISPCache.GetDomain(DomainID);
-            
-            // Достаем настройки AntiBot из кеша
-            var antiBotToGlobalConf = AntiBot.GlobalConf(jsonDB.AntiBot);
+
+            // Статистика запросов - "req/m"
+            SetCountRequestToMinute(TypeRequest.All, host, DomainID, Domain.confToLog.EnableCountRequest);
 
             #region Проверяем "IP/User-Agent" в блокировке IPtables
             // Проверяем IP в блокировке IPtables по домену
@@ -165,6 +166,9 @@ namespace ISPCore.Engine.core.Check
                 return context.Response.WriteAsync(IPtables.BlockedToHtml("Ваш User-Agent в списке запрещенных"), context.RequestAborted);
             }
             #endregion
+
+            // Достаем настройки AntiBot из кеша
+            var antiBotToGlobalConf = AntiBot.GlobalConf(jsonDB.AntiBot);
 
             // Что-бы лишний раз не дергать WhiteList
             AntiBotType antiBotType = (antiBotToGlobalConf.conf.Enabled || Domain.AntiBot.UseGlobalConf) ? antiBotToGlobalConf.conf.type : Domain.AntiBot.type;
@@ -714,6 +718,7 @@ namespace ISPCore.Engine.core.Check
             // Записываем данные запроса
             AddJurnalTo403And303(Is303: true);
             SetCountRequestToHour(TypeRequest._303, host, Domain.confToLog.EnableCountRequest);
+            SetCountRequestToMinute(TypeRequest._303, host, DomainID, Domain.confToLog.EnableCountRequest);
 
             // Если не одно правило не подошло
             return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);
@@ -727,6 +732,7 @@ namespace ISPCore.Engine.core.Check
                     // Записываем данные пользователя
                     AddJurnalTo403And303(Is303: true);
                     SetCountRequestToHour(TypeRequest._303, host, Domain.confToLog.EnableCountRequest);
+                    SetCountRequestToMinute(TypeRequest._303, host, DomainID, Domain.confToLog.EnableCountRequest);
 
                     // Разрешаем запрос
                     return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303);

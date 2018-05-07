@@ -1,6 +1,6 @@
 ﻿@using Newtonsoft.Json;
 @using ISPCore.Models.RequestsFilter.Domains
-@model Domain
+@model IEnumerable<AliasView>
 
 @{
     int Id = (int)ViewData["Id"];
@@ -15,7 +15,7 @@
 <div class="wrapper wrapper-page-title">
     <div class="page-subtitle margin-bottom-0">
         <button class="btn btn-success t_right" onclick="saveEditSite(this, '/requests-filter/domain/save/aliases')">Сохранить изменения</button>
-        <h3>Домен: @Model.host</h3>
+        <h3>Домен: @ViewBag.host</h3>
     </div>
 
     <form id="form" method="POST">
@@ -40,6 +40,7 @@
                             <table class="table table-responsive add-ads-code-table">
                                 <thead>
                                     <tr>
+                                        <th style="width: 95px;">req/m</th>
                                         <th style="width: 280px;">Домен</th>
                                         <th>Директория</th>
                                         <th style="width: 70px;"></th>
@@ -58,7 +59,7 @@
 
 
 <script>
-    var Aliases = @Html.Raw(JsonConvert.SerializeObject(Model?.Aliases ?? new List<Alias>()));
+    var Aliases = @Html.Raw(JsonConvert.SerializeObject(Model));
     for (var i = 0; i < Aliases.length; i++) {
         addNewAlias(@Id, Aliases[i]);
     }

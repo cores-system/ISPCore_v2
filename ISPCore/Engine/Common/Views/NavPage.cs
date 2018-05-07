@@ -16,13 +16,13 @@ namespace ISPCore.Engine.Common.Views
         string PagePatch, QueryString;
         int pageSize, page;
 
-        public NavPage(IEnumerable<T> db, HttpContext context, int _pageSize, int _page, bool reverse = true)
+        public NavPage(IEnumerable<T> db, HttpContext context, int _pageSize, int _page, bool reverse = true, bool overrideMass = false)
         {
             QueryString = Regex.Replace(context.Request.QueryString.Value.Replace("?", "&"), "(&page=[^&]+|&ajax=[^&]+)", "", RegexOptions.IgnoreCase);
             PagePatch = $"{context.Request.Path.Value}?page";
             pageSize = _pageSize;
             page = _page;
-            mass = (reverse ? db.AsEnumerable().Reverse() : db).Skip((page * pageSize) - pageSize).Take(NavPageSize(page, pageSize)).ToList();
+            mass = overrideMass ? db.ToList() : (reverse ? db.AsEnumerable().Reverse() : db).Skip((page * pageSize) - pageSize).Take(NavPageSize(page, pageSize)).ToList();
 
             #region Локальный метод - NavPageSize
             int NavPageSize(int page, int pageSize)

@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using ISPCore.Models.Databases;
-using Microsoft.Extensions.Caching.Memory;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Models.Response;

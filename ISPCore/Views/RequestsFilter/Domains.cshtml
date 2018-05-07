@@ -1,7 +1,5 @@
-﻿@using System.Text
-@using System.Text.RegularExpressions
-@using ISPCore.Models.RequestsFilter.Domains
-@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.RequestsFilter.Domains.Domain>
+﻿@using ISPCore.Models.RequestsFilter.Domains
+@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.RequestsFilter.Domains.DomainView>
 
 @{
     if (Model.ajax)
@@ -113,6 +111,7 @@
                         <th style="width: 100px;">Защита</th>
                         <th class="text-left">Домен</th>
                         <th class="text-left">Шаблоны правил</th>
+                        <th style="width: 105px;"><a href="/requests-filter/domains?sort=req" onclick="return loadPage(this)">req/s</a></th>
                         <th style="width: 130px;">Настройки</th>
                     </tr>
 
@@ -144,16 +143,11 @@
                             </td>
 
                             <td class="text-left table-products">
-                                <strong>
-                                    @{
-                                        StringBuilder TemplateName = new StringBuilder();
-                                        foreach (var tpl in domain.Templates)
-                                        {
-                                            TemplateName.Append(Model.coreDB.RequestsFilter_Templates.GetTemplateName(tpl.Template, "") + ", ");
-                                        }
-                                    }
-                                    @Regex.Replace(TemplateName.ToString(), ",([ ]+)?$", "")
-                                </strong>
+                                <strong>@domain.Templates</strong>
+                            </td>
+
+                            <td class="table-products">
+                                <strong>@string.Format("{0:N0}", domain.ReqToSecond)</strong>
                             </td>
 
                             <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
@@ -169,7 +163,7 @@
         }
         else
         {
-            <p>У вас еще нет добавленных доменов</p>
+            <p>@ViewBag.Info</p>
         }
     </div>
 
@@ -179,7 +173,6 @@
 
 
 <input type="file" id="file" name="file" style="display: none">
-
 <script>
     $(function () {
         $('#file').change(function () {

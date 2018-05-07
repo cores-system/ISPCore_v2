@@ -287,6 +287,7 @@ function addNewAlias(DomainId, option) {
 	var data = {
         host: '',
         Folder: '',
+		ReqMinuteToString: '',
 		Id: 0
 	}
 	$.extend(data, option || {})
@@ -295,6 +296,7 @@ function addNewAlias(DomainId, option) {
 	var code = $([
 		'<tr id="c' + id + '">',
 		'<input type="hidden" class="set-id-val" name="aliases[' + id + '].Id" value="' + data.Id + '" />',
+		'<td></td>',
         '<td><div class="add-ads-input-light"><input class="name" name="aliases[' + id + '].host" value="' + data.host +'"></div></td>',
         '<td><div class="add-ads-input-light"><input class="name" name="aliases[' + id + '].Folder" value="'+(data.Folder || '')+'"></div></td>',
 		'<td style="text-align: right;" class="table-products btn-icons">',
@@ -305,6 +307,7 @@ function addNewAlias(DomainId, option) {
     
     var codeEmpty = $([
         '<tr id="c' + id + '">',
+		'<td>' + (data.ReqMinuteToString || '0') + '</td>',
         '<td>' + data.host + '</td>',
         '<td>' + (data.Folder || 'не указана') + '</td>',
         '<td class="table-products btn-icons text-right">',

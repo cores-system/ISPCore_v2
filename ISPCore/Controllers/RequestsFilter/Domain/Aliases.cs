@@ -5,25 +5,61 @@ using System.Collections.Generic;
 using ISPCore.Models.RequestsFilter.Domains;
 using System.Text.RegularExpressions;
 using ISPCore.Engine.core.Cache.CheckLink;
-using ISPCore.Engine.Databases;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using ISPCore.Models.Response;
 using ISPCore.Engine.Base;
+using ISPCore.Engine.Base.SqlAndCache;
+using ISPCore.Models.RequestsFilter.Monitoring;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ISPCore.Controllers
 {
     public class RequestsFilterToDomainAliasesController : ControllerToDB
     {
+        #region Index
         [HttpGet]
         public IActionResult Index(int Id, bool ajax)
         {
             ViewData["Id"] = Id;
             ViewData["ajax"] = ajax;
-            return View("~/Views/RequestsFilter/Domain/Aliases.cshtml", FindAndInclude(coreDB.RequestsFilter_Domains.AsNoTracking(), Id));
+
+            // Статистика запросов за прошлую минуту
+            if (!memoryCache.TryGetValue(KeyToMemoryCache.IspNumberOfRequestToMinutes(DateTime.Now.AddMinutes(-1)), out IDictionary<string, NumberOfRequestMinute> NumberOfRequestsPerMinute))
+                NumberOfRequestsPerMinute = new Dictionary<string, NumberOfRequestMinute>();
+
+            // Настройки домена
+            var domain = FindAndInclude(coreDB.RequestsFilter_Domains.AsNoTracking(), Id);
+            ViewBag.host = domain.host;
+
+            // Список алиасов
+            List<AliasView> Aliases = new List<AliasView>();
+
+            // Alias To AliasView
+            foreach (var alias in domain.Aliases)
+            {
+                // Base Alias
+                var model = new AliasView()
+                {
+                    DomainId = alias.DomainId,
+                    Folder = alias.Folder,
+                    host = alias.host,
+                    Id = alias.Id
+                };
+
+                // Количество запросов для алиаса
+                if (NumberOfRequestsPerMinute.TryGetValue(alias.host, out NumberOfRequestMinute dt))
+                    model.ReqToMinute = dt.NumberOfRequest;
+
+                Aliases.Add(model);
+            }
+
+            // Выводим результат
+            return View("~/Views/RequestsFilter/Domain/Aliases.cshtml", Aliases.OrderByDescending(i => i.ReqToMinute));
         }
+        #endregion
 
-
+        #region Save
         [HttpPost]
         public JsonResult Save(Domain domain, IDictionary<string, Alias> aliases = null)
         {
@@ -63,8 +99,9 @@ namespace ISPCore.Controllers
             // Отдаем сообщение и Id новых алиасов
             return Json(new UpdateToIds("Настройки домена сохранены", 0, NewAliases));
         }
+        #endregion
 
-
+        #region FindAndInclude
         /// <summary>
         /// 
         /// </summary>
@@ -74,5 +111,6 @@ namespace ISPCore.Controllers
         {
             return db.Where(i => i.Id == Id).Include(i => i.Aliases).FirstOrDefault();
         }
+        #endregion
     }
 }

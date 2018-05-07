@@ -17,6 +17,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
 
         public static string LimitLogin(string IP) => $"LimitLogin-{IP}";
         public static string IspNumberOfRequestToHour(DateTime time) => $"isp_NumberOfRequestToHour-{time.Hour}";
+        public static string IspNumberOfRequestToMinutes(DateTime time) => $"isp_NumberOfRequestToMinutes-{time.Minute}";
 
         public static string AntiDdosNumberOfRequestDay(DateTime time) => $"AntiDdosNumberOfRequestDay-{time.Hour}";
         

@@ -84,6 +84,61 @@ namespace ISPCore.Engine.core.Check
         }
         #endregion
 
+        #region SetCountRequestToMinute
+        public static void SetCountRequestToMinute(TypeRequest type, string host, int DomainID, bool EnableCountRequest)
+        {
+            if (type != TypeRequest.All && type != TypeRequest._303)
+                return;
+
+            #region Локальный метод - "SetCount"
+            void SetCount(NumberOfRequestMinute dt)
+            {
+                switch (type)
+                {
+                    case TypeRequest._303:
+                        dt.Count303++;
+                        break;
+                    case TypeRequest.All:
+                        dt.NumberOfRequest++;
+                        break;
+                }
+            }
+            #endregion
+
+            if (EnableCountRequest)
+            {
+                string keyNumberOfRequestToMinutes = KeyToMemoryCache.IspNumberOfRequestToMinutes(DateTime.Now);
+                if (memoryCache.TryGetValue(keyNumberOfRequestToMinutes, out IDictionary<string, NumberOfRequestMinute> NumberOfRequestsPerMinute))
+                {
+                    // Если хост есть в кеше
+                    if (NumberOfRequestsPerMinute.TryGetValue(host, out NumberOfRequestMinute dtValue))
+                    {
+                        SetCount(dtValue);
+                    }
+
+                    // Если хоста нету в кеше
+                    else
+                    {
+                        var dt = new NumberOfRequestMinute();
+                        dt.DomainID = DomainID;
+                        SetCount(dt);
+                        NumberOfRequestsPerMinute.Add(host, dt);
+                    }
+                }
+                else
+                {
+                    // Считаем запрос
+                    var dt = new NumberOfRequestMinute();
+                    dt.DomainID = DomainID;
+                    SetCount(dt);
+
+                    // Создаем кеш
+                    memoryCache.Set(keyNumberOfRequestToMinutes, new Dictionary<string, NumberOfRequestMinute>() { [host] = dt }, TimeSpan.FromMinutes(3));
+                }
+            }
+        }
+        #endregion
+
         #region SetBlockedToIPtables
         public static void SetBlockedToIPtables(ModelCache.Domain Domain, string IP, string host, string Msg, DateTime Expires, string uri, string userAgent, string PtrHostName)
         {
