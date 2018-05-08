@@ -383,8 +383,15 @@ namespace ISPCore.Engine.Databases
 
                                     case 7:
                                         {
-                                            // Миграция на 8
-                                            //goto case 8;
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_NumberOfRequestDay] ADD [CountIPtables] BIGINT DEFAULT 0 NOT NULL ;");
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_NumberOfRequestMonth] ADD [CountIPtables] BIGINT DEFAULT 0 NOT NULL ;");
+                                            goto case 8;
+                                        }
+
+                                    case 8:
+                                        {
+                                            // Миграция на 9
+                                            //goto case 9;
                                             break;
                                         }
                                 }

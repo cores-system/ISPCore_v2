@@ -60,6 +60,7 @@ namespace ISPCore.Controllers
                     item.Count401 += dt.Count401;
                     item.Count500 += dt.Count500;
                     item.Count2FA += dt.Count2FA;
+                    item.CountIPtables += dt.CountIPtables;
                 }
                 else
                 {
@@ -72,7 +73,8 @@ namespace ISPCore.Controllers
                         Count403 = dt.Count403,
                         Count401 = dt.Count401,
                         Count500 = dt.Count500,
-                        Count2FA = dt.Count2FA
+                        Count2FA = dt.Count2FA,
+                        CountIPtables = dt.CountIPtables
                     });
                 }
             }
@@ -103,6 +105,7 @@ namespace ISPCore.Controllers
             string tmp401 = tmpBase;
             string tmp500 = tmpBase;
             string tmp2FA = tmpBase;
+            string tmpIPtables= tmpBase;
             #endregion
 
             #region Обновляем переменные
@@ -119,6 +122,7 @@ namespace ISPCore.Controllers
                 tmp303 = GeReplace(tmp303, dt.Value.Count303);
                 tmp403 = GeReplace(tmp403, dt.Value.Count403);
                 tmp401 = GeReplace(tmp401, dt.Value.Count401);
+                tmpIPtables = GeReplace(tmpIPtables, dt.Value.CountIPtables);
                 tmp500 = GeReplace(tmp500, dt.Value.Count500);
                 tmp2FA = GeReplace(tmp2FA, dt.Value.Count2FA);
             }
@@ -130,6 +134,7 @@ namespace ISPCore.Controllers
             json.Append("{key: '303', nonStackable: false, shifting: false, values: [ " + tmp303 + " ] },");
             json.Append("{key: '403', nonStackable: false, shifting: false, values: [ " + tmp403 + " ] },");
             json.Append("{key: '401', nonStackable: false, shifting: false, values: [ " + tmp401 + " ] },");
+            json.Append("{key: 'IPtables', nonStackable: false, shifting: false, values: [ " + tmpIPtables + " ] },");
             json.Append("{key: '500', nonStackable: false, shifting: false, values: [ " + tmp500 + " ] },");
             json.Append("{key: '2FA', nonStackable: false, shifting: false, values: [ " + tmp2FA + " ] }");
             #endregion

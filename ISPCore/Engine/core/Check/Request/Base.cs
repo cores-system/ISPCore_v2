@@ -46,6 +46,9 @@ namespace ISPCore.Engine.core.Check
                     case TypeRequest._2fa:
                         dt.Count2FA++;
                         break;
+                    case TypeRequest.IPtables:
+                        dt.CountIPtables++;
+                        break;
                 }
             }
             #endregion

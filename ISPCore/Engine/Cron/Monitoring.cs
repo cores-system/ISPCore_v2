@@ -40,6 +40,7 @@ namespace ISPCore.Engine.Cron
                         Count403 = item.Value.Count403,
                         Count500 = item.Value.Count500,
                         Count2FA = item.Value.Count2FA,
+                        CountIPtables = item.Value.CountIPtables,
                     });
                 }
 
@@ -152,6 +153,7 @@ namespace ISPCore.Engine.Cron
                             it.Count401 += item.Count401;
                             it.Count500 += item.Count500;
                             it.Count2FA += item.Count2FA;
+                            it.CountIPtables += item.CountIPtables;
                         }
                         else
                         {
@@ -170,13 +172,14 @@ namespace ISPCore.Engine.Cron
                         coreDB.RequestsFilter_NumberOfRequestMonth.Add(new NumberOfRequestMonth()
                         {
                             Time = item.Value.Time,
-                            allRequests = item.Value.Count200 + item.Value.Count303 + item.Value.Count403 + item.Value.Count500 + item.Value.Count401 + item.Value.Count2FA,
+                            allRequests = item.Value.Count200 + item.Value.Count303 + item.Value.Count403 + item.Value.Count500 + item.Value.Count401 + item.Value.Count2FA + item.Value.CountIPtables,
                             Count200 = item.Value.Count200,
                             Count303 = item.Value.Count303,
                             Count401 = item.Value.Count401,
                             Count403 = item.Value.Count403,
                             Count500 = item.Value.Count500,
                             Count2FA = item.Value.Count2FA,
+                            CountIPtables = item.Value.CountIPtables
                         });
                     }
                     #endregion

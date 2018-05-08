@@ -49,13 +49,13 @@ namespace ISPCore
         public static LatestVersion version => new LatestVersion()
         {
             Version = 2.2,
-            Patch = 4
+            Patch = 5
         };
 
         public static LatestVersion vSql => new LatestVersion()
         {
             Version = 0.1,
-            Patch = 7
+            Patch = 8
         };
         #endregion
         

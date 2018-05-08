@@ -17,5 +17,6 @@ namespace ISPCore.Models.RequestsFilter.Monitoring
         public long Count401 { get; set; }
         public long Count500 { get; set; }
         public long Count2FA { get; set; }
+        public long CountIPtables { get; set; }
     }
 }

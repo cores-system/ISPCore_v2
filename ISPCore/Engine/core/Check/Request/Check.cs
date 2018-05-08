@@ -137,7 +137,7 @@ namespace ISPCore.Engine.core.Check
             {
                 // Логируем пользователя
                 AddJurnalTo200(IsIPtables: true);
-                SetCountRequestToHour(TypeRequest._200, host, Domain.confToLog.EnableCountRequest);
+                SetCountRequestToHour(TypeRequest.IPtables, host, Domain.confToLog.EnableCountRequest);
 
                 // StatusCode
                 context.Response.StatusCode = 401;
@@ -154,7 +154,7 @@ namespace ISPCore.Engine.core.Check
             {
                 // Логируем пользователя
                 AddJurnalTo200(IsIPtables: true);
-                SetCountRequestToHour(TypeRequest._200, host, Domain.confToLog.EnableCountRequest);
+                SetCountRequestToHour(TypeRequest.IPtables, host, Domain.confToLog.EnableCountRequest);
 
                 // Код ответа
                 context.Response.StatusCode = 401;

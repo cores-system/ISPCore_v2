@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ISPCore.Engine.Security;
+using ISPCore.Models.RequestsFilter.Monitoring;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -25,6 +26,9 @@ namespace ISPCore.Engine.Middleware
             // Поиск IP в кеше для блокировки пользователя
             if (IPtables.CheckIP(httpContext.Connection.RemoteIpAddress.ToString(), memoryCache, out ModelIPtables data))
             {
+                // Статистика
+                Engine.core.Check.Request.SetCountRequestToHour(TypeRequest.IPtables, "global", true);
+
                 httpContext.Response.StatusCode = 401;
                 if (Startup.cmd.StatusCode.IPtables)
                     return Task.FromResult(true);
