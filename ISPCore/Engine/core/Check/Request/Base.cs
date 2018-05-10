@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using ModelCache = ISPCore.Models.core.Cache.CheckLink;
 using ModelIPtables = ISPCore.Models.Security.IPtables;
+using Trigger = ISPCore.Models.Triggers.Events.core.CheckRequest;
 
 namespace ISPCore.Engine.core.Check
 {
@@ -88,7 +89,7 @@ namespace ISPCore.Engine.core.Check
         #endregion
 
         #region SetCountRequestToMinute
-        public static void SetCountRequestToMinute(TypeRequest type, string host, int DomainID, bool EnableCountRequest)
+        public static void SetCountRequestToMinute(string IP, TypeRequest type, string host, int DomainID, bool EnableCountRequest)
         {
             if (type != TypeRequest.All && type != TypeRequest._303)
                 return;
@@ -100,9 +101,11 @@ namespace ISPCore.Engine.core.Check
                 {
                     case TypeRequest._303:
                         dt.Count303++;
+                        Trigger.OnRequestToMinute((IP, type, dt.Count303, host, DomainID));
                         break;
                     case TypeRequest.All:
                         dt.NumberOfRequest++;
+                        Trigger.OnRequestToMinute((IP, type, dt.NumberOfRequest, host, DomainID));
                         break;
                 }
             }

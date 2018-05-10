@@ -26,6 +26,7 @@ using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Models.Command_Line;
 using ModelIPtables = ISPCore.Models.Security.IPtables;
 using ISPCore.Engine.Security;
+using ISPCore.Engine.Triggers;
 
 namespace ISPCore
 {
@@ -122,6 +123,9 @@ namespace ISPCore
 
             // Создаем сервис
             Service.Create(memoryCache);
+
+            // Регистрируем триггеры
+            RegisteredTriggers.Initialize();
 
             #region Загружаем список BlockedIP в кеш
             using (CoreDB coreDB = Service.Get<CoreDB>())

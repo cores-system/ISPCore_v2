@@ -10,7 +10,7 @@ namespace ISPCore.Engine.Base
             Directory.CreateDirectory(Temp.AutoUpdate);
             Directory.CreateDirectory(Temp.SyncBackup);
             Directory.CreateDirectory(Passwd);
-            Directory.CreateDirectory(Databases);
+            Directory.CreateDirectory(Triggers);
             Directory.CreateDirectory(LogRequests);
             Directory.CreateDirectory(ReportsAV);
             Directory.CreateDirectory(ReportSync);
@@ -26,6 +26,7 @@ namespace ISPCore.Engine.Base
         public static string Tmp => "core/tmp";
         public static string Passwd => "core/passwd";
         public static string Databases => "core/Databases";
+        public static string Triggers => "core/Databases/Triggers";
         public static string Log => RootPath + "/core/Log";
         public static string LogRequests => RootPath + "/core/Log/Requests";
         public static string ReportsAV => RootPath + "/wwwroot/reports/av";
@@ -38,6 +39,7 @@ namespace ISPCore.Engine.Base
         public static class File
         {
             public static string SystemErrorLog => $"{Log}/system.error.log";
+            public static string TriggerErrorLog => $"{Log}/trigger.error.log";
             public static string ISPCoreDB => $"{RootPath}/core/Databases/ISPCore.db";
         }
 
