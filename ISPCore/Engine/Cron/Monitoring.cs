@@ -73,8 +73,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем NumberOfRequestMonth
                     foreach (var item in coreDB.RequestsFilter_NumberOfRequestMonth.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_NumberOfRequestMonth), item.Id));
                     }
                     #endregion
@@ -82,8 +82,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем Jurnals200
                     foreach (var item in coreDB.RequestsFilter_Jurnals200.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_Jurnals200), item.Id));
                     }
                     #endregion
@@ -91,8 +91,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем Jurnals303
                     foreach (var item in coreDB.RequestsFilter_Jurnals303.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_Jurnals303), item.Id));
                     }
                     #endregion
@@ -100,8 +100,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем Jurnals403
                     foreach (var item in coreDB.RequestsFilter_Jurnals403.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_Jurnals403), item.Id));
                     }
                     #endregion
@@ -109,8 +109,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем Jurnals401
                     foreach (var item in coreDB.RequestsFilter_Jurnals401.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_Jurnals401), item.Id));
                     }
                     #endregion
@@ -118,8 +118,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем Jurnals2FA
                     foreach (var item in coreDB.RequestsFilter_Jurnals2FA.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_Jurnals2FA), item.Id));
                     }
                     #endregion
@@ -127,8 +127,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем Jurnals500
                     foreach (var item in coreDB.RequestsFilter_Jurnals500.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_Jurnals500), item.Id));
                     }
                     #endregion

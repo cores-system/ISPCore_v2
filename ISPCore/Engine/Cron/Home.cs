@@ -25,7 +25,7 @@ namespace ISPCore.Engine.Cron
                 memoryCache.Set("Cron-Home_Jurnals", (byte)1, TimeSpan.FromHours(12));
 
                 SqlToMode.SetMode(SqlMode.Read);
-                var expires = DateTime.Now.AddDays(-30);
+                var expires = DateTime.Now.AddDays(-90);
 
                 // Пропускаем последние 60 записей
                 foreach (var jurn in coreDB.Home_Jurnals.AsNoTracking().AsEnumerable().Reverse().Skip(60))

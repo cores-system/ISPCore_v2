@@ -145,8 +145,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем NumberOfRequestMonth
                     foreach (var item in coreDB.AntiDdos_NumberOfRequestMonths.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.AntiDdos_NumberOfRequestMonths), item.Id));
                     }
                     #endregion
@@ -154,8 +154,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем Jurnals
                     foreach (var item in coreDB.AntiDdos_Jurnals.AsNoTracking())
                     {
-                        // Если записи больше 7 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 7)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 90)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.AntiDdos_Jurnals), item.Id));
                     }
                     #endregion

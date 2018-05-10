@@ -44,8 +44,8 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     // Чистим базу
                     foreach (var note in coreDB.SyncBackup_Notations.AsNoTracking())
                     {
-                        // Если записи больше 30 дней
-                        if ((DateTime.Now - note.Time).TotalDays > 30)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - note.Time).TotalDays > 90)
                         {
                             // Удаляем заметку
                             coreDB.SyncBackup_Notations.RemoveAttach(coreDB, note.Id);
@@ -60,7 +60,7 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     {
                         try
                         {
-                            if ((DateTime.Now - File.GetLastWriteTime(intFile)).TotalDays > 30)
+                            if ((DateTime.Now - File.GetLastWriteTime(intFile)).TotalDays > 90)
                                 File.Delete(intFile);
                         }
                         catch { }

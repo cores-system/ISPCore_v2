@@ -38,8 +38,8 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     // Чистим базу
                     foreach (var note in coreDB.SyncBackup_db_Reports.AsNoTracking())
                     {
-                        // Если записи больше 7 дней
-                        if ((DateTime.Now - note.Time).TotalDays > 7)
+                        // Если записи больше 90 дней
+                        if ((DateTime.Now - note.Time).TotalDays > 90)
                         {
                             // Удаляем отчет
                             coreDB.SyncBackup_db_Reports.RemoveAttach(coreDB, note.Id);
