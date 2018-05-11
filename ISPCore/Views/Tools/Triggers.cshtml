@@ -9,7 +9,7 @@
 
 <div class="wrapper wrapper-page-title">
     <div class="page-subtitle">
-        <button href="/tools/trigger" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10">Создать</button>
+        <button href="/trigger" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10">Создать</button>
         <button onclick="$('#file').click(); return false;" class="btn btn-primary t_right">Импорт</button>
 
         <h3>Триггеры</h3>
@@ -61,8 +61,8 @@
                             </td>
 
                             <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
-                                <a href="/tools/trigger?Id=@tgr.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
-                                <a onclick="return deleteElement(this,'/tools/trigger/remove',{Id:'@tgr.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                                <a href="/trigger?Id=@tgr.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
+                                <a onclick="return deleteElement(this,'/trigger/remove',{Id:'@tgr.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
                             </td>
                         </tr>
                     }
@@ -86,7 +86,7 @@
     $(function () {
         $('#file').change(function () {
 
-            $(this).simpleUpload("/tools/trigger/import", {
+            $(this).simpleUpload("/trigger/import", {
 
                 start: function (file) {
                     //upload started
@@ -96,7 +96,7 @@
                 },
                 success: function (data) {
                     //upload successful
-                    loadPage(null, '/tools/triggers')
+                    loadPage(null, '/triggers')
                 },
                 error: function (error) {
                     //upload failed

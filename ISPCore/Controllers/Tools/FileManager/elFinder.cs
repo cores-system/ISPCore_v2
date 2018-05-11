@@ -7,12 +7,12 @@ using ISPCore.Models.Base;
 
 namespace ISPCore.Controllers
 {
-    public class FileManager : Controller
+    public class ToolsToFileManager : Controller
     {
         public IActionResult Index(bool ajax)
         {
             ViewData["ajax"] = ajax;
-            return View("/Views/Tools/FileManager/elFinder.cshtml");
+            return View("~/Views/Tools/FileManager/elFinder.cshtml");
         }
 
         public virtual IActionResult Сonnector()

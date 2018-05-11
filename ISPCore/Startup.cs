@@ -632,23 +632,23 @@ namespace ISPCore
             #region Файловый менеджер
             app.UseMvc(routes =>
             {
-                routes.MapRoute(null, "file-manager", new { controller = "FileManager", action = "Index" });
-                routes.MapRoute(null, "file-manager/target/{targetfile}", new { controller = "FileManager", action = "Target" });
-                routes.MapRoute(null, "file-manager/connector", new { controller = "FileManager", action = "Сonnector" });
-                routes.MapRoute(null, "file-manager/thumb/{hash}", new { controller = "FileManager", action = "Thumbs" });
+                routes.MapRoute(null, "file-manager", new { controller = "ToolsToFileManager", action = "Index" });
+                routes.MapRoute(null, "file-manager/target/{targetfile}", new { controller = "ToolsToFileManager", action = "Target" });
+                routes.MapRoute(null, "file-manager/connector", new { controller = "ToolsToFileManager", action = "Сonnector" });
+                routes.MapRoute(null, "file-manager/thumb/{hash}", new { controller = "ToolsToFileManager", action = "Thumbs" });
             });
             #endregion
 
             #region Триггеры
             app.UseMvc(routes =>
             {
-                routes.MapRoute(null, "tools/triggers", new { controller = "ToolsToTriggers", action = "Index" });
+                routes.MapRoute(null, "triggers", new { controller = "ToolsToTriggers", action = "Index" });
 
-                routes.MapRoute(null, "tools/trigger", new { controller = "ToolsToTriggerSettings", action = "Index" });
-                routes.MapRoute(null, "tools/trigger/save", new { controller = "ToolsToTriggerSettings", action = "Save" });
-                routes.MapRoute(null, "tools/trigger/remove", new { controller = "ToolsToTriggerSettings", action = "Remove" });
-                routes.MapRoute(null, "tools/trigger/export", new { controller = "ToolsToTriggerSettings", action = "Export" });
-                routes.MapRoute(null, "tools/trigger/import", new { controller = "ToolsToTriggerSettings", action = "Import" });
+                routes.MapRoute(null, "trigger", new { controller = "ToolsToTriggerSettings", action = "Index" });
+                routes.MapRoute(null, "trigger/save", new { controller = "ToolsToTriggerSettings", action = "Save" });
+                routes.MapRoute(null, "trigger/remove", new { controller = "ToolsToTriggerSettings", action = "Remove" });
+                routes.MapRoute(null, "trigger/export", new { controller = "ToolsToTriggerSettings", action = "Export" });
+                routes.MapRoute(null, "trigger/import", new { controller = "ToolsToTriggerSettings", action = "Import" });
             });
             #endregion
 
