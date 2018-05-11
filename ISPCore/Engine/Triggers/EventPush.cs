@@ -42,8 +42,8 @@ namespace ISPCore.Engine.Triggers
 
             try
             {
-                // Обновляем базу если файл изменился
-                if (triggerConf.LastUpdateFile != File.GetLastWriteTime(triggerConf.TriggerFile))
+                // Обновляем базу если файл удалился/изменился
+                if (!File.Exists(triggerConf.TriggerFile) || triggerConf.LastUpdateFile != File.GetLastWriteTime(triggerConf.TriggerFile))
                 {
                     IsActual = false;
                     RegisteredTriggers.UpdateDB();
@@ -82,7 +82,7 @@ namespace ISPCore.Engine.Triggers
         /// <param name="model">Данные события</param>
         /// <param name="triger">Пользовательское условие (триггер)</param>
         /// <param name="StepId">Следующие условие</param>
-        bool RunTrigger(string Id, DateTime LastUpdateFile, GenScript model, Dictionary<string, Trigger> triger, string StepId)
+        bool RunTrigger(int Id, DateTime LastUpdateFile, GenScript model, Dictionary<string, Trigger> triger, string StepId)
         {
             try
             {

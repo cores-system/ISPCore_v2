@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ISPCore.Engine.Base;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -9,10 +10,10 @@ namespace ISPCore.Models.Triggers
         /// <summary>
         /// Уникальный Id
         /// </summary>
-        public string Id { get; set; }
+        public int Id { get; set; } = int.Parse(Generate.Passwd(6, IsNumberCode: true));
 
         /// <summary>
-        /// Отображаемое имя триггера
+        /// Отображаемое имя/описание триггера
         /// </summary>
         public string TriggerName { get; set; }
 

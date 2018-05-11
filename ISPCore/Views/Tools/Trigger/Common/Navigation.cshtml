@@ -1,0 +1,30 @@
+﻿@{
+    Layout = null;
+    int Id = (int)ViewData["TriggerId"];
+    string nav = (string)ViewData["NavigationTab"];
+    string PatchUrl = "/tools/trigger";
+
+    var mass = new List<(string nav, string href, string Name)>()
+    {
+        ("Base", $"{PatchUrl}?Id={Id}", "<i class=\"fa fa-th-large\"></i>"),
+        ("Node", $"{PatchUrl}/node?Id={Id}", "<strong>Список условий</strong>"),
+        ("Faq", $"{PatchUrl}/faq?Id={Id}", "<strong>FAQ</strong>"),
+    };
+}
+
+
+<div class="container-tabbed">
+    <ul class="container-tabs">
+        @foreach (var item in mass)
+        {
+            if (item.nav == nav)
+            {
+                <li><a href="#" class="active">@Html.Raw(item.Name)</a></li>
+            }
+            else
+            {
+                <li><a href="@Html.Raw(item.href)" onclick="return loadPage(this)">@Html.Raw(item.Name)</a></li>
+            }
+        }
+    </ul>
+</div>

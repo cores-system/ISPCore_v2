@@ -639,6 +639,19 @@ namespace ISPCore
             });
             #endregion
 
+            #region Триггеры
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(null, "tools/triggers", new { controller = "ToolsToTriggers", action = "Index" });
+
+                routes.MapRoute(null, "tools/trigger", new { controller = "ToolsToTriggerSettings", action = "Index" });
+                routes.MapRoute(null, "tools/trigger/save", new { controller = "ToolsToTriggerSettings", action = "Save" });
+                routes.MapRoute(null, "tools/trigger/remove", new { controller = "ToolsToTriggerSettings", action = "Remove" });
+                routes.MapRoute(null, "tools/trigger/export", new { controller = "ToolsToTriggerSettings", action = "Export" });
+                routes.MapRoute(null, "tools/trigger/import", new { controller = "ToolsToTriggerSettings", action = "Import" });
+            });
+            #endregion
+
             // Уведомления
             app.UseMvc(routes => {
                 routes.MapRoute(null, "notifications", new { controller = "Notifications", action = "Index" });

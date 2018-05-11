@@ -12,7 +12,7 @@ namespace ISPCore.Controllers
         public IActionResult Index(bool ajax)
         {
             ViewData["ajax"] = ajax;
-            return View("/Views/FileManager/elFinder.cshtml");
+            return View("/Views/Tools/FileManager/elFinder.cshtml");
         }
 
         public virtual IActionResult Сonnector()

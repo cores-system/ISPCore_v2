@@ -14,7 +14,7 @@
         <button class="btn btn-success t_right margin-left-10" onclick="saveEditSite(this, '/requests-filter/template/save')">Сохранить изменения</button>
         @if (((int)ViewData["Id"]) != 0)
         {
-            <button class="btn btn-primary t_right" href="/requests-filter/template/export?Id=@ViewData["Id"]" target="_blank">Экспорт</button>
+            <a class="btn btn-primary t_right margin-top-5 margin-bottom-10" href="/requests-filter/template/export?Id=@ViewData["Id"]" target="_blank">Экспорт</a>
         }
         <h3>Шаблон: @Model?.Name</h3>
         <p>Настройка правил для шаблона</p>

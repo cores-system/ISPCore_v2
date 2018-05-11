@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
+using System.Linq;
 
 namespace ISPCore.Engine.Triggers
 {
@@ -42,9 +43,12 @@ namespace ISPCore.Engine.Triggers
 
                         if (cache != null)
                         {
-                            // Отписываем текущий триггер
-                            (EventInfo eventInfo, Object target, Delegate handler) data = dbEvents[FileName];
-                            data.eventInfo.RemoveEventHandler(data.target, data.handler);
+                            // Отписываем текущие триггеры
+                            foreach (var subs in cache.Subscriptions)
+                            {
+                                if (dbEvents.TryGetValue(FileName + subs.StepId, out (EventInfo eventInfo, Object target, Delegate handler) data))
+                                    data.eventInfo.RemoveEventHandler(data.target, data.handler);
+                            }
 
                             // Подписываем новый триггер 
                             RegTriggerToEvent(triggerConf);
@@ -84,7 +88,7 @@ namespace ISPCore.Engine.Triggers
 
                     // Сохраняем Event для отписки
                     var data = (eventInfo, target, handler);
-                    dbEvents.AddOrUpdate(Path.GetFileName(triggerConf.TriggerFile), data, (s, e) => data);
+                    dbEvents.AddOrUpdate(Path.GetFileName(triggerConf.TriggerFile) + subs.StepId, data, (s, e) => data);
 
                 }
             }
@@ -114,9 +118,34 @@ namespace ISPCore.Engine.Triggers
         public static IEnumerable<TriggerConf> List()
         {
             UpdateDB();
+
+            List<TriggerConf> mass = new List<TriggerConf>();
             foreach (var item in dbTriggers)
             {
-                yield return item.Value;
+                mass.Add(item.Value);
+            }
+
+            return mass.OrderBy(i => i.LastUpdateFile);
+        }
+        #endregion
+
+        #region Remove
+        /// <summary>
+        /// Удалить триггер
+        /// </summary>
+        public static void Remove(TriggerConf triggerConf)
+        {
+            // Удаляем файл
+            File.Delete(triggerConf.TriggerFile);
+
+            // Сносим триггер с базы
+            dbTriggers.TryRemove(Path.GetFileName(triggerConf.TriggerFile), out _);
+
+            // Отписываем текущие триггеры
+            foreach (var subs in triggerConf.Subscriptions)
+            {
+                if (dbEvents.TryGetValue(Path.GetFileName(triggerConf.TriggerFile) + subs.StepId, out (EventInfo eventInfo, Object target, Delegate handler) data))
+                    data.eventInfo.RemoveEventHandler(data.target, data.handler);
             }
         }
         #endregion

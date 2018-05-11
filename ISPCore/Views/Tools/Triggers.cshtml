@@ -1,0 +1,113 @@
+﻿@model ISPCore.Models.Common.Views.PageToView<ISPCore.Models.Triggers.TriggerConf>
+
+@{
+    if (Model.ajax)
+    {
+        Layout = null;
+    }
+}
+
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle">
+        <button href="/tools/trigger" onclick="return loadPage(this)" class="btn btn-success t_right margin-left-10">Создать</button>
+        <button onclick="$('#file').click(); return false;" class="btn btn-primary t_right">Импорт</button>
+
+        <h3>Триггеры</h3>
+        <p>Расширьте функционал под себя</p>
+    </div>
+
+    <div class="table-responsive">
+        @if (Model.Page.GetItems().Any())
+        {
+            <table class="table table-bordered table-striped table-hover text-center">
+                <tbody>
+                    <tr>
+                        <th style="width: 100px;">Состояние</th>
+                        <th class="text-left">Описание</th>
+                        <th class="text-center" style="width: 150px;">Время запуска</th>
+                        <th class="text-center" style="width: 160px;">Автор</th>
+                        <th style="width: 100px;">Настройки</th>
+                    </tr>
+
+                    @foreach (var tgr in Model.Page.GetItems())
+                    {
+                        <tr class="elemDelete">
+                            <td class="text-center table-products">
+                                @switch (tgr.IsActive)
+                                {
+                                    case true:
+                                        {
+                                            <span class="label label-success">включен</span>
+                                            break;
+                                        }
+                                    case false:
+                                        {
+                                            <span class="label label-warning">отключен</span>
+                                            break;
+                                        }
+                                }
+                            </td>
+
+                            <td class="text-left table-products">
+                                <strong>@tgr.TriggerName</strong>
+                            </td>
+
+                            <td class="text-center table-products">
+                                <strong>@tgr.LastRunToSuccess.ToString()</strong>
+                            </td>
+
+                            <td class="text-center table-products">
+                                <strong>@tgr.Author</strong>
+                            </td>
+
+                            <td style="text-align: right;" class="table-products btn-icons btn-icons-common">
+                                <a href="/tools/trigger?Id=@tgr.Id" onclick="return loadPage(this)" class="btn nopadding-nomargin"><i class="fa fa-gear"></i></a>
+                                <a onclick="return deleteElement(this,'/tools/trigger/remove',{Id:'@tgr.Id'});" class="btn nopadding-nomargin"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>У вас еще нет триггеров</p>
+        }
+    </div>
+
+    @Html.Raw(Model.Page.Nav())
+</div>
+
+
+
+<input type="file" id="file" name="file" style="display: none">
+
+<script>
+    $(function () {
+        $('#file').change(function () {
+
+            $(this).simpleUpload("/tools/trigger/import", {
+
+                start: function (file) {
+                    //upload started
+                },
+                progress: function (progress) {
+                    //received progress
+                },
+                success: function (data) {
+                    //upload successful
+                    loadPage(null, '/tools/triggers')
+                },
+                error: function (error) {
+                    //upload failed
+                }
+
+            });
+        });
+    });
+</script>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)
+

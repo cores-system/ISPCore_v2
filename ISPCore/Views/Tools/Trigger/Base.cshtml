@@ -1,0 +1,69 @@
+﻿@using ISPCore.Engine.Common.Views
+@model ISPCore.Models.Triggers.TriggerConf
+
+@{
+    int Id = (int)ViewData["Id"];
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle margin-bottom-0">
+        @if (Id == 0)
+        {
+            <button class="btn btn-success t_right" onclick="saveAndRedirect(this, '/tools/trigger/save', '/tools/trigger')">Создать триггер</button>
+        }
+        else
+        {
+            <button class="btn btn-success t_right margin-left-10" onclick="saveEditSite(this, '/tools/trigger/save')">Сохранить изменения</button>
+            <a class="btn btn-primary t_right margin-top-5 margin-bottom-10" href="/tools/trigger/export?Id=@Id" target="_blank">Экспорт</a>
+            <h3>Основные настройки</h3>
+        }
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="tgr.Id" value="@Id" />
+
+        @if (Id != 0)
+        {
+            @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "TriggerId", Id }, { "NavigationTab", "Base" } })
+        }
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="tab-pane active row" id="tab-site">
+
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label>Описание<span>триггера</span></label>
+                            <input type="text" name="tgr.TriggerName" value="@Model?.TriggerName" class="form-control" placeholder="Описание триггера" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Состояние<span>триггера</span></label>
+                            <select class="form-control selectpicker" name="tgr.IsActive">
+                                @Html.Raw(SelectPickerTo.Bool(Model == null || Model.IsActive, "Включен", "Отключить", "Выключен", "Включить"))
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Автор<span>триггера</span></label>
+                            <input type="text" name="tgr.Author" value="@Model?.Author" class="form-control" placeholder="Необязательное поле " />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-md-offset-1">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)
+
