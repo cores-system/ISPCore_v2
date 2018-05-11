@@ -23,5 +23,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
         
         public static string LimitRequestToWhiteIP(string IP, string host) => $"LimitRequestToWhiteIP-{IP}_{host}";
         public static string WhitePtrIP(string IP) => $"WhitePtrIP-{IP}";
+
+        public static string ApiToLocalKey(string key) => $"KeyToMem:ApiToLocalKey-{key}";
     }
 }

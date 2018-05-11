@@ -1,4 +1,6 @@
-﻿namespace ISPCore.Models.Triggers
+﻿using System.Collections.Generic;
+
+namespace ISPCore.Models.Triggers
 {
     public class Trigger
     {
@@ -6,6 +8,11 @@
         /// Условие
         /// </summary>
         public string code { get; set; }
+
+        /// <summary>
+        /// System, System.IO
+        /// </summary>
+        public List<string> Namespaces { get; set; } = new List<string>();
 
         /// <summary>
         /// Что делать дальше

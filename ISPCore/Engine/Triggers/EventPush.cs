@@ -95,7 +95,7 @@ namespace ISPCore.Engine.Triggers
 
                 if (!memoryCache.TryGetValue(memKey, out (ScriptRunner<bool> Runner, DateTime LastUpdateFile) cache) || cache.LastUpdateFile != LastUpdateFile)
                 {
-                    var scriptOptions = ScriptOptions.Default.AddImports("System", "System.IO");
+                    var scriptOptions = ScriptOptions.Default.AddImports(tg.Namespaces);
                     var script = CSharpScript.Create<bool>(tg.code, options: scriptOptions, globalsType: typeof(GenScript));
                     script.Compile();
                     runner = script.CreateDelegate();

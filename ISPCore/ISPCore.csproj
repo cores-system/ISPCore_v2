@@ -40,6 +40,7 @@
     <PackageReference Include="elFinder.ISPCore" Version="1.0.2" />
     <PackageReference Include="FluentFTP" Version="19.2.2" />
     <PackageReference Include="IPNetwork2" Version="2.1.2" />
+    <PackageReference Include="MailKit" Version="2.0.3" />
     <PackageReference Include="MaxMind.GeoIP2" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.4" />

@@ -6,12 +6,15 @@ using ISPCore.Models.Databases.json;
 using System.Text;
 using ISPCore.Engine.Auth;
 using ISPCore.Models.RequestsFilter.Domains;
+using Microsoft.Extensions.Caching.Memory;
+using ISPCore.Engine.Base.SqlAndCache;
 
 namespace ISPCore.Engine.Middleware
 {
     public class AuthApiMiddleware
     {
         private readonly RequestDelegate _next;
+
 
         public AuthApiMiddleware(RequestDelegate next)
         {
@@ -22,14 +25,28 @@ namespace ISPCore.Engine.Middleware
         {
             if (httpContext.Request.Path.Value != "/api/faq" && httpContext.Request.Path.Value.StartsWith("/api"))
             {
+                // IP-адрес пользователя
+                string IP = httpContext.Connection.RemoteIpAddress.ToString();
+
+                #region Локальный запрос в API
+                if (httpContext.Request.Headers.TryGetValue("ApiKey", out var apiKey) && !string.IsNullOrWhiteSpace(apiKey))
+                {
+                    var memoryCache = Service.Get<IMemoryCache>();
+                    if (memoryCache.TryGetValue(KeyToMemoryCache.ApiToLocalKey(apiKey), out _))
+                    {
+                        LimitLogin.SuccessAuthorization(IP);
+                        return _next(httpContext);
+                    }
+                    else { LimitLogin.FailAuthorization(IP, TypeBlockIP.global); }
+                }
+                #endregion
+
+                // База
                 var jsonDB = Service.Get<JsonDB>();
 
                 // Если API выключен
                 if (!jsonDB.API.Enabled)
                     return httpContext.Response.WriteAsync($"API disabled");
-
-                // IP-адрес пользователя
-                string IP = httpContext.Connection.RemoteIpAddress.ToString();
 
                 // Белый IP
                 if (jsonDB.API.WhiteIP == IP)

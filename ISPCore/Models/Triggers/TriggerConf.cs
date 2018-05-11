@@ -7,7 +7,7 @@ namespace ISPCore.Models.Triggers
     public class TriggerConf
     {
         /// <summary>
-        /// 
+        /// Уникальный Id
         /// </summary>
         public string Id { get; set; }
 
@@ -37,7 +37,7 @@ namespace ISPCore.Models.Triggers
         public Dictionary<string, Trigger> Trigger { get; set; } = new Dictionary<string, Trigger>();
 
         /// <summary>
-        /// 
+        /// Файл с конфигурацией
         /// </summary>
         [JsonIgnore]
         public string TriggerFile { get; set; }
