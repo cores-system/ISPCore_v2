@@ -32,7 +32,7 @@ namespace ISPCore.Controllers.core.Gen
             var Domain = ISPCache.GetDomain(DomainID);
 
             // Если у пользователя валидные Cookie
-            if (Engine.core.AntiBot.IsValidCookie(HttpContext, IP, Domain.AntiBot.HashKey))
+            if (Engine.core.AntiBot.IsValidCookie(HttpContext, IP, Domain.AntiBot.HashKey, out _))
                 return Content(string.Empty, "application/javascript");
 
             // Настройки JsonDB

@@ -146,14 +146,14 @@ namespace ISPCore.Engine.core.Check
         #endregion
 
         #region SetBlockedToIPtables
-        public static void SetBlockedToIPtables(ModelCache.Domain Domain, string IP, string host, string Msg, DateTime Expires, string uri, string userAgent, string PtrHostName)
+        public static bool SetBlockedToIPtables(ModelCache.Domain Domain, string IP, string host, string Msg, DateTime Expires, string uri, string userAgent, string PtrHostName)
         {
             if (Domain.typeBlockIP == TypeBlockIP.Triggers)
             {
                 // Что-бы в статистике не считать лишний раз +1 к блокировке 
                 string memKey = $"local-fb482608:SetBlockedToIPtables-{IP}";
                 if (memoryCache.TryGetValue(memKey, out _))
-                    return;
+                    return false; // Уже заблокирован 
 
                 // Данные для статистики
                 SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
@@ -164,10 +164,7 @@ namespace ISPCore.Engine.core.Check
                 // Если IP уже заблокирован
                 if ((Domain.typeBlockIP == TypeBlockIP.domain && memoryCache.TryGetValue(KeyToMemoryCache.IPtables(IP, host), out _)) || 
                     (Domain.typeBlockIP == TypeBlockIP.global && Engine.Security.IPtables.CheckIP(IP, memoryCache, out _)))
-                    return;
-
-                // Данные для статистики
-                SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
+                    return false;
 
                 #region Записываем IP в кеш IPtables
                 switch (Domain.typeBlockIP)
@@ -180,6 +177,9 @@ namespace ISPCore.Engine.core.Check
                         break;
                 }
                 #endregion
+
+                // Данные для статистики
+                SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);
 
                 // Дублируем информацию в SQL
                 WriteLogTo.SQL(new BlockedIP()
@@ -228,6 +228,9 @@ namespace ISPCore.Engine.core.Check
                         break;
                 }
             }
+
+            // 
+            return true;
         }
         #endregion
     }

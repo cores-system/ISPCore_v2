@@ -1,0 +1,16 @@
+﻿@using ISPCore.Engine.Common.Views
+@model ISPCore.Models.Triggers.TriggerConf
+
+@{
+    int Id = (int)ViewData["Id"];
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+node
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)
+

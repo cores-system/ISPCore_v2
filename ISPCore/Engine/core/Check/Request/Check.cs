@@ -3,7 +3,6 @@ using ISPCore.Engine.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Engine.core.Cache.CheckLink;
 using ISPCore.Engine.Hash;
-using ISPCore.Engine.Middleware;
 using ISPCore.Engine.Security;
 using ISPCore.Models.core;
 using ISPCore.Models.core.Cache.CheckLink;
@@ -18,7 +17,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -28,6 +26,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ModelCache = ISPCore.Models.core.Cache.CheckLink;
 using ModelIPtables = ISPCore.Models.Security.IPtables;
+using Trigger = ISPCore.Models.Triggers.Events.core;
 
 namespace ISPCore.Engine.core.Check
 {
@@ -99,20 +98,6 @@ namespace ISPCore.Engine.core.Check
             }
             #endregion
 
-            #region ViewBag
-            var viewBag = new ViewBag();
-            viewBag.DebugEnabled = jsonDB.Base.DebugEnabled;       // Режим дебага, выводит json правил
-            viewBag.IsErrorRule = false;                           // Переменная для ловли ошибок regex
-            #endregion
-
-            // Если домена нету в базе, то выдаем 303 или заглушку
-            if (ISPCache.DomainToID(host) is int DomainID && DomainID == 0)
-                return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow, TypeRequest._303, NotCache: true);
-
-            // Если у IP есть полный доступ к сайтам или к сайту
-            if (CheckLinkWhitelistToAllDomain())
-                return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303, NotCache: true);
-
             #region Получаем User-Agent и Referer
             // User-Agent
             string userAgent = string.Empty;
@@ -125,6 +110,36 @@ namespace ISPCore.Engine.core.Check
                 Referer = tmp_Referer.ToString();
             #endregion
 
+            #region ViewBag
+            var viewBag = new ViewBag();
+            viewBag.DebugEnabled = jsonDB.Base.DebugEnabled;       // Режим дебага, выводит json правил
+            viewBag.IsErrorRule = false;                           // Переменная для ловли ошибок regex
+            viewBag.method = method;
+            viewBag.host = host;
+            viewBag.uri = uri;
+            viewBag.Referer = Referer;
+            viewBag.UserAgent = userAgent;
+            viewBag.FormData = FormData;
+            viewBag.IP = IP;
+            #endregion
+
+            // Id домена
+            int DomainID = ISPCache.DomainToID(host);
+            viewBag.DomainID = DomainID;
+
+            // Отправляем в триггер данные запроса
+            Trigger.CheckRequest.OnRequest((IP, userAgent, Referer, DomainID, method, host, uri, FormData));
+
+            // Если домена нету в базе, то выдаем 303 или заглушку
+            if (DomainID == 0)
+                return jsonDB.Base.EnableToDomainNotFound ? ViewDomainNotFound(context) : View(context, viewBag, ActionCheckLink.allow, TypeRequest._303, NotCache: true);
+
+            // Если у IP есть полный доступ к сайтам или к сайту
+            if (CheckLinkWhitelistToAllDomain()) {
+                Trigger.CheckRequest.OnIpToAccessHost((IP, host, DomainID));
+                return View(context, viewBag, ActionCheckLink.allow, TypeRequest._303, NotCache: true);
+            }
+
             // Достаем данные домена
             var Domain = ISPCache.GetDomain(DomainID);
 
@@ -132,6 +147,8 @@ namespace ISPCore.Engine.core.Check
             // Проверяем IP в блокировке IPtables по домену
             if (IPtables.CheckIP(IP, memoryCache, out ModelIPtables BlockedData, host))
             {
+                Trigger.CheckRequest.OnReturn401((IP, host, DomainID, "IP"));
+
                 // Логируем пользователя
                 AddJurnalTo200(IsIPtables: true);
                 SetCountRequestToHour(TypeRequest.IPtables, host, Domain.confToLog.EnableCountRequest);
@@ -149,6 +166,8 @@ namespace ISPCore.Engine.core.Check
             // Проверяем User-Agent в блокировке IPtables
             if (IPtables.CheckUserAgent(userAgent))
             {
+                Trigger.CheckRequest.OnReturn401((IP, host, DomainID, "User-Agent"));
+
                 // Логируем пользователя
                 AddJurnalTo200(IsIPtables: true);
                 SetCountRequestToHour(TypeRequest.IPtables, host, Domain.confToLog.EnableCountRequest);
@@ -228,12 +247,12 @@ namespace ISPCore.Engine.core.Check
                                         {
                                             // Добовляем IP в белый список на 9 дней
                                             WhitePtr.Add(IP, DnsHost.HostName, DateTime.Now.AddDays(9));
+                                            Trigger.LimitRequest.OnAddToWhitePtr((IP, host, DomainID, DnsHost.HostName, 9));
 
                                             // Успех
                                             return true;
                                         }
                                     }
-
                                 }
                             }
                             catch { }
@@ -268,6 +287,7 @@ namespace ISPCore.Engine.core.Check
                                 // Считаем количество запросов
                                 item.countRequest++;
                                 memoryCache.Set(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), item, TimeSpan.FromMinutes(item.ExpiresToMinute));
+                                Trigger.LimitRequest.OnRecaptchaView((true, IP, host, DomainID, item.countRequest, item.ExpiresToMinute));
                                 return false;
                             }
                             #endregion
@@ -281,6 +301,7 @@ namespace ISPCore.Engine.core.Check
                             // Ответ
                             context.Response.ContentType = "text/html; charset=utf-8";
                             context.Response.WriteAsync(AntiBot.Html(tplToUrl, json), context.RequestAborted);
+                            Trigger.LimitRequest.OnRecaptchaView((false, IP, host, DomainID, 1, ExpiresToMinute));
                             return true;
                         }
                         #endregion
@@ -293,6 +314,7 @@ namespace ISPCore.Engine.core.Check
                             {
                                 item.value++;
                                 _cacheValue = item;
+                                Trigger.LimitRequest.OnRequest((IP, host, DomainID, keyName, item.value));
                                 if (item.value > limit)
                                     return true;
                             }
@@ -300,6 +322,7 @@ namespace ISPCore.Engine.core.Check
                             {
                                 _cacheValue = new CacheValue() { value = 1, Expires = DateTime.Now.AddMinutes(ExpiresToMinute) };
                                 memoryCache.Set(key, _cacheValue, TimeSpan.FromMinutes(ExpiresToMinute));
+                                Trigger.LimitRequest.OnRequest((IP, host, DomainID, keyName, 1));
                             }
 
                             return false;
@@ -313,7 +336,8 @@ namespace ISPCore.Engine.core.Check
                                 return;
 
                             // Записываем IP в кеш IPtables и журнал
-                            SetBlockedToIPtables(Domain, IP, host, Msg, Expires, uri, userAgent, PtrHostName);
+                            if (SetBlockedToIPtables(Domain, IP, host, Msg, Expires, uri, userAgent, PtrHostName))
+                                Trigger.LimitRequest.OnBlockedIP((IP, PtrHostName, host, DomainID, Msg, Expires));
                         }
                         #endregion
 
@@ -392,7 +416,7 @@ namespace ISPCore.Engine.core.Check
                 #endregion
 
                 #region AntiBot
-                if (!AntiBot.ValidRequest(IP, antiBotType, host, method, uri, context, Domain, out string outHtml))
+                if (!AntiBot.ValidRequest(IP, antiBotType, host, method, uri, context, Domain, DomainID, out string outHtml))
                 {
                     // Логируем пользователя
                     AddJurnalTo200(IsAntiBot: true);
@@ -424,7 +448,7 @@ namespace ISPCore.Engine.core.Check
                         if (item.value >= limit)
                             return true;
                     }
-
+                    
                     _cacheValue = null;
                     return false;
                 }
@@ -439,18 +463,13 @@ namespace ISPCore.Engine.core.Check
                     memoryCache.Set(KeyLimitRequestToBlockedWait, (byte)0, TimeSpan.FromMinutes(5));
 
                     // Записываем IP в кеш IPtables и журнал
-                    SetBlockedToIPtables(Domain, IP, host, Msg, Expires, uri, userAgent, null);
+                    if (SetBlockedToIPtables(Domain, IP, host, Msg, Expires, uri, userAgent, null))
+                        Trigger.BruteForce.OnBlockedIP((IP, host, DomainID, Msg, Expires));
 
                     // Сносим временную запись
                     memoryCache.Remove(KeyLimitRequestToBlockedWait);
                 }
                 #endregion
-
-                // Блокировка IP
-                if (CheckToLimit("Day", BrutConf.DayLimit, 1440, out cacheValue) || CheckToLimit("Hour", BrutConf.HourLimit, 60, out cacheValue) || CheckToLimit("Minute", BrutConf.MinuteLimit, 1, out cacheValue))
-                {
-                    BlockedToIP("Защита от Brute Force", cacheValue.Expires);
-                }
 
                 // Была авторизация
                 if (BruteForce.IsLogin(Domain.StopBruteForce, method, uri, FormData))
@@ -462,13 +481,19 @@ namespace ISPCore.Engine.core.Check
                         if (memoryCache.TryGetValue(key, out CacheValue item))
                         {
                             item.value++;
+                            Trigger.BruteForce.OnIsLogin((IP, DomainID, method, host, uri, FormData, keyName, item.value));
                         }
                         else
                         {
                             memoryCache.Set(key, new CacheValue() { value = 1, Expires = DateTime.Now.AddMinutes(ExpiresToMinute) }, TimeSpan.FromMinutes(ExpiresToMinute));
+                            Trigger.BruteForce.OnIsLogin((IP, DomainID, method, host, uri, FormData, keyName, 1));
                         }
                     }
                     #endregion
+
+                    // Блокировка IP
+                    if (CheckToLimit("Day", BrutConf.DayLimit, 1440, out cacheValue) || CheckToLimit("Hour", BrutConf.HourLimit, 60, out cacheValue) || CheckToLimit("Minute", BrutConf.MinuteLimit, 1, out cacheValue))
+                        BlockedToIP("Защита от Brute Force", cacheValue.Expires);
 
                     // Обновляем счетчики
                     SetValue("Day", 1440);
@@ -481,18 +506,11 @@ namespace ISPCore.Engine.core.Check
             #region ViewBag
             if (jsonDB.Base.DebugEnabled)
             {
-                viewBag.IP = IP;
                 viewBag.jsonDomain = JsonConvert.SerializeObject(Domain, Formatting.Indented);
                 viewBag.antiBotToGlobalConf = JsonConvert.SerializeObject(antiBotToGlobalConf, Formatting.Indented);
-                viewBag.FormData = FormData;
             }
 
             viewBag.CreateCacheView = Domain.CreateTime;
-            viewBag.method = method;
-            viewBag.host = host;
-            viewBag.uri = uri;
-            viewBag.Referer = Referer;
-            viewBag.UserAgent = userAgent;
             #endregion
 
             #region Кеш ответа

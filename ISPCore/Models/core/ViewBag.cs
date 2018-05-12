@@ -5,8 +5,8 @@ namespace ISPCore.Models.core
     public class ViewBag
     {
         public bool DebugEnabled { get; set; }
-
         public bool IsErrorRule { get; set; }
+        public int DomainID { get; set; }
 
         public string IP { get; set; }
         public string uri { get; set; }

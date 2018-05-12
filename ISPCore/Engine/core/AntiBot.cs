@@ -11,17 +11,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
-using ISPCore.Models.Security;
-using ISPCore.Models.RequestsFilter.Monitoring;
-using ISPCore.Models.Databases;
-using ISPCore.Models.RequestsFilter.Domains;
-using ISPCore.Models.RequestsFilter.Domains.Log;
 using System.Linq;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using System.IO;
 using Newtonsoft.Json;
-using System.Text;
+using Trigger = ISPCore.Models.Triggers.Events.core.AntiBot;
 
 namespace ISPCore.Engine.core
 {
@@ -87,13 +82,16 @@ namespace ISPCore.Engine.core
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="IP"></param>
         /// <param name="antiBotType"></param>
         /// <param name="HostConvert"></param>
         /// <param name="method"></param>
+        /// <param name="uri"></param>
         /// <param name="HttpContext"></param>
         /// <param name="domain"></param>
+        /// <param name="DomainID"></param>
         /// <param name="outHtml"></param>
-        public static bool ValidRequest(string IP, AntiBotType antiBotType, string HostConvert, string method, string uri, HttpContext HttpContext, Models.core.Cache.CheckLink.Domain domain, out string outHtml)
+        public static bool ValidRequest(string IP, AntiBotType antiBotType, string HostConvert, string method, string uri, HttpContext HttpContext, Models.core.Cache.CheckLink.Domain domain, int DomainID, out string outHtml)
         {
             // По умолчанию null
             outHtml = null;
@@ -102,9 +100,14 @@ namespace ISPCore.Engine.core
             if (antiBotType == AntiBotType.Off)
                 return true;
 
-            // Проверка Cookie
-            if (IsValidCookie(HttpContext, IP, domain.AntiBot.HashKey))
+            #region Проверка Cookie
+            if (IsValidCookie(HttpContext, IP, domain.AntiBot.HashKey, out string _verification))
+            {
+                Trigger.OnValidCookie((IP, HostConvert, DomainID, true, _verification));
                 return true;
+            }
+            else { Trigger.OnValidCookie((IP, HostConvert, DomainID, false, _verification)); }
+            #endregion
 
             // IMemoryCache
             var memoryCache = Service.Get<IMemoryCache>();
@@ -113,9 +116,10 @@ namespace ISPCore.Engine.core
             var jsonDB = Service.Get<JsonDB>();
 
             #region Отдаем данные с кеша
-            if (jsonDB.Cache.AntiBot != 0 && memoryCache.TryGetValue(KeyToMemoryCache.AntiBotToCache(IP), out (string tplToUrl, string json) _cache))
+            if (jsonDB.Cache.AntiBot != 0 && memoryCache.TryGetValue(KeyToMemoryCache.AntiBotToCache(IP), out (string tplToUrl, string json, AntiBotType type) _cache))
             {
                 outHtml = Html(_cache.tplToUrl, _cache.json);
+                Trigger.OnResponseView((IP, HostConvert, DomainID, _cache.type));
                 return false;
             }
             #endregion
@@ -174,7 +178,9 @@ namespace ISPCore.Engine.core
                                 if (Regex.IsMatch(host.HostName, @".*\.(yandex.(ru|net|com)|googlebot.com|google.com|mail.ru|search.msn.com)$", RegexOptions.IgnoreCase))
                                 {
                                     // Добовляем IP в белый
-                                    WhitePtr.Add(IP, host.HostName, DateTime.Now.AddHours(IsGlobalConf() ? antiBotToGlobalConf.conf.HourCacheToBot : domain.AntiBot.HourCacheToBot));
+                                    int HourCacheToBot = IsGlobalConf() ? antiBotToGlobalConf.conf.HourCacheToBot : domain.AntiBot.HourCacheToBot;
+                                    WhitePtr.Add(IP, host.HostName, DateTime.Now.AddHours(HourCacheToBot));
+                                    Trigger.OnAddToWhitePtr((IP, HostConvert, DomainID, ptr, HourCacheToBot));
                                     return true;
                                 }
                             }
@@ -182,7 +188,8 @@ namespace ISPCore.Engine.core
                         catch { }
 
                         // Записываем IP в кеш IPtables и журнал
-                        Check.Request.SetBlockedToIPtables(domain, IP, HostConvert, "AntiBot", DateTime.Now.AddMinutes(40), uri, userAgent, ptr);
+                        if (Check.Request.SetBlockedToIPtables(domain, IP, HostConvert, "AntiBot", DateTime.Now.AddMinutes(40), uri, userAgent, ptr))
+                            Trigger.OnBlockedIP((IP, ptr, HostConvert, DomainID, "AntiBot", 40));
 
                         // Не удалось проверить PTR-запись
                         memoryCache.Remove(memKey);
@@ -261,6 +268,7 @@ namespace ISPCore.Engine.core
             // reCAPTCHA, SignalR или JavaScript
             var tplName = (!IsRecaptcha && antiBotType == AntiBotType.reCAPTCHA) ? AntiBotType.SignalR : antiBotType;
             outHtml = Html(tplName, antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey, jsonDB.Cache.AntiBot, domain.AntiBot.HashKey);
+            Trigger.OnResponseView((IP, HostConvert, DomainID, tplName));
             return false;
 
             #region Локальный метод - "IsGlobalConf"
@@ -311,8 +319,9 @@ namespace ISPCore.Engine.core
         /// <param name="HttpContext"></param>
         /// <param name="IP">IP-адрес</param>
         /// <param name="AntiBotHashKey"></param>
-        public static bool IsValidCookie(HttpContext HttpContext, string IP, string AntiBotHashKey)
+        public static bool IsValidCookie(HttpContext HttpContext, string IP, string AntiBotHashKey, out string verification)
         {
+            verification = null;
             if (HttpContext.Request.Cookies.TryGetValue("isp.ValidCookie", out var cookie))
             {
                 // Получаем время и ключ
@@ -321,6 +330,8 @@ namespace ISPCore.Engine.core
                 // Проверяем на пустоту
                 if (!string.IsNullOrWhiteSpace(g[1].Value) && !string.IsNullOrWhiteSpace(g[2].Value) && !string.IsNullOrWhiteSpace(g[3].Value))
                 {
+                    verification = g[1].Value;
+
                     // Cookie еще активны
                     // Ключ валидный
                     if (ValidCookie(g[1].Value, g[2].Value, g[3].Value, IP, AntiBotHashKey))
@@ -392,8 +403,9 @@ if (xhr.status == 200) {
             switch (tplName)
             {
                 case AntiBotType.SignalR:
+                    mass.Add("host", HostConvert);
                     mass.Add("AntiBotHashKey", AntiBotHashKey);
-                    mass.Add("HashToSignalR", md5.text($"{IP}:{conf.HourCacheToUser}:{AntiBotHashKey}:{PasswdTo.salt}"));
+                    mass.Add("HashToSignalR", md5.text($"{IP}:{HostConvert}:{conf.HourCacheToUser}:{AntiBotHashKey}:{PasswdTo.salt}"));
                     tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/SignalR.html" : "/statics/tpl/AntiBot/default/SignalR.html";
                     break;
                 case AntiBotType.reCAPTCHA:
@@ -402,8 +414,10 @@ if (xhr.status == 200) {
                     tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/reCAPTCHA.html" : "/statics/tpl/AntiBot/default/reCAPTCHA.html";
                     break;
                 case AntiBotType.CookieAndJS:
+                    string cookie = GetValidCookie(conf.HourCacheToUser, IP, "js", AntiBotHashKey);
+                    mass.Add("ValidCookie", cookie);
                     mass.Add("AntiBotHashKey", AntiBotHashKey);
-                    mass.Add("ValidCookie", GetValidCookie(conf.HourCacheToUser, IP, "js", AntiBotHashKey));
+                    Trigger.OnSetValidCookie((IP, HostConvert, cookie, "js", conf.HourCacheToUser));
                     tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/CookieAndJS.html" : "/statics/tpl/AntiBot/default/CookieAndJS.html";
                     break;
             }
@@ -417,7 +431,7 @@ if (xhr.status == 200) {
             {
                 //IMemoryCache
                 var memoryCache = Service.Get<IMemoryCache>();
-                memoryCache.Set(KeyToMemoryCache.AntiBotToCache(IP), (tplToUrl, json), TimeSpan.FromMilliseconds(CacheAntiBot));
+                memoryCache.Set(KeyToMemoryCache.AntiBotToCache(IP), (tplToUrl, json, tplName), TimeSpan.FromMilliseconds(CacheAntiBot));
             }
             #endregion
 

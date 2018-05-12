@@ -106,7 +106,7 @@
                 })
 
 	            Hub.start().then(function () {
-		            Hub.invoke('GetValidCookie', '{isp:IP}', '{isp:HourCacheToUser}', '{isp:AntiBotHashKey}', '{isp:HashToSignalR}');
+		            Hub.invoke('GetValidCookie', '{isp:IP}', '{isp:host}', '{isp:HourCacheToUser}', '{isp:AntiBotHashKey}', '{isp:HashToSignalR}');
 	            }).catch(function(error) 
                 {
                     $('#InfoText').text('Упс! Не удалось подключится к SignalR')

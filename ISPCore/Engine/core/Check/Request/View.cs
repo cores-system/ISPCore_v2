@@ -12,6 +12,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Trigger = ISPCore.Models.Triggers.Events.core.CheckRequest;
 
 namespace ISPCore.Engine.core.Check
 {
@@ -92,6 +93,9 @@ namespace ISPCore.Engine.core.Check
                 }
             }
             #endregion
+
+            // Данные ответа
+            Trigger.OnResponseView((viewBag.IP, viewBag.UserAgent, viewBag.Referer, viewBag.DomainID, viewBag.method, viewBag.host, viewBag.uri, viewBag.FormData, context.Response.StatusCode, viewBag.IsCacheView));
 
             #region Локальный метод - "RenderTitle"
             string RenderTitle()
