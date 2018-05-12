@@ -103,7 +103,7 @@ namespace ISPCore.Engine.core
                 return true;
 
             // Проверка Cookie
-            if (IsValidCookie(HttpContext, IP))
+            if (IsValidCookie(HttpContext, IP, domain.AntiBot.HashKey))
                 return true;
 
             // IMemoryCache
@@ -260,7 +260,7 @@ namespace ISPCore.Engine.core
             
             // reCAPTCHA, SignalR или JavaScript
             var tplName = (!IsRecaptcha && antiBotType == AntiBotType.reCAPTCHA) ? AntiBotType.SignalR : antiBotType;
-            outHtml = Html(tplName, antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey, jsonDB.Cache.AntiBot);
+            outHtml = Html(tplName, antiBotConf, jsonDB.Base.CoreAPI, IP, HostConvert, jsonDB.Security.reCAPTCHASitekey, jsonDB.Cache.AntiBot, domain.AntiBot.HashKey);
             return false;
 
             #region Локальный метод - "IsGlobalConf"
@@ -276,50 +276,54 @@ namespace ISPCore.Engine.core
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="verification"></param>
         /// <param name="expired"></param>
-        /// <param name="IP"></param>
         /// <param name="key"></param>
-        private static bool ValidCookie(string expired, string IP, string key)
+        /// <param name="IP">IP-адрес</param>
+        /// <param name="AntiBotHashKey"></param>
+        private static bool ValidCookie(string verification, string expired, string key, string IP, string AntiBotHashKey)
         {
-            return DateTime.FromBinary(long.Parse(expired)) > DateTime.Now && key == md5.text($"{expired}:{IP}:{PasswdTo.salt}");
+            return DateTime.FromBinary(long.Parse(expired)) > DateTime.Now && key == md5.text($"{expired}:{IP}:{(verification == "reCAPTCHA" ? verification : AntiBotHashKey)}:{PasswdTo.salt}");
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="HourCacheToUser"></param>
-        /// <param name="IP"></param>
-        public static string GetValidCookie(int HourCacheToUser, string IP)
+        /// <param name="IP">IP-адрес</param>
+        /// <param name="verification">Пользователь прошел проверку в "reCAPTCHA/SignalR/JS"</param>
+        /// <param name="AntiBotHashKey">Дополнительный хеш для проверки "SignalR/JS"</param>
+        public static string GetValidCookie(int HourCacheToUser, string IP, string verification, string AntiBotHashKey)
         {
             // Когда куки станут недействительны
             string expired = DateTime.Now.AddHours(HourCacheToUser).ToBinary().ToString();
 
-            // Ключ  для проверки
-            string key = md5.text($"{expired}:{IP}:{PasswdTo.salt}");
+            // Ключ для проверки
+            string key = md5.text($"{expired}:{IP}:{(verification == "reCAPTCHA" ? verification : AntiBotHashKey)}:{PasswdTo.salt}");
 
             // Результат
-            return $"{expired}:{key}";
+            return $"{verification}:{expired}:{key}";
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="HttpContext"></param>
-        /// <param name="IP"></param>
-        /// <returns></returns>
-        public static bool IsValidCookie(HttpContext HttpContext, string IP)
+        /// <param name="IP">IP-адрес</param>
+        /// <param name="AntiBotHashKey"></param>
+        public static bool IsValidCookie(HttpContext HttpContext, string IP, string AntiBotHashKey)
         {
             if (HttpContext.Request.Cookies.TryGetValue("isp.ValidCookie", out var cookie))
             {
                 // Получаем время и ключ
-                var g = new Regex("(-[0-9]+):([a-z0-9]+)").Match(cookie.ToString()).Groups;
+                var g = new Regex("([a-zA-Z]+):(-[0-9]+):([a-z0-9]+)").Match(cookie.ToString()).Groups;
 
                 // Проверяем на пустоту
-                if (!string.IsNullOrWhiteSpace(g[1].Value) && !string.IsNullOrWhiteSpace(g[2].Value))
+                if (!string.IsNullOrWhiteSpace(g[1].Value) && !string.IsNullOrWhiteSpace(g[2].Value) && !string.IsNullOrWhiteSpace(g[3].Value))
                 {
                     // Cookie еще активны
                     // Ключ валидный
-                    if (ValidCookie(g[1].Value, IP, g[2].Value))
+                    if (ValidCookie(g[1].Value, g[2].Value, g[3].Value, IP, AntiBotHashKey))
                         return true;
                 }
             }
@@ -369,7 +373,9 @@ if (xhr.status == 200) {
         /// <param name="IP"></param>
         /// <param name="HostConvert"></param>
         /// <param name="reCAPTCHASitekey"></param>
-        static string Html(AntiBotType tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey, int CacheAntiBot)
+        /// <param name="CacheAntiBot"></param>
+        /// <param name="AntiBotHashKey"></param>
+        static string Html(AntiBotType tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey, int CacheAntiBot, string AntiBotHashKey)
         {
             #region Базовые параметры
             string tplToUrl = string.Empty;
@@ -386,7 +392,8 @@ if (xhr.status == 200) {
             switch (tplName)
             {
                 case AntiBotType.SignalR:
-                    mass.Add("HashToSignalR", md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdTo.salt}"));
+                    mass.Add("AntiBotHashKey", AntiBotHashKey);
+                    mass.Add("HashToSignalR", md5.text($"{IP}:{conf.HourCacheToUser}:{AntiBotHashKey}:{PasswdTo.salt}"));
                     tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/SignalR.html" : "/statics/tpl/AntiBot/default/SignalR.html";
                     break;
                 case AntiBotType.reCAPTCHA:
@@ -395,7 +402,8 @@ if (xhr.status == 200) {
                     tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/reCAPTCHA.html" : "/statics/tpl/AntiBot/default/reCAPTCHA.html";
                     break;
                 case AntiBotType.CookieAndJS:
-                    mass.Add("ValidCookie", GetValidCookie(conf.HourCacheToUser, IP));
+                    mass.Add("AntiBotHashKey", AntiBotHashKey);
+                    mass.Add("ValidCookie", GetValidCookie(conf.HourCacheToUser, IP, "js", AntiBotHashKey));
                     tplToUrl = File.Exists($"{Folders.Tpl.AntiBot}/{tplName}.html") ? "/statics/tpl/AntiBot/CookieAndJS.html" : "/statics/tpl/AntiBot/default/CookieAndJS.html";
                     break;
             }

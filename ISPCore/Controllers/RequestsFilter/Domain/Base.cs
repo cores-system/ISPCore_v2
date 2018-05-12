@@ -68,6 +68,9 @@ namespace ISPCore.Controllers
             // Новый домен
             if (domain.Id == 0)
             {
+                // AntiBotHashKey
+                domain.AntiBot.HashKey = Generate.Passwd(12);
+
                 // Добовляем в базу
                 coreDB.RequestsFilter_Domains.Add(domain);
 

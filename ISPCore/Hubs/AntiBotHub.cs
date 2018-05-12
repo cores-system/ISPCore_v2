@@ -7,10 +7,10 @@ namespace ISPCore.Hubs
 {
     public class AntiBotHub : Hub
     {
-        async public Task GetValidCookie(string IP, int HourCacheToUser, string hash)
+        async public Task GetValidCookie(string IP, int HourCacheToUser, string AntiBotHashKey, string hash)
         {
             // Делаем проверку IP
-            if (hash != md5.text($"{IP}:{HourCacheToUser}:{PasswdTo.salt}"))
+            if (hash != md5.text($"{IP}:{HourCacheToUser}:{AntiBotHashKey}:{PasswdTo.salt}"))
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("OnError", "Что-то пошло не так, попробуйте обновить страницу");
                 Context.Abort();
@@ -18,7 +18,7 @@ namespace ISPCore.Hubs
             }
 
             // Валидные куки
-            string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP);
+            string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP, "SignalR", AntiBotHashKey);
 
             // Отдаем пользователю результат
             await Clients.Client(Context.ConnectionId).SendAsync("OnCookie", cookie, HourCacheToUser);

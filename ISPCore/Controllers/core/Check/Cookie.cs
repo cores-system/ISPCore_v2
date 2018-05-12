@@ -7,12 +7,12 @@ namespace ISPCore.Controllers.core
 {
     public class CoreCheckCookieController : Controller
     {
-        public JsonResult Index(string IP)
+        public JsonResult Index(string IP, string AntiBotHashKey)
         {
             if (string.IsNullOrWhiteSpace(IP))
                 IP = HttpContext.Connection.RemoteIpAddress.ToString();
 
-            if (AntiBot.IsValidCookie(HttpContext, IP))
+            if (AntiBot.IsValidCookie(HttpContext, IP, AntiBotHashKey))
                 return Json(new TrueOrFalse(true));
 
             if (HttpContext.Request.Cookies.TryGetValue("isp.ValidCookie", out _))

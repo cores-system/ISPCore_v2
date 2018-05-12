@@ -28,8 +28,11 @@ namespace ISPCore.Controllers.core.Gen
             // IP адрес пользователя
             string IP = HttpContext.Connection.RemoteIpAddress.ToString();
 
+            // Достаем данные для домена из кеша
+            var Domain = ISPCache.GetDomain(DomainID);
+
             // Если у пользователя валидные Cookie
-            if (Engine.core.AntiBot.IsValidCookie(HttpContext, IP))
+            if (Engine.core.AntiBot.IsValidCookie(HttpContext, IP, Domain.AntiBot.HashKey))
                 return Content(string.Empty, "application/javascript");
 
             // Настройки JsonDB
@@ -39,9 +42,6 @@ namespace ISPCore.Controllers.core.Gen
             if (WhiteUserList.IsWhiteIP(IP) || WhitePtr.IsWhiteIP(IP))
                 return Content(string.Empty, "application/javascript");
             #endregion
-
-            // Достаем данные для домена из кеша
-            var Domain = ISPCache.GetDomain(DomainID);
 
             // Достаем настройки AntiBot из кеша
             var antiBotToGlobalConf = Engine.core.AntiBot.GlobalConf(jsonDB.AntiBot);

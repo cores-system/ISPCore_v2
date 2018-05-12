@@ -385,6 +385,7 @@ namespace ISPCore.Engine.Databases
                                         {
                                             coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_NumberOfRequestDay] ADD [CountIPtables] BIGINT DEFAULT 0 NOT NULL ;");
                                             coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_NumberOfRequestMonth] ADD [CountIPtables] BIGINT DEFAULT 0 NOT NULL ;");
+                                            coreDB.Database.ExecuteSqlCommand("ALTER TABLE [RequestsFilter_Domain_AntiBot] ADD [HashKey] TEXT NULL ;");
                                             goto case 8;
                                         }
 

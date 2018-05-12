@@ -21,7 +21,7 @@ namespace ISPCore.Controllers.core
             if (res.res)
             {
                 // Валидные куки
-                string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP);
+                string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP, "reCAPTCHA", null);
 
                 // Отдаем ответ
                 return Json(new { result = true, cookie = cookie, HourToCookie = HourCacheToUser });

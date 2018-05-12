@@ -65,7 +65,7 @@
 	            var date = new Date(new Date().getTime() + (60 * 1000) * 60 * {isp:HourCacheToUser});
                 document.cookie = 'isp.ValidCookie={isp:ValidCookie}; path=/; expires=' + date.toUTCString();
 
-                 $.post('{isp:CoreApiUrl}/check/cookie?ip={isp:IP}', $('#form').serializeArray(), function (data) {
+                 $.post('{isp:CoreApiUrl}/check/cookie?ip={isp:IP}&AntiBotHashKey={isp:AntiBotHashKey}', $('#form').serializeArray(), function (data) {
                     var json = JSON.parse(JSON.stringify(data));
                     if (json.result) {
                         location.reload();

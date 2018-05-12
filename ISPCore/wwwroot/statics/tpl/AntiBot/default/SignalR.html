@@ -79,7 +79,7 @@
                     var date = new Date(new Date().getTime() + (60 * 1000) * 60 * HourToCookie);
                     document.cookie = 'isp.ValidCookie='+cookie+'; path=/; expires=' + date.toUTCString();
 
-                    $.post('{isp:CoreApiUrl}/check/cookie?ip={isp:IP}', $('#form').serializeArray(), function (data) 
+                    $.post('{isp:CoreApiUrl}/check/cookie?ip={isp:IP}&AntiBotHashKey={isp:AntiBotHashKey}', $('#form').serializeArray(), function (data) 
                     {
                         var json = JSON.parse(JSON.stringify(data));
                         if (json.result) {
@@ -106,7 +106,7 @@
                 })
 
 	            Hub.start().then(function () {
-		            Hub.invoke('GetValidCookie', '{isp:IP}', '{isp:HourCacheToUser}', '{isp:HashToSignalR}');
+		            Hub.invoke('GetValidCookie', '{isp:IP}', '{isp:HourCacheToUser}', '{isp:AntiBotHashKey}', '{isp:HashToSignalR}');
 	            }).catch(function(error) 
                 {
                     $('#InfoText').text('Упс! Не удалось подключится к SignalR')

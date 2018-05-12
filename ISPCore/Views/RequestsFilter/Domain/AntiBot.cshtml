@@ -88,6 +88,13 @@
                 <div class="col-md-6 col-md-offset-1">
 
                     <div class="form-group typeGlobalConf typeLocalConf">
+                        <label>Hash<span>key</span></label>
+                        <input name="domain.AntiBot.HashKey"
+                               @if (!string.IsNullOrWhiteSpace(Model.AntiBot.HashKey)) { <text> value="@Model.AntiBot.HashKey" </text> }
+                               class="form-control" placeholder="Используется для безопасности cookie" />
+                    </div>
+
+                    <div class="form-group typeGlobalConf typeLocalConf">
                         <label>Выполнять<span>проверку пользователей в фоновом режиме</span></label>
                         <select class="form-control selectpicker changeAntiBotToBackgroundConf" name="domain.AntiBot.BackgroundCheck" onchange="changeAntiBotToBackgroundConf(this)">
                             @Html.Raw(SelectPickerTo.Bool(Model.AntiBot.BackgroundCheck, "Да", "Нет"))
