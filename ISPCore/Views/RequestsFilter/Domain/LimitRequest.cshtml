@@ -106,9 +106,10 @@
         $('.typeLocalConf').hide();
 
         if (type == 'false') {
-            $('.typeLocalConf').show()
+            $('.typeLocalConf').show();
+            changeLimitRequestToBlockType($('.changeLimitRequestToBlockType'));
         }
-
+        
         $(window).trigger('resize')
     }
 
@@ -122,9 +123,7 @@
 
         $(window).trigger('resize');
     }
-
-
-    changeLimitRequestToBlockType($('.changeLimitRequestToBlockType'));
+    
     changeGlobalConf($('.changeGlobalConf'));
 </script>
 
