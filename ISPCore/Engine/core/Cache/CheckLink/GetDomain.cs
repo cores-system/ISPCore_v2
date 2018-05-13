@@ -1,17 +1,14 @@
-﻿using ISPCore.Engine.Base;
-using ISPCore.Engine.Base.SqlAndCache;
-using ISPCore.Engine.Databases;
+﻿using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Models.Base;
 using ISPCore.Models.Databases;
 using ISPCore.Models.RequestsFilter.Base;
 using ISPCore.Models.RequestsFilter.Base.Enums;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using ModelCache = ISPCore.Models.core.Cache.CheckLink;
+using Trigger = ISPCore.Models.Triggers.Events.core.CheckRequest;
 
 namespace ISPCore.Engine.core.Cache.CheckLink
 {
@@ -156,6 +153,7 @@ namespace ISPCore.Engine.core.Cache.CheckLink
 
                 // Отдаем данные
                 MassGetDomain.AddOrUpdate(Id, cache, (i, d) => cache);
+                Trigger.OnDomainCache((Id, IsCreate: true, IsRemove: false));
                 return cache;
             }
 

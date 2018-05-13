@@ -5,6 +5,7 @@ using ISPCore.Models.Base.WhiteList;
 using ISPCore.Models.Databases.json;
 using ISPCore.Models.Response;
 using Microsoft.AspNetCore.Mvc;
+using Trigger = ISPCore.Models.Triggers.Events.Settings.WhiteList;
 
 namespace ISPCore.Controllers
 {
@@ -23,9 +24,14 @@ namespace ISPCore.Controllers
             md.Id = int.Parse(Generate.Passwd(6, true));
             jsonDB.WhiteList.Add(md);
 
-            // Успех
+            // Обновляем
             jsonDB.Save();
             WhiteUserList.UpdateCache();
+
+            // 
+            Trigger.OnChange((0, 0));
+            
+            // Успех
             return Json(new TrueOrFalse(true));
         }
     }

@@ -5,6 +5,7 @@ using ISPCore.Engine.Base;
 using ISPCore.Models.Response;
 using ISPCore.Models.Databases;
 using ISPCore.Models.Databases.json;
+using Trigger = ISPCore.Models.Triggers.Events.Settings.Service;
 
 namespace ISPCore.Controllers
 {
@@ -36,7 +37,10 @@ namespace ISPCore.Controllers
             jsonDB.ServiceBot.Email = email;
             jsonDB.ServiceBot.SMS = sms;
             jsonDB.Save();
-            
+
+            // 
+            Trigger.OnChange((0, 0));
+
             // Ответ
             if (IsAPI)
                 return Json(new TrueOrFalse(true));

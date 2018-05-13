@@ -12,12 +12,15 @@ using ISPCore.Models.Base.WhiteList;
 using ISPCore.Engine.Network;
 using ISPCore.Engine.Databases;
 using System.Collections.Concurrent;
+using Trigger = ISPCore.Models.Triggers.Events.Security.IPtables;
 
 namespace ISPCore.Engine.Security
 {
     public static class IPtables
     {
         #region IPtables
+        static IMemoryCache memoryCache = Service.Get<IMemoryCache>();
+
         /// <summary>
         /// Список заблокированных IPv4
         /// </summary>
@@ -54,16 +57,21 @@ namespace ISPCore.Engine.Security
         /// Проверить IPv4/6
         /// </summary>
         /// <param name="RemoteIpAddress">IPv4/6</param>
-        /// <param name="memoryCache"></param>
         /// <param name="data">Время и причина блокировки</param>
         /// <param name="BlockedHost">Домен для которого делать проверку</param>
-        public static bool CheckIP(string RemoteIpAddress, IMemoryCache memoryCache, out ModelIPtables data, string BlockedHost = null)
+        public static bool CheckIP(string RemoteIpAddress, out ModelIPtables data, string BlockedHost = null)
         {
             data = null;
 
             // Блокировка по домену
             if (BlockedHost != null)
-                return memoryCache.TryGetValue(KeyToMemoryCache.IPtables(RemoteIpAddress, BlockedHost), out data);
+            {
+                if (memoryCache.TryGetValue(KeyToMemoryCache.IPtables(RemoteIpAddress, BlockedHost), out data))
+                {
+                    Trigger.OnReturn401((RemoteIpAddress, BlockedHost, "IP"));
+                    return true;
+                }
+            }
 
             // IPv6
             if (RemoteIpAddress.Contains(":"))
@@ -87,6 +95,7 @@ namespace ISPCore.Engine.Security
                 {
                     if (!IPv6ToModels.TryGetValue(matchIPv6, out data))
                         data = new ModelIPtables();
+                    Trigger.OnReturn401((RemoteIpAddress, BlockedHost, "IP"));
                     return true;
                 }
 
@@ -100,6 +109,7 @@ namespace ISPCore.Engine.Security
                 {
                     if (!IPv4ToModels.TryGetValue(FirstUsable, out data))
                         data = new ModelIPtables();
+                    Trigger.OnReturn401((RemoteIpAddress, BlockedHost, "IP"));
                     return true;
                 }
 
@@ -113,50 +123,62 @@ namespace ISPCore.Engine.Security
         /// Заблокировать IPv4/6
         /// </summary>
         /// <param name="IP">IPv4/6</param>
+        /// <param name="target"></param>
         /// <param name="data">Время и причина блокировки</param>
-        public static void AddIPv4Or6(string IP, ModelIPtables data)
+        public static void AddIPv4Or6(string IP, ModelIPtables data, TypeBlockIP target, string BlockedHost = null)
         {
-            if (IPNetwork.CheckingSupportToIPv4Or6(IP, out var ipnetwork))
+            if (target == TypeBlockIP.domain)
             {
-                // Крон нужно запустить раньше
-                if (NextTimeClearDbAndCacheToIPv4Or6 > data.TimeExpires)
-                    NextTimeClearDbAndCacheToIPv4Or6 = data.TimeExpires;
-
-                // IPv6
-                if (IP.Contains(":"))
+                memoryCache.Set(KeyToMemoryCache.IPtables(IP, BlockedHost), data, data.TimeExpires);
+                Trigger.OnAddIPv4Or6((IP, BlockedHost, data.Description, data.TimeExpires));
+            }
+            else if (target != TypeBlockIP.UserAgent)
+            {
+                if (IPNetwork.CheckingSupportToIPv4Or6(IP, out var ipnetwork))
                 {
-                    string IPv6 = IPNetwork.IPv6ToRegex(ipnetwork.FirstUsable);
+                    // Крон нужно запустить раньше
+                    if (NextTimeClearDbAndCacheToIPv4Or6 > data.TimeExpires)
+                        NextTimeClearDbAndCacheToIPv4Or6 = data.TimeExpires;
 
-                    // Время и причина блокировки
-                    IPv6ToModels.AddOrUpdate(IPv6, data, (s, e) => data);
-
-                    #region Обновляем IPv6ToRegex
-                    if (IPv6ToRegex == "^$")
+                    // IPv6
+                    if (IP.Contains(":"))
                     {
-                        IPv6ToRegex = $"^({IPv6})";
-                    }
-                    else {
-                        IPv6ToRegex = Regex.Replace(IPv6ToRegex, @"\)$", $"|{IPv6})");
-                    }
-                    #endregion
-                }
-
-                // IPv4
-                else
-                {
-                    if (IPNetwork.IPv4ToRange(ipnetwork.FirstUsable, ipnetwork.LastUsable) is var item && item.FirstUsable != 0)
-                    {
-                        #region Находим число которое выше FirstUsable и ставим FirstUsable перед ним
-                        int index = IPv4ToRange.FindIndex(0, IPv4ToRange.Count, i => i.FirstUsable > item.FirstUsable);
-
-                        if (index == -1)
-                            IPv4ToRange.Add(item);
-                        else
-                            IPv4ToRange.Insert(index, item);
-                        #endregion
+                        string IPv6 = IPNetwork.IPv6ToRegex(ipnetwork.FirstUsable);
 
                         // Время и причина блокировки
-                        IPv4ToModels.AddOrUpdate(item.FirstUsable, data, (s,e) => data);
+                        IPv6ToModels.AddOrUpdate(IPv6, data, (s, e) => data);
+                        Trigger.OnAddIPv4Or6((IP, BlockedHost, data.Description, data.TimeExpires));
+
+                        #region Обновляем IPv6ToRegex
+                        if (IPv6ToRegex == "^$")
+                        {
+                            IPv6ToRegex = $"^({IPv6})";
+                        }
+                        else
+                        {
+                            IPv6ToRegex = Regex.Replace(IPv6ToRegex, @"\)$", $"|{IPv6})");
+                        }
+                        #endregion
+                    }
+
+                    // IPv4
+                    else
+                    {
+                        if (IPNetwork.IPv4ToRange(ipnetwork.FirstUsable, ipnetwork.LastUsable) is var item && item.FirstUsable != 0)
+                        {
+                            #region Находим число которое выше FirstUsable и ставим FirstUsable перед ним
+                            int index = IPv4ToRange.FindIndex(0, IPv4ToRange.Count, i => i.FirstUsable > item.FirstUsable);
+
+                            if (index == -1)
+                                IPv4ToRange.Add(item);
+                            else
+                                IPv4ToRange.Insert(index, item);
+                            #endregion
+
+                            // Время и причина блокировки
+                            IPv4ToModels.AddOrUpdate(item.FirstUsable, data, (s, e) => data);
+                            Trigger.OnAddIPv4Or6((IP, BlockedHost, data.Description, data.TimeExpires));
+                        }
                     }
                 }
             }
@@ -168,29 +190,42 @@ namespace ISPCore.Engine.Security
         /// Разблокировать IPv4/6
         /// </summary>
         /// <param name="IP">IPv4/6</param>
-        public static void RemoveIPv4Or6(string IP)
+        /// <param name="target"></param>
+        /// <param name="BlockedHost">Заблокированный домен</param>
+        public static void RemoveIPv4Or6(string IP, TypeBlockIP target, string BlockedHost)
         {
-            if (IPNetwork.CheckingSupportToIPv4Or6(IP, out var ipnetwork))
+            if (target == TypeBlockIP.domain)
             {
-                // IPv6
-                if (IP.Contains(":"))
+                memoryCache.Remove(KeyToMemoryCache.IPtables(IP, BlockedHost));
+                Trigger.OnRemoveIPv4Or6((IP, BlockedHost));
+            }
+            else if (target != TypeBlockIP.UserAgent)
+            {
+                if (IPNetwork.CheckingSupportToIPv4Or6(IP, out var ipnetwork))
                 {
-                    string ipRegex = IPNetwork.IPv6ToRegex(ipnetwork.FirstUsable);
-                    IPv6ToRegex = Regex.Replace(IPv6ToRegex, $@"^\^\({ipRegex}\|?", "^(");
-                    IPv6ToRegex = Regex.Replace(IPv6ToRegex, $@"\|{ipRegex}", "");
-                    if (IPv6ToRegex == "^()")
-                        IPv6ToRegex = "^$";
-
-                    IPv6ToModels.TryRemove(ipRegex, out _);
-                }
-
-                // IPv4
-                else
-                {
-                    if (IPNetwork.IPv4ToRange(ipnetwork.FirstUsable, ipnetwork.LastUsable) is var item && item.FirstUsable != 0)
+                    // IPv6
+                    if (IP.Contains(":"))
                     {
-                        IPv4ToRange.RemoveAll(i => i.FirstUsable == item.FirstUsable && i.LastUsable == item.LastUsable);
-                        IPv4ToModels.TryRemove(item.FirstUsable, out _);
+                        string ipRegex = IPNetwork.IPv6ToRegex(ipnetwork.FirstUsable);
+                        IPv6ToRegex = Regex.Replace(IPv6ToRegex, $@"^\^\({ipRegex}\|?", "^(");
+                        IPv6ToRegex = Regex.Replace(IPv6ToRegex, $@"\|{ipRegex}", "");
+                        if (IPv6ToRegex == "^()")
+                            IPv6ToRegex = "^$";
+
+                        if (IPv6ToModels.TryRemove(ipRegex, out _))
+                            Trigger.OnRemoveIPv4Or6((IP, BlockedHost));
+
+                    }
+
+                    // IPv4
+                    else
+                    {
+                        if (IPNetwork.IPv4ToRange(ipnetwork.FirstUsable, ipnetwork.LastUsable) is var item && item.FirstUsable != 0)
+                        {
+                            IPv4ToRange.RemoveAll(i => i.FirstUsable == item.FirstUsable && i.LastUsable == item.LastUsable);
+                            if (IPv4ToModels.TryRemove(item.FirstUsable, out _))
+                                Trigger.OnRemoveIPv4Or6((IP, BlockedHost));
+                        }
                     }
                 }
             }
@@ -218,8 +253,16 @@ namespace ISPCore.Engine.Security
                 {
                     if (DateTime.Now > blockedIP.BlockingTime)
                     {
-                        RemoveIPv4Or6(blockedIP.IP);
-                        coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.BlockedsIP), blockedIP.Id));
+                        if (blockedIP.typeBlockIP == TypeBlockIP.UserAgent)
+                        {
+                            coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.BlockedsIP), blockedIP.Id));
+                            UpdateCacheToUserAgent();
+                        }
+                        else
+                        {
+                            RemoveIPv4Or6(blockedIP.IP, blockedIP.typeBlockIP, blockedIP.BlockedHost);
+                            coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.BlockedsIP), blockedIP.Id));
+                        }
                     }
                     else
                     {
@@ -249,13 +292,21 @@ namespace ISPCore.Engine.Security
             if (UserAgentRegex == "^$")
                 return false;
 
-            return Regex.IsMatch(userAgent, UserAgentRegex, RegexOptions.IgnoreCase);
+            if (Regex.IsMatch(userAgent, UserAgentRegex, RegexOptions.IgnoreCase))
+            {
+                Trigger.OnReturn401((userAgent, null, "User-Agent"));
+                return true;
+            }
+
+            return false;
         }
         #endregion
 
         #region UpdateCacheToUserAgent
         public static void UpdateCacheToUserAgent()
         {
+            string oldUserAgentRegex = UserAgentRegex;
+
             // Меняем режим доступа к SQL
             SqlToMode.SetMode(SqlMode.Read);
 
@@ -268,6 +319,7 @@ namespace ISPCore.Engine.Security
                     if (blockedIP.BlockingTime > DateTime.Now && blockedIP.typeBlockIP == TypeBlockIP.UserAgent)
                     {
                         mass.Add(blockedIP.IP);
+                        Trigger.OnAddUserAgent((blockedIP.IP, blockedIP.Description, blockedIP.BlockingTime));
                     }
                 }
 
@@ -277,6 +329,7 @@ namespace ISPCore.Engine.Security
 
             // Меняем режим доступа к SQL
             SqlToMode.SetMode(SqlMode.ReadOrWrite);
+            Trigger.OnUpdateCacheToUserAgent((oldUserAgentRegex, UserAgentRegex));
         }
         #endregion
 

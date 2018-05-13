@@ -6,6 +6,7 @@ using ISPCore.Models.Databases;
 using ISPCore.Models.SyncBackup.Tasks;
 using ISPCore.Models.Response;
 using ISPCore.Engine.Base;
+using Trigger = ISPCore.Models.Triggers.Events.SyncBackup.Files;
 
 namespace ISPCore.Controllers
 {
@@ -85,6 +86,9 @@ namespace ISPCore.Controllers
 
                 // Сохраняем базу
                 coreDB.SaveChanges();
+
+                // 
+                Trigger.OnCreate((task.Id, -1));
 
                 // Отдаем Id записи в базе
                 return Json(new RewriteToId(task.Id));
@@ -181,6 +185,9 @@ namespace ISPCore.Controllers
                 // Сохраняем базу
                 coreDB.SaveChanges();
 
+                // 
+                Trigger.OnChange((task.Id, -1));
+
                 // Отдаем результат
                 return Json(new Text("Задание сохранено"));
             }
@@ -198,7 +205,10 @@ namespace ISPCore.Controllers
 
             // Удаляем задание
             if (coreDB.SyncBackup_Tasks.RemoveAttach(coreDB, Id))
+            {
+                Trigger.OnRemove((Id, -1));
                 return Json(new TrueOrFalse(true));
+            }
 
             return Json(new Text("Ошибка ;("));
         }
@@ -224,6 +234,7 @@ namespace ISPCore.Controllers
 
             // Сохраняем базу
             coreDB.SaveChanges();
+            Trigger.OnChange((task.Id, -1));
 
             // Отдаем результат
             if (IsAPI)

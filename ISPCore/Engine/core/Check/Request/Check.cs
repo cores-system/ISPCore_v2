@@ -145,7 +145,7 @@ namespace ISPCore.Engine.core.Check
 
             #region Проверяем "IP/User-Agent" в блокировке IPtables
             // Проверяем IP в блокировке IPtables по домену
-            if (IPtables.CheckIP(IP, memoryCache, out ModelIPtables BlockedData, host))
+            if (IPtables.CheckIP(IP, out ModelIPtables BlockedData, host))
             {
                 Trigger.CheckRequest.OnReturn401((IP, host, DomainID, "IP"));
 

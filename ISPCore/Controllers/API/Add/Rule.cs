@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using ISPCore.Models.Databases;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using ISPCore.Engine.core.Cache.CheckLink;
 using ISPCore.Models.Response;
 
 namespace ISPCore.Controllers

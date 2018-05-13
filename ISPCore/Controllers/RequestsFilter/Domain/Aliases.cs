@@ -12,6 +12,7 @@ using ISPCore.Engine.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Models.RequestsFilter.Monitoring;
 using Microsoft.Extensions.Caching.Memory;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -95,6 +96,9 @@ namespace ISPCore.Controllers
 
             // Удаляем кеш для домена
             ISPCache.RemoveDomain(domain.Id);
+
+            // 
+            Trigger.OnChange((domain.Id, "Aliases"));
 
             // Отдаем сообщение и Id новых алиасов
             return Json(new UpdateToIds("Настройки домена сохранены", 0, NewAliases));

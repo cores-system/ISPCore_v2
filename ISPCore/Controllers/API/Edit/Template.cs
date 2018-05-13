@@ -5,6 +5,7 @@ using ISPCore.Models.Response;
 using System.Linq;
 using ISPCore.Engine.core.Cache.CheckLink;
 using ISPCore.Models.RequestsFilter.Templates;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Template;
 
 namespace ISPCore.Controllers
 {
@@ -26,6 +27,9 @@ namespace ISPCore.Controllers
 
                 // Удаляем кеш для шаблона
                 ISPCache.RemoveTemplate(Id);
+
+                // 
+                Trigger.OnChange((Id, 0));
 
                 // Успех
                 return Json(new TrueOrFalse(true));

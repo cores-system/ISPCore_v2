@@ -9,6 +9,7 @@ using ISPCore.Engine.Common.Views;
 using System.IO;
 using System.Linq;
 using ISPCore.Models.Databases;
+using Trigger = ISPCore.Models.Triggers.Events.Security.AntiVirus;
 
 namespace ISPCore.Controllers
 {
@@ -49,6 +50,7 @@ namespace ISPCore.Controllers
             //Обновляем базу
             jsonDB.AntiVirus = av;
             jsonDB.Save();
+            Trigger.OnChange((0, 0));
 
             // Ответ
             if (IsAPI)
@@ -110,6 +112,9 @@ namespace ISPCore.Controllers
             // Имя отчета
             string report = $"{AntiVirus.name}_{AntiVirus.vers}_{DateTime.Now.ToString("HH-mm_dd-MM-yyy")}{av.path.Replace("/", "_-_")}";
 
+            // 
+            Trigger.OnStart(("0", report));
+
             // Запускаем процесс bash
             Bash bash = new Bash();
             bash.Run($"{av.php} {Folders.AV}/ai-bolit.php {comand.ToString()} --progress={Folders.AV}/progress_id-0.json --report={Folders.ReportsAV}/{report}.html >/dev/null 2>/dev/null &");
@@ -137,6 +142,7 @@ namespace ISPCore.Controllers
                     bash.Run($"kill -9 {pid}");
 
                 System.IO.File.Delete($"{Folders.AV}/progress_id-{Id}.json");
+                Trigger.OnStop((Id.ToString(), null));
             }
 
             return Json(new TrueOrFalse(true));

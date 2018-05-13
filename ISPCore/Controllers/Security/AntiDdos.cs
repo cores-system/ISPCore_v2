@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using ISPCore.Models;
 using ISPCore.Models.Response;
 using ISPCore.Engine.Base.SqlAndCache;
+using Trigger = ISPCore.Models.Triggers.Events.Security.AntiDdos;
 
 namespace ISPCore.Controllers
 {
@@ -72,6 +73,9 @@ namespace ISPCore.Controllers
 
             // Сохраняем базу
             jsonDB.Save();
+
+            // 
+            Trigger.OnChange((0, 0));
 
             // Ответ
             if (IsAPI)

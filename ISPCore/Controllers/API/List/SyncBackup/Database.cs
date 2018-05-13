@@ -3,8 +3,6 @@ using ISPCore.Models.Databases;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Collections.Generic;
-using ISPCore.Models.SyncBackup.Operation;
 
 namespace ISPCore.Controllers
 {

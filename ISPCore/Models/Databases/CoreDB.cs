@@ -145,6 +145,6 @@ namespace ISPCore.Models.Databases
         /// <summary>
         /// Заблокированный домен
         /// </summary>
-        public string BlockedHost { get; set; } //new
+        public string BlockedHost { get; set; }
     }
 }

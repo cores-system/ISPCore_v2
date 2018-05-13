@@ -25,7 +25,6 @@ namespace ISPCore.Engine.Cron
             if (memoryCache.TryGetValue(KeyToMemoryCache.IspNumberOfRequestToHour(TimeIspNumberOfRequestDay), out IDictionary<string, NumberOfRequestHour> DataNumberOfRequestToHour))
             {
                 SqlToMode.SetMode(SqlMode.Read);
-                coreDB.ChangeTracker.AutoDetectChangesEnabled = false;
 
                 // Записываем данные в базу
                 foreach (var item in DataNumberOfRequestToHour)
@@ -49,7 +48,6 @@ namespace ISPCore.Engine.Cron
 
                 // Разрешаем записывать данные в SQL
                 SqlToMode.SetMode(SqlMode.ReadOrWrite);
-                coreDB.ChangeTracker.AutoDetectChangesEnabled = true;
 
                 // Сносим кеш (статистика за час)
                 memoryCache.Remove(KeyToMemoryCache.IspNumberOfRequestToHour(TimeIspNumberOfRequestDay));

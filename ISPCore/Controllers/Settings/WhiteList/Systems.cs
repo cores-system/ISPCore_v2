@@ -31,15 +31,15 @@ namespace ISPCore.Controllers
             // Удаляем домен
             if (coreDB.WhitePtrIPs.FindItem(i => i.Id == Id) is WhitePtrIP item)
             {
-                // Сохраняем IP
-                string IPv4Or6 = item.IPv4Or6;
+                // Удаляем IP в кеше
+                memoryCache.Remove(KeyToMemoryCache.WhitePtrIP(item.IPv4Or6));
+
+                // 
+                ISPCore.Models.Triggers.Events.Base.SqlAndCache.WhitePtrIP.OnRemove((item.IPv4Or6, item.PTR));
 
                 // Удаляем запись в SQL
                 coreDB.WhitePtrIPs.Remove(item);
                 coreDB.SaveChanges();
-
-                // Удаляем IP в кеше
-                memoryCache.Remove(KeyToMemoryCache.WhitePtrIP(IPv4Or6));
 
                 // Отдаем результат
                 return Json(new TrueOrFalse(true));

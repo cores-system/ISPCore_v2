@@ -108,6 +108,8 @@ namespace ISPCore.Engine.Triggers
             {
                 RegTriggerToEvent(triggerConf);
             }
+
+            ISPCore.Models.Triggers.Events.System.OnTriggersInitialize((0, 0));
         }
         #endregion
 

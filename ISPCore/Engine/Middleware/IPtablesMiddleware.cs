@@ -24,7 +24,7 @@ namespace ISPCore.Engine.Middleware
         public Task Invoke(HttpContext httpContext)
         {
             // Поиск IP в кеше для блокировки пользователя
-            if (IPtables.CheckIP(httpContext.Connection.RemoteIpAddress.ToString(), memoryCache, out ModelIPtables data))
+            if (IPtables.CheckIP(httpContext.Connection.RemoteIpAddress.ToString(), out ModelIPtables data))
             {
                 // Статистика
                 Engine.core.Check.Request.SetCountRequestToHour(TypeRequest.IPtables, "global", true);

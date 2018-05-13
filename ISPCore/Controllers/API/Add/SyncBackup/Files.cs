@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ISPCore.Models.Databases;
 using ISPCore.Models.SyncBackup.Tasks;
 using ISPCore.Models.Response;
+using Trigger = ISPCore.Models.Triggers.Events.SyncBackup.Files;
 
 namespace ISPCore.Controllers
 {
@@ -22,6 +23,9 @@ namespace ISPCore.Controllers
 
             // Сохраняем базу
             coreDB.SaveChanges();
+
+            // 
+            Trigger.OnChange((TaskId, -1));
 
             // Отдаем сообщение и Id новых шаблонов
             return Json(new UpdateToIds("accepted", TaskId, NewIgnore));

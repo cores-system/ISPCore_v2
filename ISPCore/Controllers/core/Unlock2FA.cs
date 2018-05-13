@@ -63,7 +63,7 @@ namespace ISPCore.Controllers.core
             #endregion
 
             #region Проверяем IP в блокировке IPtables по домену
-            if (IPtables.CheckIP(IP, memoryCache, out ModelIPtables BlockedData, HostConvert))
+            if (IPtables.CheckIP(IP, out ModelIPtables BlockedData, HostConvert))
             {
                 // Логируем пользователя
                 AddJurnalToIPtables(domain, IP, host, method, userAgent, referer, uri);

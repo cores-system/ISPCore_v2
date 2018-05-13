@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using ISPCore.Models.Databases;
-using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Engine.core.Cache.CheckLink;
 using ISPCore.Models.Response;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -21,6 +21,9 @@ namespace ISPCore.Controllers
                 // Удаляем кеш
                 ISPCache.RemoveDomain(DomainId);
 
+                // 
+                Trigger.OnChange((DomainId, "Base"));
+
                 // Отдаем результат
                 return Json(new TrueOrFalse(true));
             }
@@ -37,6 +40,9 @@ namespace ISPCore.Controllers
             {
                 // Удаляем кеш
                 ISPCache.RemoveDomain(DomainId);
+
+                // 
+                Trigger.OnChange((DomainId, "LogSettings"));
 
                 // Отдаем результат
                 return Json(new TrueOrFalse(true));

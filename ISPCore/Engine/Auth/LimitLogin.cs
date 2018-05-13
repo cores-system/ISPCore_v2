@@ -35,18 +35,9 @@ namespace ISPCore.Engine.Auth
                 // Блокировка IP
                 if ((array.Count + 1) >= jsonDB.Security.CountAccess)
                 {
-                    #region Записываем IP в кеш IPtables
+                    // Записываем IP в кеш IPtables
                     var data = new IPtables("Перебор паролей", DateTime.Now.AddMinutes(jsonDB.Security.BlockingTime));
-                    switch (typeBlockIP)
-                    {
-                        case TypeBlockIP.global:
-                            Engine.Security.IPtables.AddIPv4Or6(RemoteIpAddress, data);
-                            break;
-                        case TypeBlockIP.domain:
-                            memoryCache.Set(KeyToMemoryCache.IPtables(RemoteIpAddress, host), data, TimeSpan.FromMinutes(jsonDB.Security.BlockingTime));
-                            break;
-                    }
-                    #endregion
+                    Engine.Security.IPtables.AddIPv4Or6(RemoteIpAddress, data, typeBlockIP, host);
 
                     // Удаляем ключ LimitLogin
                     memoryCache.Remove(key);

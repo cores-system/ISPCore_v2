@@ -14,6 +14,7 @@ using ISPCore.Engine.Base;
 using ISPCore.Models.Security.AntiDdos;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
+using Trigger = ISPCore.Models.Triggers.Events.Security.AntiDdos;
 
 namespace ISPCore.Engine.Cron
 {
@@ -42,10 +43,11 @@ namespace ISPCore.Engine.Cron
                 // Записываем данные в кеш
                 if (memoryCache.TryGetValue(KeyToMemoryCache.AntiDdosNumberOfRequestDay(DateTime.Now), out dataHour))
                 {
+                    Trigger.OnCountTcpOrUpd((MaxTcpOrUpd, dataHour.value));
+
                     if (MaxTcpOrUpd > dataHour.value)
                     {
                         dataHour.value = MaxTcpOrUpd;
-
                         memoryCache.Set(KeyToMemoryCache.AntiDdosNumberOfRequestDay(DateTime.Now), dataHour);
                     }
                 }
@@ -56,7 +58,9 @@ namespace ISPCore.Engine.Cron
                         value = MaxTcpOrUpd,
                         Time = DateTime.Now
                     };
+
                     memoryCache.Set(KeyToMemoryCache.AntiDdosNumberOfRequestDay(DateTime.Now), dataHour);
+                    Trigger.OnCountTcpOrUpd((MaxTcpOrUpd, dataHour.value));
                 }
                 #endregion
 
@@ -91,7 +95,7 @@ namespace ISPCore.Engine.Cron
                         continue;
 
                     // Блокируем IP
-                    Blocked(memoryCache, Regex.Replace(IP, "[\n\r\t ]+", ""), jsonDB.AntiDdos.BlockToIPtables);
+                    Blocked(memoryCache, Regex.Replace(IP, "[\n\r\t ]+", ""));
                 }
                 #endregion
             }
@@ -267,9 +271,19 @@ namespace ISPCore.Engine.Cron
                 return;
             IsRunBlocked = true;
 
-            // Получаем текущий список заблокированных IP
-            string IPv4 = new Bash().Run("iptables -L -n -v | grep \"ISPCore_\" | awk '{print $8}'");
-            string IPv6 = new Bash().Run("ip6tables -L -n -v | grep \"ISPCore_\" | awk '{print $8}'");
+            // 
+            bool BlockToIPtables = jsonDB.AntiDdos.BlockToIPtables;
+
+            #region Получаем текущий список заблокированных IP
+            string IPv4 = string.Empty;
+            string IPv6 = string.Empty;
+
+            if (BlockToIPtables)
+            {
+                IPv4 = new Bash().Run("iptables -L -n -v | grep \"ISPCore_\" | awk '{print $8}'");
+                IPv6 = new Bash().Run("ip6tables -L -n -v | grep \"ISPCore_\" | awk '{print $8}'");
+            }
+            #endregion
 
             // Блокируем IP
             Parallel.For(0, BlockedIP.Count, new ParallelOptions { MaxDegreeOfParallelism = jsonDB.Base.CountParallel }, (index, state) =>
@@ -304,6 +318,7 @@ namespace ISPCore.Engine.Cron
                                     {
                                         // Добовляем IP в белый список на неделю
                                         WhitePtr.Add(IP, host.HostName, DateTime.Now.AddDays(7));
+                                        Trigger.OnAddToWhitePtr((IP, HostName, 7));
 
                                         // Удаляем временное значение с кеша
                                         memoryCache.Remove($"AntiDdosCheckBlockedIP-{IP}");
@@ -316,8 +331,13 @@ namespace ISPCore.Engine.Cron
                         #endregion
 
                         // Добовляем IP в IPtables
-                        string comandTables = IP.Contains(":") ? "ip6tables" : "iptables";
-                        new Bash().Run($"{comandTables} -A INPUT -s {IP} -m comment --comment \"ISPCore_{DateTime.Now.AddMinutes(jsonDB.AntiDdos.BlockingTime).ToString("yyy-MM-ddTHH:mm:00")}\" -j REJECT");
+                        if (BlockToIPtables) {
+                            string comandTables = IP.Contains(":") ? "ip6tables" : "iptables";
+                            new Bash().Run($"{comandTables} -A INPUT -s {IP} -m comment --comment \"ISPCore_{DateTime.Now.AddMinutes(jsonDB.AntiDdos.BlockingTime).ToString("yyy-MM-ddTHH:mm:00")}\" -j REJECT");
+                        }
+
+                        // 
+                        Trigger.OnBlockedIP((IP, HostName, jsonDB.AntiDdos.BlockingTime));
 
                         // Пишем IP в базу
                         if (jsonDB.AntiDdos.Jurnal)
@@ -351,21 +371,18 @@ namespace ISPCore.Engine.Cron
         #endregion
 
         #region Blocked
-        private static void Blocked(IMemoryCache memoryCache, string IP, bool BlockToIPtables)
+        private static void Blocked(IMemoryCache memoryCache, string IP)
         {
             byte bit = 0;
             string key = $"AntiDdosCheckBlockedIP-{IP}";
 
             if (!memoryCache.TryGetValue(key, out bit))
             {
-                if (BlockToIPtables)
-                {
-                    // Пишем IP в кеш, что-бы два раза не писать в базу один и тот-же IP
-                    memoryCache.Set(key, bit, TimeSpan.FromMinutes(30));
+                // Пишем IP в кеш, что-бы два раза не писать в базу один и тот-же IP
+                memoryCache.Set(key, bit, TimeSpan.FromMinutes(30));
 
-                    // Добовляем IP в базу блокировок
-                    BlockedIP.Enqueue(IP);
-                }
+                // Добовляем IP в базу блокировок
+                BlockedIP.Enqueue(IP);
 
                 // Записываем в кеш
                 if (dataHour != null)

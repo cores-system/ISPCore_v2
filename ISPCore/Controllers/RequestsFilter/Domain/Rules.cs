@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ISPCore.Models.Response;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Domains.Rules;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -52,6 +53,9 @@ namespace ISPCore.Controllers
 
             // Удаляем кеш для домена
             ISPCache.RemoveDomain(domain.Id);
+
+            // 
+            Trigger.OnChange((domain.Id, "Rules"));
 
             // API
             if (IsAPI)

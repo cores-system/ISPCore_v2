@@ -23,6 +23,8 @@ namespace ISPCore.Controllers.core
             {
                 // Валидные куки
                 string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP, "reCAPTCHA", null);
+
+                // 
                 Trigger.AntiBot.OnRecaptchaVerify((true, IP, HttpContext.Request.Host.Host, HourCacheToUser));
                 Trigger.AntiBot.OnSetValidCookie((IP, HttpContext.Request.Host.Host, cookie, "reCAPTCHA", HourCacheToUser));
 
@@ -44,6 +46,8 @@ namespace ISPCore.Controllers.core
             {
                 // Создаем кеш
                 memoryCache.Set(KeyToMemoryCache.LimitRequestToreCAPTCHA(IP), (0, ExpiresToMinute), TimeSpan.FromMinutes(ExpiresToMinute));
+
+                // 
                 Trigger.LimitRequest.OnRecaptchaVerify((true, IP, HttpContext.Request.Host.Host, ExpiresToMinute));
 
                 // Отдаем ответ

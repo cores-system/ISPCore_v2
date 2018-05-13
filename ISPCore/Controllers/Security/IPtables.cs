@@ -36,8 +36,7 @@ namespace ISPCore.Controllers
                 return Json(new Text("Запись не найдена"));
 
             // Удаляем IP с кеша
-            IPtables.RemoveIPv4Or6(item.IP);
-            memoryCache.Remove(KeyToMemoryCache.IPtables(item.IP, item.BlockedHost));
+            IPtables.RemoveIPv4Or6(item.IP, item.typeBlockIP, item.BlockedHost);
 
             // Удаляем IP
             coreDB.BlockedsIP.Remove(item);
@@ -82,7 +81,7 @@ namespace ISPCore.Controllers
                     return Json(new Text($"Not supported format: {IP}"));
 
                 // Записываем IP в кеш IPtables
-                IPtables.AddIPv4Or6(IP, new ModelIPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)));
+                IPtables.AddIPv4Or6(IP, new ModelIPtables(Description, DateTime.Now.AddDays(BlockingTimeDay)), typeBlockIP);
             }
             else
             {

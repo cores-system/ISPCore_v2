@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Newtonsoft.Json;
 using System.Text;
+using Trigger = ISPCore.Models.Triggers.Events.Settings.WhiteList;
 
 namespace ISPCore.Controllers
 {
@@ -62,6 +63,9 @@ namespace ISPCore.Controllers
             // Кеш настроек WhiteList
             WhiteUserList.UpdateCache();
 
+            // 
+            Trigger.OnChange((0, 0));
+
             // Отдаем сообщение и Id новых настроек WhiteList
             return Json(new UpdateToIds("Настройки успешно сохранены", 0, NewWhiteList));
         }
@@ -85,6 +89,9 @@ namespace ISPCore.Controllers
 
             // Кеш настроек WhiteList
             WhiteUserList.UpdateCache();
+
+            // 
+            Trigger.OnChange((0, 0));
 
             // Успех
             return Json(new TrueOrFalse(true));
@@ -128,6 +135,9 @@ namespace ISPCore.Controllers
 
                     // Кеш настроек WhiteList
                     WhiteUserList.UpdateCache();
+
+                    // 
+                    Trigger.OnChange((0, 0));
                 }
             }
 

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using ISPCore.Engine.Databases;
 using ISPCore.Engine.Base;
 using ISPCore.Models.Response;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -47,6 +48,9 @@ namespace ISPCore.Controllers
 
             // Сохраняем базу
             coreDB.SaveChanges();
+
+            // 
+            Trigger.OnChange((domain.Id, "av"));
 
             // Отдаем сообщение
             return Json(new Text("Настройки домена сохранены"));

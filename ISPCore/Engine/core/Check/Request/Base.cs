@@ -163,20 +163,11 @@ namespace ISPCore.Engine.core.Check
             {
                 // Если IP уже заблокирован
                 if ((Domain.typeBlockIP == TypeBlockIP.domain && memoryCache.TryGetValue(KeyToMemoryCache.IPtables(IP, host), out _)) || 
-                    (Domain.typeBlockIP == TypeBlockIP.global && Engine.Security.IPtables.CheckIP(IP, memoryCache, out _)))
+                    (Domain.typeBlockIP == TypeBlockIP.global && Engine.Security.IPtables.CheckIP(IP, out _)))
                     return false;
 
-                #region Записываем IP в кеш IPtables
-                switch (Domain.typeBlockIP)
-                {
-                    case TypeBlockIP.global:
-                        IPtables.AddIPv4Or6(IP, new ModelIPtables(Msg, Expires));
-                        break;
-                    case TypeBlockIP.domain:
-                        memoryCache.Set(KeyToMemoryCache.IPtables(IP, host), new ModelIPtables(Msg, Expires), Expires);
-                        break;
-                }
-                #endregion
+                // Записываем IP в кеш IPtables
+                IPtables.AddIPv4Or6(IP, new ModelIPtables(Msg, Expires), Domain.typeBlockIP, host);
 
                 // Данные для статистики
                 SetCountRequestToHour(TypeRequest._401, host, Domain.confToLog.EnableCountRequest);

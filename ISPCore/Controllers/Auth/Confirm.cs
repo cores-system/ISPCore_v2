@@ -5,6 +5,7 @@ using ISPCore.Models.Databases;
 using ISPCore.Models.Response;
 using ISPCore.Models.Databases.Enums;
 using ISPCore.Models.Auth;
+using Trigger = ISPCore.Models.Triggers.Events.Auth;
 
 namespace ISPCore.Controllers
 {
@@ -20,6 +21,9 @@ namespace ISPCore.Controllers
         [HttpPost]
         public JsonResult Unlock(string code)
         {
+            // IP адрес пользователя
+            string IP = HttpContext.Connection.RemoteIpAddress.ToString();
+
             // Проверка кода
             GoogleTo2FA TwoFacAuth = new GoogleTo2FA();
             if (TwoFacAuth.ValidateTwoFactorPIN(PasswdTo.Google2FA, code))
@@ -34,11 +38,17 @@ namespace ISPCore.Controllers
                         item.Confirm2FA = true;
                         coreDB.SaveChanges();
 
+                        // 
+                        Trigger.OnTwoFacAuth((IP, IsSuccess: true));
+
                         // Успех
                         return Json(new TrueOrFalse(true));
                     }
                 }
             }
+
+            // 
+            Trigger.OnTwoFacAuth((IP, IsSuccess: false));
 
             // Ошибка
             return Json(new Text("Неверный код"));

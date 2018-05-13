@@ -7,6 +7,7 @@ using ISPCore.Engine.Databases;
 using ISPCore.Models.core.Cache.CheckLink;
 using ISPCore.Models.Response;
 using ISPCore.Engine.Base;
+using Trigger = ISPCore.Models.Triggers.Events.Security.AntiBot;
 
 namespace ISPCore.Controllers
 {
@@ -37,6 +38,9 @@ namespace ISPCore.Controllers
             // Сохраняем базу
             jsonDB.AntiBot.LastUpdateToConf = DateTime.Now;
             jsonDB.Save();
+
+            // 
+            Trigger.OnChange((0, 0));
 
             // Ответ
             if (IsAPI)

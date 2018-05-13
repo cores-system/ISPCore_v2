@@ -9,6 +9,7 @@ using ISPCore.Models.Databases;
 using ISPCore.Models.Auth;
 using ISPCore.Engine;
 using ISPCore.Models.Databases.Enums;
+using Trigger = ISPCore.Models.Triggers.Events.Settings.Base;
 
 namespace ISPCore.Controllers
 {
@@ -47,12 +48,16 @@ namespace ISPCore.Controllers
             jsonDB.Save();
             #endregion
 
+            // 
+            Trigger.OnChange((0, 0));
+
             // Меняем соль
             if (!string.IsNullOrWhiteSpace(salt))
             {
                 if (salt.Length < 18)
                     return Json(new Text("Соль должна состоять минимум из 18 символов"));
 
+                Trigger.OnChangeSalt((PasswdTo.salt, salt));
                 PasswdTo.salt = salt;
             }
 
@@ -61,7 +66,10 @@ namespace ISPCore.Controllers
             {
                 if (PasswdRoot.Length < 6)
                     return Json(new Text("Пароль 'Root' должен состоять минимум из 6 символов"));
-                
+
+                // 
+                Trigger.OnChangePasswdRoot((PasswdTo.Root, PasswdRoot));
+
                 // Меняем пароль в файле
                 System.IO.File.WriteAllText(Folders.Passwd + "/root", SHA256.Text(PasswdRoot));
 
@@ -89,6 +97,7 @@ namespace ISPCore.Controllers
                 if (Passwd2FA.Length < 6)
                     return Json(new Text("Пароль '2FA' должен состоять минимум из 6 символов"));
 
+                Trigger.OnChangePasswd2FA((PasswdTo.FA, Passwd2FA));
                 System.IO.File.WriteAllText(Folders.Passwd + "/2fa", SHA256.Text(Passwd2FA));
             }
 

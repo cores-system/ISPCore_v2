@@ -1,11 +1,10 @@
 ﻿using ISPCore.Engine;
 using ISPCore.Engine.Base;
 using ISPCore.Engine.core.Cache.CheckLink;
-using ISPCore.Engine.Databases;
 using ISPCore.Models.Databases;
 using ISPCore.Models.Response;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter;
 
 namespace ISPCore.Controllers
 {
@@ -26,11 +25,17 @@ namespace ISPCore.Controllers
 
             // Удаляем правило из шаблона
             if (TemplateId != 0 && coreDB.RequestsFilter_Template_Rules.RemoveAttach(coreDB, Id))
+            {
+                Trigger.Template.OnChange((TemplateId, 0));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Удаляем правило из домена
             if (DomainId != 0 && coreDB.RequestsFilter_Domain_Rules.RemoveAttach(coreDB, Id))
+            {
+                Trigger.Domain.OnChange((DomainId, "Rules"));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Отдаем результат
             return Json(new TrueOrFalse(false));
@@ -52,11 +57,17 @@ namespace ISPCore.Controllers
 
             // Удаляем правило из шаблона
             if (TemplateId != 0 && coreDB.RequestsFilter_Template_RuleReplaces.RemoveAttach(coreDB, Id))
+            {
+                Trigger.Template.OnChange((TemplateId, 0));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Удаляем правило из домена
             if (DomainId != 0 && coreDB.RequestsFilter_Domain_RuleReplaces.RemoveAttach(coreDB, Id))
+            {
+                Trigger.Domain.OnChange((DomainId, "Rules"));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Отдаем результат
             return Json(new TrueOrFalse(false));
@@ -78,11 +89,17 @@ namespace ISPCore.Controllers
 
             // Удаляем правило из шаблона
             if (TemplateId != 0 && coreDB.RequestsFilter_Template_RuleOverrides.RemoveAttach(coreDB, Id))
+            {
+                Trigger.Template.OnChange((TemplateId, 0));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Удаляем правило из домена
             if (DomainId != 0 && coreDB.RequestsFilter_Domain_RuleOverrides.RemoveAttach(coreDB, Id))
+            {
+                Trigger.Domain.OnChange((DomainId, "Rules"));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Отдаем результат
             return Json(new TrueOrFalse(false));
@@ -104,11 +121,17 @@ namespace ISPCore.Controllers
 
             // Удаляем правило из шаблона
             if (TemplateId != 0 && coreDB.RequestsFilter_Template_RuleArgs.RemoveAttach(coreDB, Id))
+            {
+                Trigger.Template.OnChange((TemplateId, 0));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Удаляем правило из домена
             if (DomainId != 0 && coreDB.RequestsFilter_Domain_RuleArgs.RemoveAttach(coreDB, Id))
+             {
+                Trigger.Domain.OnChange((DomainId, "Rules"));
                 return Json(new TrueOrFalse(true));
+            }
 
             // Отдаем результат
             return Json(new TrueOrFalse(false));
@@ -129,6 +152,7 @@ namespace ISPCore.Controllers
             {
                 // Удаляем кеш для домена
                 ISPCache.RemoveDomain(DomainId);
+                Trigger.Domain.OnChange((DomainId, "Aliases"));
                 return Json(new TrueOrFalse(true));
             }
 

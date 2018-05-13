@@ -5,10 +5,10 @@ using ISPCore.Engine.Auth;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Domains;
 using ISPCore.Engine;
-using ISPCore.Models.Databases.json;
 using ISPCore.Engine.Base.SqlAndCache;
 using ISPCore.Models.Databases;
 using ISPCore.Models.Auth;
+using Trigger = ISPCore.Models.Triggers.Events.Auth;
 
 namespace ISPCore.Controllers
 {
@@ -55,6 +55,9 @@ namespace ISPCore.Controllers
                 // Удаляем список неудачных попыток
                 LimitLogin.SuccessAuthorization(IP);
 
+                // 
+                Trigger.OnUnlock((IP, IsSuccess: true));
+
                 // Отдаем результат
                 return Json(new Models.Response.TrueOrFalse(true));
             }
@@ -64,6 +67,9 @@ namespace ISPCore.Controllers
 
             // Записываем в базу IP адрес пользователя, который ввел неправильно пароль
             LimitLogin.FailAuthorization(IP, TypeBlockIP.global);
+
+            // 
+            Trigger.OnUnlock((IP, IsSuccess: false));
 
             // Отдаем результат
             return Json(new Models.Response.Text("Неверный пароль"));
@@ -81,6 +87,9 @@ namespace ISPCore.Controllers
                 {
                     coreDB.Auth_Sessions.RemoveAll(i => i.Session == authSession);
                     coreDB.SaveChanges();
+
+                    // 
+                    Trigger.OnSignOut((HttpContext.Connection.RemoteIpAddress.ToString(), 0));
                 }
             }
 

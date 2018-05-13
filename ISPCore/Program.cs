@@ -150,6 +150,9 @@ namespace ISPCore
         {
             try
             {
+                // Триггер
+                ISPCore.Models.Triggers.Events.System.OnCronSeconds((0, 0));
+
                 // Удаляем из базы старые IP адреса
                 Engine.Security.IPtables.ClearDbAndCacheToIPv4Or6();
 

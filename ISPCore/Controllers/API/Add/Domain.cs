@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ISPCore.Models.Response;
 using ISPCore.Models.RequestsFilter.Domains.Log;
 using ISPCore.Models.RequestsFilter.Base.Enums;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -57,6 +58,9 @@ namespace ISPCore.Controllers
                 // Удаляем кеш для домена
                 ISPCache.RemoveDomain(DomainId);
 
+                // 
+                Trigger.OnChange((DomainId, "Aliases"));
+
                 // Отдаем сообщение и Id новых алиасов
                 return Json(new UpdateToIds("accepted", domain.Id, NewAliases));
             }
@@ -77,6 +81,9 @@ namespace ISPCore.Controllers
             // Удаляем кеш для домена
             ISPCache.RemoveDomain(DomainId);
 
+            // 
+            Trigger.OnChange((DomainId, "Base"));
+
             // Отдаем сообщение и Id новых шаблонов
             return Json(new UpdateToIds("accepted", DomainId, NewTemplatesId));
         }
@@ -93,6 +100,9 @@ namespace ISPCore.Controllers
 
             // Удаляем кеш для домена
             ISPCache.RemoveDomain(DomainId);
+
+            // 
+            Trigger.OnChange((DomainId, "LogSettings"));
 
             // Отдаем сообщение и Id новых шаблонов
             return Json(new UpdateToIds("accepted", DomainId, NewIgnore));

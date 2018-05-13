@@ -10,6 +10,7 @@ using ISPCore.Engine.Base;
 using System.Text.RegularExpressions;
 using ISPCore.Models.SyncBackup.Database.Enums;
 using System.IO;
+using Trigger = ISPCore.Models.Triggers.Events.SyncBackup.Database;
 
 namespace ISPCore.Engine.Cron.SyncBackup
 {
@@ -76,6 +77,9 @@ namespace ISPCore.Engine.Cron.SyncBackup
                 if (task.JobStatus != JobStatus.on || task.LastSync > DateTime.Now.AddMinutes(-task.SuncTime))
                     continue;
 
+                // 
+                Trigger.OnStartJob((task.Id, task.TypeDb));
+
                 // Выполняем задание
                 Dump(task, out bool IsOk, out string ErrorMsg);
 
@@ -99,6 +103,9 @@ namespace ISPCore.Engine.Cron.SyncBackup
 
                 // Меняем режим доступа к SQL
                 SqlToMode.SetMode(SqlMode.ReadOrWrite);
+
+                // 
+                Trigger.OnStopJob((task.Id, task.TypeDb, IsOk, ErrorMsg));
             }
             
             IsRun = false;

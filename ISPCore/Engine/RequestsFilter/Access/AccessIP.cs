@@ -5,6 +5,7 @@ using ISPCore.Models.RequestsFilter.Access;
 using ISPCore.Engine.Base;
 using System.IO;
 using Newtonsoft.Json;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.AccessIP;
 
 namespace ISPCore.Engine.RequestsFilter.Access
 {
@@ -38,6 +39,9 @@ namespace ISPCore.Engine.RequestsFilter.Access
         {
             // Удаляем старые данные
             Remove(IP, host, accessType);
+
+            // 
+            Trigger.OnAdd((IP, host, expires, accessType));
 
             // Модель
             var model = new AccessIPModel()
@@ -73,6 +77,7 @@ namespace ISPCore.Engine.RequestsFilter.Access
             string key = $"{IP}-{host}-{accessType.ToString()}";
             if (db.TryGetValue(key, out _))
             {
+                Trigger.OnRemove((IP, host, accessType));
                 db.Remove(key);
                 Save();
             }
@@ -104,7 +109,14 @@ namespace ISPCore.Engine.RequestsFilter.Access
                 List<string> keyRemove = new List<string>();
 
                 // Удаляем ненужные Value
-                foreach (var item in db)  {
+                foreach (var item in db)
+                {
+                    foreach (var val in item.Value)
+                    {
+                        if (DateTime.Now > val.Expires)
+                            Trigger.OnRemove((val.IP, val.host, val.accessType));
+                    }
+
                     item.Value.RemoveAll(i => i.Expires < DateTime.Now);
                     if (item.Value.Count == 0)
                         keyRemove.Add(item.Key);

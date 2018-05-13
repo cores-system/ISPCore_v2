@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using Trigger = ISPCore.Models.Triggers.Events.SyncBackup.Database;
 
 namespace ISPCore.Controllers
 {
@@ -50,6 +51,7 @@ namespace ISPCore.Controllers
                 }
                 #endregion
 
+                Trigger.OnChange((task.Id, 0));
                 return Edit(item, task);
             }
 
@@ -67,6 +69,7 @@ namespace ISPCore.Controllers
                 if (string.IsNullOrWhiteSpace(conf.Whence))
                     return Json(new Text("Локальный каталог не может быть пустым"));
 
+                Trigger.OnChange((Id, 0));
                 return Edit(item.DumpConf, conf);
             }
 
@@ -84,6 +87,7 @@ namespace ISPCore.Controllers
                 if (string.IsNullOrWhiteSpace(conf.Host) || string.IsNullOrWhiteSpace(conf.User) || string.IsNullOrWhiteSpace(conf.Password))
                     return Json(new Text($"Настройки '{item.TypeDb.ToString()}' имеют недопустимое значение"));
 
+                Trigger.OnChange((Id, 0));
                 return Edit(item.ConnectionConf, conf);
             }
 

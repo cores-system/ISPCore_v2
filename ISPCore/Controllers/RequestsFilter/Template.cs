@@ -13,6 +13,7 @@ using ISPCore.Models.Response;
 using ISPCore.Models.RequestsFilter.Templates;
 using ISPCore.Engine.Base;
 using ISPCore.Models.RequestsFilter.Templates.Rules;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Template;
 
 namespace ISPCore.Controllers
 {
@@ -53,6 +54,9 @@ namespace ISPCore.Controllers
                 // Сохраняем базу
                 coreDB.SaveChanges();
 
+                // 
+                Trigger.OnCreate((tpl.Id, 0));
+
                 // Отдаем новый Id шаблона и Id новых правил
                 return Json(new UpdateToIds(IsAPI ? "accepted" : null, tpl.Id, NewRules, NewRuleReplace, NewRuleOverrides, NewRuleArgs));
             }
@@ -80,6 +84,9 @@ namespace ISPCore.Controllers
                 // Удаляем кеш для шаблона
                 ISPCache.RemoveTemplate(tpl.Id);
 
+                // 
+                Trigger.OnChange((tpl.Id, 0));
+
                 // API
                 if (IsAPI)
                     return Json(new UpdateToIds("accepted", tpl.Id, NewRules, NewRuleReplace, NewRuleOverrides, NewRuleArgs));
@@ -104,6 +111,9 @@ namespace ISPCore.Controllers
             {
                 // Удаляем кеш для шаблона
                 ISPCache.RemoveTemplate(Id);
+
+                // 
+                Trigger.OnRemove((Id, 0));
 
                 // Отдаем результат
                 return Json(new TrueOrFalse(true));
@@ -152,6 +162,9 @@ namespace ISPCore.Controllers
                     // Сохраняем базу
                     coreDB.SaveChanges();
                     res = true;
+
+                    // 
+                    Trigger.OnChange((tpl.Id, 0));
                 }
             }
 

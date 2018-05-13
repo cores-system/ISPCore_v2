@@ -15,6 +15,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Text;
 using ISPCore.Engine.Hash;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -86,6 +87,9 @@ namespace ISPCore.Controllers
                 // Удаляем кеш для домена
                 ISPCache.RemoveDomain(domain.Id);
 
+                // 
+                Trigger.OnCreate((domain.Id, 0));
+
                 // Отдаем ответ
                 return Json(new RewriteToId(domain.Id));
             }
@@ -113,6 +117,9 @@ namespace ISPCore.Controllers
                 // Удаляем кеш для домена
                 ISPCache.RemoveDomain(domain.Id);
 
+                // 
+                Trigger.OnChange((domain.Id, "Base"));
+
                 // Отдаем сообщение и Id новых алиасов
                 return Json(new Text("Настройки домена сохранены"));
             }
@@ -133,6 +140,9 @@ namespace ISPCore.Controllers
             {
                 // Удаляем кеш для домена
                 ISPCache.RemoveDomain(Id);
+
+                // 
+                Trigger.OnRemove((Id, 0));
 
                 // Отдаем результат
                 return Json(new TrueOrFalse(true));
@@ -193,6 +203,9 @@ namespace ISPCore.Controllers
                     // Сохраняем базу
                     coreDB.SaveChanges();
                     res = true;
+
+                    // 
+                    Trigger.OnCreate((domain.Id, 0));
                 }
             }
 

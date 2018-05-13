@@ -7,6 +7,7 @@ using ISPCore.Models.Base;
 using System.Text;
 using System.IO;
 using ISPCore.Engine.Base.SqlAndCache;
+using Trigger = ISPCore.Models.Triggers.Events.Security.AntiVirus;
 
 namespace ISPCore.Engine.Cron
 {
@@ -57,9 +58,15 @@ namespace ISPCore.Engine.Cron
                     // Имя отчета
                     string report = $"{Models.Security.AntiVirus.name}_{Models.Security.AntiVirus.vers}_{DateTime.Now.ToString("HH-mm_dd-MM-yyy")}{task.av.path.Replace("/", "_-_")}";
 
+                    // 
+                    Trigger.OnStart((progress_id, report));
+
                     // Запускаем процесс bash
                     Bash bash = new Bash();
                     bash.Run($"{task.av.php} {Folders.AV}/ai-bolit.php {comand.ToString()} --progress={Folders.AV}/progress_id-{progress_id}.json --report={Folders.ReportsAV}/{report}.html >/dev/null 2>/dev/null");
+
+                    // 
+                    Trigger.OnStop((progress_id, report));
                 }
                 #endregion
 

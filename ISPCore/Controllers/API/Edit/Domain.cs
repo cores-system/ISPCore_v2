@@ -9,6 +9,7 @@ using ISPCore.Models.Response;
 using System.Text.RegularExpressions;
 using ISPCore.Engine.Databases;
 using ISPCore.Models.RequestsFilter.Domains.Log;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -55,7 +56,10 @@ namespace ISPCore.Controllers
 
             // Поиск домена
             if (coreDB.RequestsFilter_Domains.Where(i => i.Id == Id).FirstOrDefault() is Domain item)
+            {
+                Trigger.OnChange((Id, "Base"));
                 return Edit(Id, item, domain);
+            }
 
             return Json(new Text("Домен не найден"));
         }
@@ -66,7 +70,10 @@ namespace ISPCore.Controllers
         {
             // Поиск домена
             if (coreDB.RequestsFilter_Domains.Where(i => i.Id == Id).Include(i => i.confToLog).FirstOrDefault() is Domain item)
+            {
+                Trigger.OnChange((Id, "LogSettings"));
                 return Edit(Id, item.confToLog, conf);
+            }
 
             return Json(new Text("Домен не найден"));
         }
@@ -82,6 +89,7 @@ namespace ISPCore.Controllers
                 if (string.IsNullOrWhiteSpace(item.av.path) && string.IsNullOrWhiteSpace(av.path) || (HttpContext.Request.Query.TryGetValue("path", out _) && string.IsNullOrWhiteSpace(av.path)))
                     return Json(new Text("Укажите каталог для сканирования"));
 
+                Trigger.OnChange((Id, "av"));
                 return Edit(Id, item.av, av);
             }
 
@@ -94,7 +102,10 @@ namespace ISPCore.Controllers
         {
             // Поиск домена
             if (coreDB.RequestsFilter_Domains.Where(i => i.Id == Id).Include(i => i.AntiBot).FirstOrDefault() is Domain item)
+            {
+                Trigger.OnChange((Id, "AntiBot"));
                 return Edit(Id, item.AntiBot, antiBot);
+            }
 
             return Json(new Text("Домен не найден"));
         }
@@ -105,7 +116,10 @@ namespace ISPCore.Controllers
         {
             // Поиск домена
             if (coreDB.RequestsFilter_Domains.Where(i => i.Id == Id).Include(i => i.limitRequest).FirstOrDefault() is Domain item)
+            {
+                Trigger.OnChange((Id, "LimitRequest"));
                 return Edit(Id, item.limitRequest, limitRequest);
+            }
 
             return Json(new Text("Домен не найден"));
         }

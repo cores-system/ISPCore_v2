@@ -17,6 +17,13 @@ namespace ISPCore.Models.Triggers.Events.core
         /// 
         /// </summary>
         /// <param name=""></param>
+        public static Action<(int DomainID, bool IsCreate, bool IsRemove)> OnDomainCache => (s) => DomainCache?.Invoke(null, s);
+        public static event EventHandler<ITuple> DomainCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name=""></param>
         public static Action<(string IP, string UserAgent, string Referer, int DomainID, string method, string host, string uri, string FormData)> OnRequest => (s) => Request?.Invoke(null, s);
         public static event EventHandler<ITuple> Request;
 

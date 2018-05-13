@@ -6,6 +6,7 @@ using ISPCore.Models.Response;
 using ISPCore.Engine.Databases;
 using ISPCore.Models.SyncBackup.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Trigger = ISPCore.Models.Triggers.Events.SyncBackup.Files;
 
 namespace ISPCore.Controllers
 {
@@ -77,6 +78,7 @@ namespace ISPCore.Controllers
                 }
                 #endregion
 
+                Trigger.OnChange((task.Id, 0));
                 return Edit(item, task);
             }
 
@@ -101,6 +103,7 @@ namespace ISPCore.Controllers
                     return Json(new Text("Настройки 'FTP/SFTP' имеют недопустимое значение, укажите Passwd"));
                 #endregion
 
+                Trigger.OnChange((Id, 0));
                 return Edit(item.FTP, ftp);
             }
 
@@ -125,6 +128,7 @@ namespace ISPCore.Controllers
                     return Json(new Text("Настройки 'WebDav' имеют недопустимое значение, укажите Passwd"));
                 #endregion
 
+                Trigger.OnChange((Id, 0));
                 return Edit(item.WebDav, webDav);
             }
 
@@ -146,6 +150,7 @@ namespace ISPCore.Controllers
                     return Json(new Text("Настройки 'OneDrive' имеют недопустимое значение, укажите RefreshToken"));
                 #endregion
 
+                Trigger.OnChange((Id, 0));
                 return Edit(item.OneDrive, oneDrive);
             }
 

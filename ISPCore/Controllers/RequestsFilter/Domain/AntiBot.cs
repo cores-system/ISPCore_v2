@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using ISPCore.Engine.Base;
 using ISPCore.Models.Response;
+using Trigger = ISPCore.Models.Triggers.Events.RequestsFilter.Domain;
 
 namespace ISPCore.Controllers
 {
@@ -48,6 +49,9 @@ namespace ISPCore.Controllers
 
             // Удаляем кеш для домена
             ISPCache.RemoveDomain(domain.Id);
+
+            // 
+            Trigger.OnChange((domain.Id, "AntiBot"));
 
             // Отдаем сообщение
             return Json(new Text("Настройки домена сохранены"));

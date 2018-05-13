@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ISPCore.Engine.Databases;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
+using Trigger = ISPCore.Models.Triggers.Events.Base.SqlAndCache.WhitePtrIP;
 
 namespace ISPCore.Engine.Cron
 {
@@ -26,7 +27,10 @@ namespace ISPCore.Engine.Cron
                 foreach (var whiteIP in coreDB.WhitePtrIPs.AsNoTracking())
                 {
                     if (DateTime.Now > whiteIP.Expires)
+                    {
                         coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.WhitePtrIPs), whiteIP.Id));
+                        Trigger.OnRemove((whiteIP.IPv4Or6, whiteIP.PTR));
+                    }
                 }
                 SqlToMode.SetMode(SqlMode.ReadOrWrite);
 

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using ISPCore.Models.Databases;
 using ISPCore.Models.Base;
+using Trigger = ISPCore.Models.Triggers.Events.Base.SqlAndCache.WhitePtrIP;
 
 namespace ISPCore.Engine.Base.SqlAndCache
 {
@@ -31,6 +32,9 @@ namespace ISPCore.Engine.Base.SqlAndCache
         {
             if (IsWhiteIP(IPv4Or6))
                 return;
+
+            // 
+            Trigger.OnAdd((IPv4Or6, ptr, Expires));
 
             // Добовляем IP в кеш
             memoryCache.Set(KeyToMemoryCache.WhitePtrIP(IPv4Or6), (byte)0, Expires);

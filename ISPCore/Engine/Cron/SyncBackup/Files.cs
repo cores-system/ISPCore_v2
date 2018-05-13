@@ -16,6 +16,7 @@ using ISPCore.Models.Databases;
 using ISPCore.Models.Base;
 using ISPCore.Engine.Base.SqlAndCache;
 using System.Text;
+using Trigger = ISPCore.Models.Triggers.Events.SyncBackup.Files;
 
 namespace ISPCore.Engine.Cron.SyncBackup
 {
@@ -123,6 +124,9 @@ namespace ISPCore.Engine.Cron.SyncBackup
                     SqlToMode.SetMode(SqlMode.ReadOrWrite);
                 }
 
+                // 
+                Trigger.OnStartJob((task.Id, task.TypeSunc));
+
                 // Создание отчета по ошибкам
                 Report report = new Report(task);
 
@@ -163,6 +167,9 @@ namespace ISPCore.Engine.Cron.SyncBackup
 
                 // Меняем режим доступа к SQL
                 SqlToMode.SetMode(SqlMode.ReadOrWrite);
+
+                // 
+                Trigger.OnStopJob((task.Id, task.TypeSunc, IsOk));
             }
             
             IsRun = false;

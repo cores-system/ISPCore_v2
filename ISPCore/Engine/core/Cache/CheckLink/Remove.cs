@@ -1,4 +1,6 @@
-﻿namespace ISPCore.Engine.core.Cache.CheckLink
+﻿using Trigger = ISPCore.Models.Triggers.Events.core.CheckRequest;
+
+namespace ISPCore.Engine.core.Cache.CheckLink
 {
     partial class ISPCache
     {
@@ -14,6 +16,7 @@
 
                 // Удаляем кеш домена
                 MassGetDomain.TryRemove(Id, out var value);
+                Trigger.OnDomainCache((Id, IsCreate: false, IsRemove: true));
             }
             catch { }
         }
