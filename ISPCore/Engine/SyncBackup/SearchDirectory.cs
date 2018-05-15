@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace ISPCore.Engine.SyncBackup
 {
     public static class SearchDirectory
     {
+        /// <summary>
+        /// Получить список подпапок
+        /// </summary>
+        /// <param name="dir">Путь к начальной папке</param>
         public static List<string> Get(string dir)
         {
             List<string> list = new List<string> { };
@@ -16,6 +19,11 @@ namespace ISPCore.Engine.SyncBackup
         }
 
 
+        /// <summary>
+        /// Получить список папок
+        /// </summary>
+        /// <param name="dir">Путь к папке</param>
+        /// <param name="list"></param>
         private static void GetAllDir(string dir, ref List<string> list)
         {
             try

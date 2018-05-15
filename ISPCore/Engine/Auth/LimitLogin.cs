@@ -68,7 +68,6 @@ namespace ISPCore.Engine.Auth
         /// <summary>
         /// Успешнная авторизация
         /// </summary>
-        /// <param name="memoryCache"></param>
         /// <param name="RemoteIpAddress">IP адрес пользователя</param>
         public static void SuccessAuthorization(string RemoteIpAddress)
         {

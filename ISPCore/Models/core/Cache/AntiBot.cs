@@ -1,13 +1,9 @@
-﻿using ISPCore.Models.core.Cache.CheckLink;
-using ISPCore.Models.RequestsFilter.Base;
-using System;
-
-namespace ISPCore.Models.core.Cache
+﻿namespace ISPCore.Models.core.Cache
 {
     public class AntiBotCacheToGlobalConf
     {
         /// <summary>
-        /// 
+        /// Список доменов на которых можно вывести reCAPTCHA
         /// </summary>
         public string DomainsToreCaptchaRegex { get; set; } = "^$";
 

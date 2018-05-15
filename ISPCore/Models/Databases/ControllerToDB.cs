@@ -12,6 +12,7 @@ namespace ISPCore.Models.Databases
 {
     public class ControllerToDB : Controller, IDisposable
     {
+        #region ControllerToDB
         dynamic navPage;
         public JsonDB jsonDB { get; }
         public CoreDB coreDB { get; }
@@ -24,12 +25,15 @@ namespace ISPCore.Models.Databases
             memoryCache = Service.Get<IMemoryCache>();
             coreDB = Service.Get<CoreDB>();
         }
+        #endregion
 
-
+        #region View
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
+        /// <typeparam name="T">Тип модели</typeparam>
+        /// <param name="_navPage">Навигация</param>
+        /// <param name="_ajax">ajax запрос</param>
         public ViewResult View<T>(NavPage<T> _navPage, bool _ajax)
         {
             return View<T>(null, _navPage, _ajax);
@@ -38,15 +42,19 @@ namespace ISPCore.Models.Databases
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
+        /// <typeparam name="T">Тип модели</typeparam>
+        /// <param name="viewName">Путь к шаблону .cshtml</param>
+        /// <param name="_navPage">Навигация</param>
+        /// <param name="_ajax">ajax запрос</param>
         public ViewResult View<T>(string viewName, NavPage<T> _navPage, bool _ajax)
         {
             navPage = _navPage;
             var page = new PageToView<T>(_navPage, _ajax, jsonDB, coreDB, memoryCache);
             return viewName == null ? base.View(page) : base.View(viewName, page);
         }
+        #endregion
 
-
+        #region Dispose
         /// <summary>
         /// Очистка ресурсов
         /// </summary>
@@ -57,5 +65,6 @@ namespace ISPCore.Models.Databases
             SqlToMode.SetMode(SqlMode.ReadOrWrite);
             base.Dispose();
         }
+        #endregion
     }
 }

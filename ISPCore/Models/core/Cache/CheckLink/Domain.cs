@@ -101,9 +101,19 @@ namespace ISPCore.Models.core.Cache.CheckLink
         /// </summary>
         public DateTime CreateTime { get; set; } = DateTime.Now;
 
-
+        /// <summary>
+        /// Проверять правила
+        /// </summary>
         public bool CheckRuleToBase { get; set; }
+
+        /// <summary>
+        /// Проверять правила
+        /// </summary>
         public bool CheckRuleToOverride { get; set; }
+
+        /// <summary>
+        /// Проверять правила
+        /// </summary>
         public bool CheckRuleToReplace { get; set; }
     }
 } 

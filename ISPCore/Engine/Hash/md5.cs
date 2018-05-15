@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 using System.Security.Cryptography;
 
@@ -7,6 +6,10 @@ namespace ISPCore.Engine.Hash
 {
     public class md5
     {
+        /// <summary>
+        /// Хеш MD5
+        /// </summary>
+        /// <param name="IntText">Исходный текст</param>
         public static string text(string IntText)
         {
             using (var md5 = MD5.Create())

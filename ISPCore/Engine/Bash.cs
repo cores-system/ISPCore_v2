@@ -5,7 +5,11 @@ namespace ISPCore.Engine
 {
     public class Bash
     {
-        public string Run(string arguments)
+        /// <summary>
+        /// Выполнить Bash команду
+        /// </summary>
+        /// <param name="comand">Bash команда</param>
+        public string Run(string comand)
         {
             try
             {
@@ -13,7 +17,7 @@ namespace ISPCore.Engine
                 processInfo.UseShellExecute = false;
                 processInfo.RedirectStandardOutput = true;
                 processInfo.FileName = "/bin/bash";
-                processInfo.Arguments = $" -c \"{arguments}\"";
+                processInfo.Arguments = $" -c \"{comand}\"";
 
                 var process = Process.Start(processInfo);
                 var outPut = process.StandardOutput.ReadToEnd();

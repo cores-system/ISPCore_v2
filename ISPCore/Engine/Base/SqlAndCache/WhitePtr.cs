@@ -27,7 +27,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
         /// </summary>
         /// <param name="IPv4Or6">IP-адрес</param>
         /// <param name="ptr">PTR-адрес</param>
-        /// <param name="Expires"></param>
+        /// <param name="Expires">На какой период добавить IP в белый список</param>
         public static void Add(string IPv4Or6, string ptr, DateTime Expires)
         {
             if (IsWhiteIP(IPv4Or6))

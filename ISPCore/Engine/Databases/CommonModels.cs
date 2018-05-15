@@ -9,13 +9,13 @@ namespace ISPCore.Engine.Databases
     public class CommonModels
     {
         /// <summary>
-        /// 
+        /// Обновить данные
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="oldItem"></param>
-        /// <param name="newItem"></param>
+        /// <typeparam name="T">Тип данных</typeparam>
+        /// <param name="oldItem">Исходные данные</param>
+        /// <param name="newItem">Новые данные</param>
         /// <param name="HttpContext"></param>
-        /// <param name="updateType"></param>
+        /// <param name="updateType">Метод обновления исходных данных</param>
         public static void Update<T>(T oldItem, T newItem, HttpContext HttpContext, UpdateType updateType = UpdateType.update) where T : class
         {
             Update(oldItem, newItem, $"^({string.Join('|', HttpContext.Request.Query.Keys)})$", updateType);
@@ -23,13 +23,13 @@ namespace ISPCore.Engine.Databases
 
 
         /// <summary>
-        /// 
+        /// Обновить данные
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="oldItem"></param>
-        /// <param name="newItem"></param>
-        /// <param name="pattern"></param>
-        /// <param name="updateType"></param>
+        /// <typeparam name="T">Тип данных</typeparam>
+        /// <param name="oldItem">Исходные данные</param>
+        /// <param name="newItem">Новые данные</param>
+        /// <param name="pattern">Regex для игнорирования отдельный полей</param>
+        /// <param name="updateType">Метод обновления исходных данных</param>
         public static void Update<T>(T oldItem, T newItem, string pattern = "^$", UpdateType updateType = UpdateType.Default) where T : class
         {
             // Получаем все поля "{get; set;}"

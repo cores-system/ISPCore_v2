@@ -123,7 +123,7 @@ namespace ISPCore.Engine.Security
         /// Заблокировать IPv4/6
         /// </summary>
         /// <param name="IP">IPv4/6</param>
-        /// <param name="target"></param>
+        /// <param name="target">Цель</param>
         /// <param name="data">Время и причина блокировки</param>
         public static void AddIPv4Or6(string IP, ModelIPtables data, TypeBlockIP target, string BlockedHost = null)
         {
@@ -190,7 +190,7 @@ namespace ISPCore.Engine.Security
         /// Разблокировать IPv4/6
         /// </summary>
         /// <param name="IP">IPv4/6</param>
-        /// <param name="target"></param>
+        /// <param name="target">Цель</param>
         /// <param name="BlockedHost">Заблокированный домен</param>
         public static void RemoveIPv4Or6(string IP, TypeBlockIP target, string BlockedHost)
         {

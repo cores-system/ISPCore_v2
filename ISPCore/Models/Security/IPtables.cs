@@ -5,6 +5,12 @@ namespace ISPCore.Models.Security
     public class IPtables
     {
         public IPtables() { }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_Description">Причина блокировки</param>
+        /// <param name="_TimeExpires">До какого времени заблокирован IP</param>
         public IPtables(string _Description, DateTime _TimeExpires)
         {
             Description = _Description;

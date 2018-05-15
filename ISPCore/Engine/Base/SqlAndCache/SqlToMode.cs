@@ -22,9 +22,9 @@ namespace ISPCore.Engine.Base.SqlAndCache
 
 
         /// <summary>
-        /// 
+        /// Изменить режим доступа к SQL
         /// </summary>
-        /// <param name="mode"></param>
+        /// <param name="mode">Режим доступа к SQL</param>
         public static void SetMode(SqlMode mode)
         {
             switch (mode)

@@ -33,7 +33,7 @@ namespace ISPCore.Engine.Triggers
         /// <summary>
         /// Событие триггера
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">null</param>
         /// <param name="data">Данные события</param>
         void EventHandler(object sender, ITuple data)
         {

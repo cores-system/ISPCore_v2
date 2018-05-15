@@ -5,8 +5,13 @@ namespace ISPCore.Models.RequestsFilter.Domains
     public class AntiBot : AntiBotBase
     {
         public int Id { get; set; }
-        public int DomainId { get; set; }
         private string _hashKey;
+
+        /// <summary>
+        /// Id домена
+        /// </summary>
+        public int DomainId { get; set; }
+
 
         /// <summary>
         /// Использовать глобальные настройки AntiBot вместо локальных

@@ -2,6 +2,13 @@
 {
     public class EndOfText
     {
+        /// <summary>
+        /// Правильное окончание текста
+        /// </summary>
+        /// <param name="s1">минуту</param>
+        /// <param name="s2">минуты</param>
+        /// <param name="s3">минут</param>
+        /// <param name="x">число</param>
         public static string get(string s1, string s2, string s3, int x)
         {
             int n = x % 100;

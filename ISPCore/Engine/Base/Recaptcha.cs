@@ -7,6 +7,11 @@ namespace ISPCore.Engine.Base
 {
     public class Recaptcha
     {
+        /// <summary>
+        /// Проверка авторизации в reCAPTCHA
+        /// </summary>
+        /// <param name="response">Данные присланные пользователем </param>
+        /// <param name="secret">Секретный ключ для сайта</param>
         async public static Task<bool> Verify(string response, string secret)
         {
             try

@@ -7,9 +7,9 @@ namespace ISPCore.Engine.Hash
     public static class SHA256
     {
         /// <summary>
-        /// 
+        /// Хеш SHA-256
         /// </summary>
-        /// <param name="IntText"></param>
+        /// <param name="IntText">Исходный текст</param>
         public static string Text(string IntText)
         {
             using (SHA256Managed sha = new SHA256Managed())

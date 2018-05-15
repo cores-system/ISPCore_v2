@@ -80,17 +80,17 @@ namespace ISPCore.Engine.core
 
         #region ValidRequest
         /// <summary>
-        /// 
+        /// Проверка запроса
         /// </summary>
-        /// <param name="IP"></param>
-        /// <param name="antiBotType"></param>
-        /// <param name="HostConvert"></param>
-        /// <param name="method"></param>
-        /// <param name="uri"></param>
-        /// <param name="HttpContext"></param>
-        /// <param name="domain"></param>
-        /// <param name="DomainID"></param>
-        /// <param name="outHtml"></param>
+        /// <param name="IP">IPv4/6</param>
+        /// <param name="antiBotType">Cпособ проверки</param>
+        /// <param name="HostConvert">Домен</param>
+        /// <param name="method">Метод запроса</param>
+        /// <param name="uri">Url запроса</param>
+        /// <param name="HttpContext">Используется для проверки cookie</param>
+        /// <param name="domain">Кеш настроек домена</param>
+        /// <param name="DomainID">Id домена</param>
+        /// <param name="outHtml">html для вывода пользователю</param>
         public static bool ValidRequest(string IP, AntiBotType antiBotType, string HostConvert, string method, string uri, HttpContext HttpContext, Models.core.Cache.CheckLink.Domain domain, int DomainID, out string outHtml)
         {
             // По умолчанию null
@@ -282,23 +282,23 @@ namespace ISPCore.Engine.core
 
         #region ValidCookie
         /// <summary>
-        /// 
+        /// Проверка Cookie
         /// </summary>
-        /// <param name="verification"></param>
-        /// <param name="expired"></param>
-        /// <param name="key"></param>
-        /// <param name="IP">IP-адрес</param>
-        /// <param name="AntiBotHashKey"></param>
+        /// <param name="verification">reCAPTCHA/SignalR/js</param>
+        /// <param name="expired">Время жизни Cookie</param>
+        /// <param name="key">Ключ</param>
+        /// <param name="IP">IPv4/6</param>
+        /// <param name="AntiBotHashKey">Дополнительный хеш для проверки "SignalR/JS"</param>
         private static bool ValidCookie(string verification, string expired, string key, string IP, string AntiBotHashKey)
         {
             return DateTime.FromBinary(long.Parse(expired)) > DateTime.Now && key == md5.text($"{expired}:{IP}:{(verification == "reCAPTCHA" ? verification : AntiBotHashKey)}:{PasswdTo.salt}");
         }
 
         /// <summary>
-        /// 
+        /// Получить валидные Cookie
         /// </summary>
-        /// <param name="HourCacheToUser"></param>
-        /// <param name="IP">IP-адрес</param>
+        /// <param name="HourCacheToUser">Сколько часов валидны Cookie</param>
+        /// <param name="IP">IPv4/6</param>
         /// <param name="verification">Пользователь прошел проверку в "reCAPTCHA/SignalR/JS"</param>
         /// <param name="AntiBotHashKey">Дополнительный хеш для проверки "SignalR/JS"</param>
         public static string GetValidCookie(int HourCacheToUser, string IP, string verification, string AntiBotHashKey)
@@ -314,11 +314,11 @@ namespace ISPCore.Engine.core
         }
 
         /// <summary>
-        /// 
+        /// Проверка Cookie
         /// </summary>
         /// <param name="HttpContext"></param>
-        /// <param name="IP">IP-адрес</param>
-        /// <param name="AntiBotHashKey"></param>
+        /// <param name="IP">IPv4/6</param>
+        /// <param name="AntiBotHashKey">Дополнительный хеш для проверки "SignalR/JS"</param>
         public static bool IsValidCookie(HttpContext HttpContext, string IP, string AntiBotHashKey, out string verification)
         {
             verification = null;
@@ -347,8 +347,8 @@ namespace ISPCore.Engine.core
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tplToUrl"></param>
-        /// <param name="json"></param>
+        /// <param name="tplToUrl">Ссылка на шаблон</param>
+        /// <param name="json">Json</param>
         public static string Html(string tplToUrl, string json)
         {
             return @"<!DOCTYPE html>
@@ -376,16 +376,16 @@ if (xhr.status == 200) {
 
 
         /// <summary>
-        /// 
+        /// Получить html для AntiBot
         /// </summary>
-        /// <param name="tplName"></param>
-        /// <param name="conf"></param>
-        /// <param name="CoreApiUrl"></param>
-        /// <param name="IP"></param>
-        /// <param name="HostConvert"></param>
-        /// <param name="reCAPTCHASitekey"></param>
-        /// <param name="CacheAntiBot"></param>
-        /// <param name="AntiBotHashKey"></param>
+        /// <param name="tplName">Имя шаблона</param>
+        /// <param name="conf">Настройки AntiBot</param>
+        /// <param name="CoreApiUrl">Ссылка на /core/</param>
+        /// <param name="IP">IPv4/6</param>
+        /// <param name="HostConvert">Домен</param>
+        /// <param name="reCAPTCHASitekey">Секретный ключ reCAPTCHA</param>
+        /// <param name="CacheAntiBot">Кеширование ответа</param>
+        /// <param name="AntiBotHashKey">Дополнительный хеш для проверки "SignalR/JS"</param>
         static string Html(AntiBotType tplName, AntiBotBase conf, string CoreApiUrl, string IP, string HostConvert, string reCAPTCHASitekey, int CacheAntiBot, string AntiBotHashKey)
         {
             #region Базовые параметры
@@ -425,7 +425,7 @@ if (xhr.status == 200) {
 
             // Сериализуем данные
             string json = JsonConvert.SerializeObject(mass);
-
+            
             #region Создаем кеш
             if (CacheAntiBot != 0)
             {
@@ -441,6 +441,10 @@ if (xhr.status == 200) {
         #endregion
 
         #region JsToBase64
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="RewriteToOriginalDomain"></param>
         public static string JsToBase64(bool RewriteToOriginalDomain)
         {
             if (!RewriteToOriginalDomain)
@@ -519,12 +523,15 @@ var Base64 =
         #endregion
 
         #region JsToRewriteUser
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="RewriteToOriginalDomain"></param>
+        /// <param name="HostConvert"></param>
         public static string JsToRewriteUser(bool RewriteToOriginalDomain, string HostConvert)
         {
             if (!RewriteToOriginalDomain)
-            {
                 return "if (false) { }";
-            }
 
             return @"if (" + $"!\"{HostConvert}\".match(/.isp$/) && " + " location.hostname.replace(/www./gi,'') != Base64.decode('" + base64.Encode(HostConvert) + @"')) { window.location = Base64.decode('" + base64.Encode("http://" + HostConvert) + @"'); }";
         }

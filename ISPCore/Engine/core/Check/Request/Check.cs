@@ -520,7 +520,7 @@ namespace ISPCore.Engine.core.Check
                 if (memoryCache.TryGetValue(KeyToMemoryCache.CheckLinkToCache(method, host, uri), out ResponseView responseView) && responseView.CacheTime == Domain.CreateTime)
                 {
                     #region Записываем данные запроса
-                    switch (responseView.TypeRequest)
+                    switch (responseView.TypeResponse)
                     {
                         case TypeRequest._200:
                             AddJurnalTo200();
@@ -535,7 +535,7 @@ namespace ISPCore.Engine.core.Check
                     #endregion
 
                     // Счетчик запросов
-                    SetCountRequestToHour(responseView.TypeRequest, host, Domain.confToLog.EnableCountRequest);
+                    SetCountRequestToHour(responseView.TypeResponse, host, Domain.confToLog.EnableCountRequest);
 
                     #region Кеш - "Замена ответа"
                     if (responseView.Is303)
@@ -557,7 +557,7 @@ namespace ISPCore.Engine.core.Check
                     // Отдаем кеш
                     viewBag.IsCacheView = true;
                     viewBag.IsErrorRule = responseView.IsErrorRule;
-                    return View(context, viewBag, responseView.ActionCheckLink, responseView.TypeRequest);
+                    return View(context, viewBag, responseView.ActionCheckLink, responseView.TypeResponse);
                 }
             }
             #endregion
@@ -640,7 +640,7 @@ namespace ISPCore.Engine.core.Check
                                         {
                                             Is303 = true,
                                             CacheTime = Domain.CreateTime,
-                                            TypeRequest = TypeRequest._200,
+                                            TypeResponse = TypeRequest._200,
                                             ContentType = rule.ContentType,
                                             kode = rule.kode,
                                             ResponceUri = _responceUri,

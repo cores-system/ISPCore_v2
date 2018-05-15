@@ -4,6 +4,10 @@ namespace ISPCore.Engine.core.Cache.CheckLink
 {
     partial class ISPCache
     {
+        /// <summary>
+        /// Удалить кеш домена
+        /// </summary>
+        /// <param name="Id">Id домена</param>
         public static void RemoveDomain(int Id)
         {
             if (Id == 0)
@@ -21,7 +25,10 @@ namespace ISPCore.Engine.core.Cache.CheckLink
             catch { }
         }
 
-
+        /// <summary>
+        /// Удалить кеш шаблона
+        /// </summary>
+        /// <param name="Id">Id шаблона</param>
         public static void RemoveTemplate(int Id)
         {
             if (Id == 0)

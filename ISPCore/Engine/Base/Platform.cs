@@ -10,11 +10,11 @@ namespace ISPCore.Engine.Base
 
 
         /// <summary>
-        /// 
+        /// Указать платформу
         /// </summary>
-        /// <param name="IsDocker"></param>
-        /// <param name="IsDemo"></param>
-        /// <param name="IsDebug"></param>
+        /// <param name="IsDocker">Docker</param>
+        /// <param name="IsDemo">Demo</param>
+        /// <param name="IsDebug">Dev</param>
         public static void Set(bool IsDocker = false, bool IsDemo = false, bool IsDebug = false)
         {
             if (IsDocker)
@@ -25,7 +25,7 @@ namespace ISPCore.Engine.Base
         }
 
         /// <summary>
-        /// 
+        /// Платформа
         /// </summary>
         public static PlatformOS Get
         {
@@ -62,7 +62,7 @@ namespace ISPCore.Engine.Base
         public static bool IsDemo => _IsDemo;
 
         /// <summary>
-        /// 
+        /// Для разработки
         /// </summary>
         public static bool IsDebug => _IsDebug;
     }

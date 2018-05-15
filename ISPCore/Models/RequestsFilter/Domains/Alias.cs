@@ -5,6 +5,10 @@ namespace ISPCore.Models.RequestsFilter.Domains
     public class Alias : IId
     {
         public int Id { get; set; }
+
+        /// <summary>
+        /// Id домена
+        /// </summary>
         public int DomainId { get; set; }
 
         /// <summary>

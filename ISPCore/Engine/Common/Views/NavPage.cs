@@ -16,6 +16,15 @@ namespace ISPCore.Engine.Common.Views
         string PagePatch, QueryString;
         int pageSize, page;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="db">Записи</param>
+        /// <param name="context">Используется для построения навигации</param>
+        /// <param name="_pageSize">Количество записей на страницу</param>
+        /// <param name="_page">Страница</param>
+        /// <param name="reverse">Последние записи выводить первыми</param>
+        /// <param name="overrideMass">Используется база с готовой навигацией</param>
         public NavPage(IEnumerable<T> db, HttpContext context, int _pageSize, int _page, bool reverse = true, bool overrideMass = false)
         {
             QueryString = Regex.Replace(context.Request.QueryString.Value.Replace("?", "&"), "(&page=[^&]+|&ajax=[^&]+)", "", RegexOptions.IgnoreCase);

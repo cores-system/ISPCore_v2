@@ -20,6 +20,13 @@ namespace ISPCore
 {
     public static class Expansion
     {
+        #region GetTemplateName
+        /// <summary>
+        /// Получить имя шаблона
+        /// </summary>
+        /// <param name="db">База</param>
+        /// <param name="TemplateId">Id шаблона</param>
+        /// <param name="DefaultDescription">Имя по умолчанию </param>
         public static string GetTemplateName(this DbSet<Template> db, int TemplateId, string DefaultDescription = null)
         {
             string name = db.Find(TemplateId)?.Name;
@@ -28,16 +35,24 @@ namespace ISPCore
 
             return name;
         }
+        #endregion
 
-        public static string ToSql(this string item) => item.Replace("'", "\"");
-
-        #region RemoveAttach
+        #region ToSql
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="db"></param>
-        /// <param name="Id"></param>
+        /// <param name="item"></param>
+        public static string ToSql(this string item) => item.Replace("'", "\"");
+        #endregion
+
+        #region RemoveAttach
+        /// <summary>
+        /// Удалить запись
+        /// </summary>
+        /// <typeparam name="T">Тип данных</typeparam>
+        /// <param name="db">Таблица</param>
+        /// <param name="coreDB">База</param>
+        /// <param name="Id">Id записи</param>
         public static bool RemoveAttach<T>(this DbSet<T> db, CoreDB coreDB, int Id) where T: class, IId, new()
         {
             try
@@ -63,7 +78,7 @@ namespace ISPCore
         /// <summary>
         /// Удалить элементы из колекции
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Тип данных</typeparam>
         /// <param name="db">Колекция</param>
         /// <param name="predicate">Функция поиска</param>
         public static void RemoveAll<T>(this DbSet<T> db, Func<T, bool> predicate) where T : class
@@ -77,7 +92,7 @@ namespace ISPCore
         /// <summary>
         /// Получить элемент
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Тип данных</typeparam>
         /// <param name="db">Колекция</param>
         /// <param name="predicate">Функция поиска</param>
         /// <param name="type">Тип поиска по колекции</param>
@@ -94,7 +109,7 @@ namespace ISPCore
         /// <summary>
         /// Получить элементы
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Тип данных</typeparam>
         /// <param name="db">Колекция</param>
         /// <param name="predicate">Функция поиска</param>
         /// <param name="type">Тип поиска по колекции</param>
@@ -108,6 +123,13 @@ namespace ISPCore
         #endregion
 
         #region FindAndInclude
+        /// <summary>
+        /// Получить данные
+        /// </summary>
+        /// <typeparam name="T">Тип данных</typeparam>
+        /// <param name="_db">База</param>
+        /// <param name="Id">Id записи</param>
+        /// <param name="AsNoTracking">Не добавлять записи в память</param>
         public static T FindAndInclude<T>(this DbSet<T> _db, int Id, bool AsNoTracking = false) where T : class
         {
             var db = AsNoTracking ? _db.AsNoTracking() : _db;
@@ -135,12 +157,12 @@ namespace ISPCore
 
         #region UpdateOrAddRange
         /// <summary>
-        /// 
+        /// Обновить записи
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="collection"></param>
-        /// <param name="data"></param>
-        /// <param name="NewIds"></param>
+        /// <typeparam name="T">Тип данных</typeparam>
+        /// <param name="collection">Исходные данные</param>
+        /// <param name="data">Новые данные</param>
+        /// <param name="NewIds">Id новых записей в SQL</param>
         public static void UpdateOrAddRange<T>(this IList<T> collection, IDictionary<string, T> data, out IDictionary<string, IId> NewIds) where T : class, IId
         {
             NewIds = new Dictionary<string, IId>();
@@ -230,13 +252,13 @@ namespace ISPCore
 
         #region AddRange
         /// <summary>
-        /// 
+        /// Добавить записи
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="collection"></param>
+        /// <typeparam name="T">Тип данных</typeparam>
+        /// <param name="collection">Исходные данные</param>
         /// <param name="DependentTableId">Зависимая таблица</param>
-        /// <param name="data"></param>
-        /// <param name="NewIds"></param>
+        /// <param name="data">Новые данные</param>
+        /// <param name="NewIds">Id новых записей в SQL</param>
         public static void AddRange<T>(this DbSet<T> collection, int DependentTableId, IDictionary<string, T> data, out IDictionary<string, IId> NewIds) where T: class, IId
         {
             NewIds = new Dictionary<string, IId>();

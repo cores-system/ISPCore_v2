@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using ISPCore.Models.Databases.json;
-using System.Text;
 
 namespace ISPCore.Engine.Middleware
 {

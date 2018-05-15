@@ -108,9 +108,9 @@ namespace ISPCore.Engine.Base.SqlAndCache
 
         #region IsWhiteIP
         /// <summary>
-        /// 
+        /// Проверка IP в белом списке
         /// </summary>
-        /// <param name="IP"></param>
+        /// <param name="IP">IPv4/6</param>
         public static bool IsWhiteIP(string IP)
         {
             // IPv6
@@ -129,9 +129,9 @@ namespace ISPCore.Engine.Base.SqlAndCache
 
         #region IsWhiteUserAgent
         /// <summary>
-        /// 
+        /// Проверка User-Agent в белом списке
         /// </summary>
-        /// <param name="userAgent"></param>
+        /// <param name="userAgent">User-Agent</param>
         public static bool IsWhiteUserAgent(string userAgent)
         {
             if (UserAgentRegex == "^$")

@@ -1,7 +1,4 @@
-﻿using ISPCore.Models.Databases.Interface;
-using System;
-
-namespace ISPCore.Models.RequestsFilter.Monitoring
+﻿namespace ISPCore.Models.RequestsFilter.Monitoring
 {
     public class Jurnal401 : JurnalBase
     {

@@ -11,15 +11,16 @@ namespace ISPCore.Engine.FileManager
     {
         #region Json/GetEncoding
         /// <summary>
-        /// 
+        /// Получить json
         /// </summary>
-        /// <param name="ob"></param>
+        /// <param name="ob">Данные для конверта</param>
+        /// <param name="charset">Кодировка</param>
         private JsonResult Json(object ob, string charset = null) => new JsonResult(ob) { ContentType = $"text/html{(charset != null ? $"; charset={charset}" : "" )}" };
 
         /// <summary>
-        /// 
+        /// Поток кодировки
         /// </summary>
-        /// <param name="conv"></param>
+        /// <param name="conv">Кодировка</param>
         private Encoding GetEncoding(string conv)
         {
             if (conv.ToLower() == "utf-8")
@@ -30,6 +31,11 @@ namespace ISPCore.Engine.FileManager
         #endregion
 
         #region GetAsync
+        /// <summary>
+        /// Получить текстовый документ
+        /// </summary>
+        /// <param name="target">Цель в формате elFinder</param>
+        /// <param name="conv">Кодировка</param>
         public JsonResult GetAsync(string target, string conv)
         {
             var fullPath = ParsePath(target);
@@ -46,6 +52,12 @@ namespace ISPCore.Engine.FileManager
         #endregion
 
         #region PutAsync
+        /// <summary>
+        /// Сохранить текстовый документ
+        /// </summary>
+        /// <param name="target">Цель в формате elFinder</param>
+        /// <param name="content">Текст</param>
+        /// <param name="conv">Кодировка</param>
         public JsonResult PutAsync(string target, string content, string conv)
         {
             var fullPath = ParsePath(target);

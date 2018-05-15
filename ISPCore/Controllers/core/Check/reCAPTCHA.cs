@@ -25,7 +25,7 @@ namespace ISPCore.Controllers.core
                 string cookie = Engine.core.AntiBot.GetValidCookie(HourCacheToUser, IP, "reCAPTCHA", null);
 
                 // 
-                Trigger.AntiBot.OnRecaptchaVerify((true, IP, HttpContext.Request.Host.Host, HourCacheToUser));
+                Trigger.AntiBot.OnRecaptchaVerify((true, IP, HttpContext.Request.Host.Host));
                 Trigger.AntiBot.OnSetValidCookie((IP, HttpContext.Request.Host.Host, cookie, "reCAPTCHA", HourCacheToUser));
 
                 // Отдаем ответ

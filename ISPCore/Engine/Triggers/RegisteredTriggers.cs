@@ -23,6 +23,7 @@ namespace ISPCore.Engine.Triggers
                 return;
             IsRunUpdateDB = true;
 
+            // Список триггеров
             foreach (var file in Directory.GetFiles(Folders.Triggers, "*.conf"))
             {
                 try
@@ -68,6 +69,7 @@ namespace ISPCore.Engine.Triggers
         /// <summary>
         /// Регистрация триггера
         /// </summary>
+        /// <param name="triggerConf">Настройки триггера</param>
         static void RegTriggerToEvent(TriggerConf triggerConf)
         {
             try
@@ -109,6 +111,7 @@ namespace ISPCore.Engine.Triggers
                 RegTriggerToEvent(triggerConf);
             }
 
+            // Событие
             ISPCore.Models.Triggers.Events.System.OnTriggersInitialize((0, 0));
         }
         #endregion
@@ -121,13 +124,8 @@ namespace ISPCore.Engine.Triggers
         {
             UpdateDB();
 
-            List<TriggerConf> mass = new List<TriggerConf>();
-            foreach (var item in dbTriggers)
-            {
-                mass.Add(item.Value);
-            }
-
-            return mass.OrderBy(i => i.LastUpdateFile);
+            // Сортировка по времени модификации файла
+            return dbTriggers.Select(i => i.Value).OrderBy(i => i.LastUpdateFile);
         }
         #endregion
 
@@ -135,6 +133,7 @@ namespace ISPCore.Engine.Triggers
         /// <summary>
         /// Удалить триггер
         /// </summary>
+        /// <param name="triggerConf">Настройки триггера</param>
         public static void Remove(TriggerConf triggerConf)
         {
             // Удаляем файл

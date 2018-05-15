@@ -39,7 +39,7 @@ namespace ISPCore.Models.Security
         private int _mode, _memory, _size;
 
         /// <summary>
-        /// 
+        /// Путь к PHP
         /// </summary>
         public string php
         {

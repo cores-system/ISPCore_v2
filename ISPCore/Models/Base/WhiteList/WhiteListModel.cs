@@ -28,7 +28,7 @@ namespace ISPCore.Models.Base.WhiteList
         public string Value { get; set; }
 
         /// <summary>
-        /// тип записи
+        /// Тип записи
         /// </summary>
         public WhiteListType Type { get; set; }
     }

@@ -83,6 +83,7 @@ namespace ISPCore.Controllers
             // Удаляем сессию в SQL
             if (HttpContext.Request.Cookies.TryGetValue("authSession", out string authSession))
             {
+                // Подключаемся к SQL
                 using (var coreDB = Service.Get<CoreDB>())
                 {
                     coreDB.Auth_Sessions.RemoveAll(i => i.Session == authSession);

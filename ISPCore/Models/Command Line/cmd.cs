@@ -8,7 +8,7 @@
         public Timeout Timeout { get; set; } = new Timeout();
 
         /// <summary>
-        /// 
+        /// Где можно не возвращать ответ в html
         /// </summary>
         public StatusCode StatusCode { get; set; } = new StatusCode();
     }

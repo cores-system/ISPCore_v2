@@ -4,7 +4,6 @@ using ISPCore.Models.SyncBackup.Tasks;
 using ISPCore.Models.SyncBackup.ToolsEngine;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -554,8 +553,8 @@ namespace ISPCore.Engine.SyncBackup
         /// <summary>
         /// Удаляем старые по времени бекапы
         /// </summary>
-        /// <param name="md"></param>
-        /// <param name="CountActiveDayBackup"></param>
+        /// <param name="md">Стандартные параметры которые есть в каждом методе Tools</param>
+        /// <param name="CountActiveDayBackup">Максимальное количиство активных бекапов</param>
         public static void DeleteFilesToActiveDayBackup(ToolsModel md, int CountActiveDayBackup)
         {
             bool IsErrorSync = false;
@@ -600,6 +599,7 @@ namespace ISPCore.Engine.SyncBackup
         /// Сортирует список файлов по дате
         /// </summary>
         /// <param name="ListRemoteFiles">Список файлов на удаленом сервере</param>
+        /// <param name="SortedToLocalTime">Сортировка по дате сервера / Sync Backup</param>
         private static Dictionary<string, List<SortedModel>> SortedFiles(List<FileModel> ListRemoteFiles, bool SortedToLocalTime = true)
         {
             // Колекция содержит 
@@ -714,6 +714,10 @@ namespace ISPCore.Engine.SyncBackup
         #endregion
 
         #region ConvertPatchToUnix
+        /// <summary>
+        /// Изменить путь в формат Unix
+        /// </summary>
+        /// <param name="patch">Путь</param>
         public static string ConvertPatchToUnix(string patch)
         {
             return Regex.Replace(patch.Replace("\\", "/"), "/$", "") + "/";

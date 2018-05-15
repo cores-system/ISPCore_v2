@@ -113,7 +113,7 @@ namespace ISPCore.Models.Base
         }
 
         /// <summary>
-        /// 
+        /// На сколько часов кешировать IP
         /// </summary>
         public int BackgroundHourCacheToIP
         {

@@ -14,7 +14,7 @@ namespace ISPCore.Engine.Network
         /// Проверка правильности CIDR
         /// </summary>
         /// <param name="IPv4Or6">IP-адрес</param>
-        /// <param name="ipnetwork"></param>
+        /// <param name="ipnetwork">Модель IPNetwork</param>
         public static bool CheckingSupportToIPv4Or6(string IPv4Or6, out (string FirstUsable, string LastUsable) ipnetwork)
         {
             ipnetwork = (null, null);
@@ -57,10 +57,10 @@ namespace ISPCore.Engine.Network
 
         #region IPv4ToRange
         /// <summary>
-        /// 
+        /// Конверт IPv4 в числовое значение
         /// </summary>
-        /// <param name="FirstUsable"></param>
-        /// <param name="LastUsable"></param>
+        /// <param name="FirstUsable">127.0.0.1</param>
+        /// <param name="LastUsable">127.0.0.254</param>
         public static CidrToIPv4 IPv4ToRange(string FirstUsable, string LastUsable = null)
         {
             if (LastUsable == null)
@@ -86,7 +86,7 @@ namespace ISPCore.Engine.Network
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="LastUsable"></param>
+        /// <param name="FirstUsable"></param>
         public static string IPv6ToRegex(string FirstUsable)
         {
             return Regex.Replace(FirstUsable, "::$", ":");
@@ -98,8 +98,8 @@ namespace ISPCore.Engine.Network
         /// Проверка IPv4
         /// </summary>
         /// <param name="IP">IPv4/6</param>
-        /// <param name="mass"></param>
-        /// <param name="FirstUsable"></param>
+        /// <param name="mass">Массив числовых значений</param>
+        /// <param name="FirstUsable">Найденное совпадение из массива</param>
         public static bool CheckToIPv4(string IP, List<CidrToIPv4> mass, out ulong FirstUsable)
         {
             if (ConvertIPv4(IP, out ulong val))
@@ -112,11 +112,11 @@ namespace ISPCore.Engine.Network
 
         #region ConvertIPv4
         /// <summary>
-        /// Конверт IPv4 в ulong
+        /// Конверт IPv4 в числовое значение
         /// </summary>
         /// <param name="ip">IPv4</param>
-        /// <param name="val">ulong</param>
-        public static bool ConvertIPv4(string ip, out ulong val)
+        /// <param name="val">Числовое значение</param>
+        static bool ConvertIPv4(string ip, out ulong val)
         {
             StringBuilder res = new StringBuilder();
             foreach (var item in ip.Split('.'))
@@ -143,11 +143,11 @@ namespace ISPCore.Engine.Network
 
         #region BinarySearch
         /// <summary>
-        /// 
+        /// Бинарный поиск
         /// </summary>
-        /// <param name="val"></param>
-        /// <param name="arr"></param>
-        /// <param name="FirstUsable"></param>
+        /// <param name="val">Числовое значение IP-адреса</param>
+        /// <param name="arr">Массив числовых значений</param>
+        /// <param name="FirstUsable">Найденное совпадение из массива</param>
         private static bool BinarySearch(ulong val, List<CidrToIPv4> arr, out ulong FirstUsable)
         {
             FirstUsable = 0;

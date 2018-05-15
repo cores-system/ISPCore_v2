@@ -663,6 +663,10 @@ namespace ISPCore.Engine.FileManager
             return mappings;
         }
 
+        /// <summary>
+        /// Получить Content-Type
+        /// </summary>
+        /// <param name="extension">Расширение файла</param>
         public static string GetMimeType(string extension)
         {
             if (!extension.StartsWith("."))

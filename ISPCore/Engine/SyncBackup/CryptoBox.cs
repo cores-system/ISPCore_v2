@@ -5,19 +5,27 @@ using System.Security.Cryptography;
 using System.Text;
 using ISPCore.Engine.Base;
 using ISPCore.Engine.Hash;
-using ISPCore.Models.SyncBackup;
 
 namespace ISPCore.Engine.SyncBackup
 {
     public class CryptoBox : IDisposable
     {
+        #region CryptoBox
         string PasswdAES;
         string LocalFile, tmpFile;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_PasswdAES">Пароль шифрования</param>
+        /// <param name="_localFile">Исходный файл</param>
+        /// <param name="_tmpFile">Где создать зашифрованный/расшифрованный файл</param>
         public CryptoBox(string _PasswdAES, string _localFile, string _tmpFile = null) {
             PasswdAES = _PasswdAES;
             LocalFile = _localFile;
             tmpFile = _tmpFile;
         }
+        #endregion
 
         #region GetAES
         Aes GetAES()
@@ -81,7 +89,7 @@ namespace ISPCore.Engine.SyncBackup
 
         #region Decrypt
         /// <summary>
-        /// 
+        /// Расшифровка файла 
         /// </summary>
         /// <param name="error">Данные ошибки</param>
         public bool Decrypt(out string error)

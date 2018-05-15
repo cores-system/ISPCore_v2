@@ -28,6 +28,7 @@ namespace ISPCore.Engine.RequestsFilter.Access
         }
         #endregion
 
+        #region Add
         /// <summary>
         /// Добавить информацию и новом доступе
         /// </summary>
@@ -64,8 +65,9 @@ namespace ISPCore.Engine.RequestsFilter.Access
             // Сохраняем базу
             Save();
         }
+        #endregion
 
-
+        #region Remove
         /// <summary>
         /// Удалить ключ из базы
         /// </summary>
@@ -82,8 +84,9 @@ namespace ISPCore.Engine.RequestsFilter.Access
                 Save();
             }
         }
+        #endregion
 
-
+        #region List
         /// <summary>
         /// Список IP адресов с разрешенным доступом
         /// </summary>
@@ -95,8 +98,9 @@ namespace ISPCore.Engine.RequestsFilter.Access
 
             return mass;
         }
+        #endregion
 
-
+        #region Clear
         /// <summary>
         /// Очистка базы
         /// </summary>
@@ -111,12 +115,15 @@ namespace ISPCore.Engine.RequestsFilter.Access
                 // Удаляем ненужные Value
                 foreach (var item in db)
                 {
+                    #region Trigger
                     foreach (var val in item.Value)
                     {
                         if (DateTime.Now > val.Expires)
                             Trigger.OnRemove((val.IP, val.host, val.accessType));
                     }
+                    #endregion
 
+                    // Удаляем записи
                     item.Value.RemoveAll(i => i.Expires < DateTime.Now);
                     if (item.Value.Count == 0)
                         keyRemove.Add(item.Key);
@@ -131,5 +138,6 @@ namespace ISPCore.Engine.RequestsFilter.Access
                 Save();
             }
         }
+        #endregion
     }
 }

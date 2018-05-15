@@ -3,7 +3,7 @@
     public class Subscription
     {
         /// <summary>
-        /// core.CheckLink
+        /// core.CheckRequest
         /// </summary>
         public string TrigerPath { get; set; }
 
