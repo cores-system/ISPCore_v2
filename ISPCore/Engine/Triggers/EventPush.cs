@@ -1,11 +1,13 @@
 ﻿using ISPCore.Engine.Base;
 using ISPCore.Models.Triggers;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -95,7 +97,10 @@ namespace ISPCore.Engine.Triggers
 
                 if (!memoryCache.TryGetValue(memKey, out (ScriptRunner<bool> Runner, DateTime LastUpdateFile) cache) || cache.LastUpdateFile != LastUpdateFile)
                 {
-                    var scriptOptions = ScriptOptions.Default.AddImports(tg.Namespaces);
+                    var scriptOptions = ScriptOptions.Default
+                        .AddReferences(tg.References.Select(name => $"{Folders.DLL}/{name}"))
+                        .AddImports(tg.Namespaces);
+                    
                     var script = CSharpScript.Create<bool>(tg.code, options: scriptOptions, globalsType: typeof(GenScript));
                     script.Compile();
                     runner = script.CreateDelegate();

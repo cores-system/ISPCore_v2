@@ -5,6 +5,11 @@ namespace ISPCore.Models.Triggers
     public class Trigger
     {
         /// <summary>
+        /// Имя
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Условие
         /// </summary>
         public string code { get; set; }
@@ -13,6 +18,11 @@ namespace ISPCore.Models.Triggers
         /// System, System.IO
         /// </summary>
         public List<string> Namespaces { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Newtonsoft.Json.dll
+        /// </summary>
+        public List<string> References { get; set; } = new List<string>();
 
         /// <summary>
         /// Что делать дальше
