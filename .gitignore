@@ -33,6 +33,7 @@ ISPCore/core/Log/
 ISPCore/core/passwd/
 ISPCore/core/sync/
 ISPCore/core/tmp/
+ISPCore/core/Databases/Triggers/
 ISPCore/core/av/progress_id-*.json
 ISPCore/core/Databases/ISPCore.db
 ISPCore/core/Databases/ISPCore.json
