@@ -61,6 +61,18 @@ namespace ISPCore.Engine.Base
 
                         return FileName;
                     }
+                case ActionStyle.blueprint:
+                    {
+                        var res = GetHashAndFileName($"{Folders.Style}/blueprint/js");
+                        string FileName = $"{res.hash}.blueprint.js";
+                        string FilePath = $"{Folders.Style}/generate/{FileName}";
+                        if (!File.Exists(FilePath)) {
+                            GenerateToFile(FilePath, res.files, $"*.blueprint.js");
+                            File.WriteAllText($"{Folders.Style}/generate/blueprint.js", File.ReadAllText(FilePath));
+                        }
+
+                        return FileName;
+                    }
             }
 
             return "";
@@ -72,7 +84,7 @@ namespace ISPCore.Engine.Base
                 StringBuilder tmpHash = new StringBuilder();
                 List<string> tmp_Files = new List<string>() { Capacity = 60 };
 
-                foreach (var IntFile in Directory.GetFiles(path, "*.*", SearchOption.TopDirectoryOnly))
+                foreach (var IntFile in Directory.GetFiles(path, "*.*", SearchOption.AllDirectories))
                 {
                     tmp_Files.Add(IntFile);
                     tmpHash.Append(IntFile + File.GetLastWriteTime(IntFile).ToBinary().ToString());
@@ -113,5 +125,6 @@ namespace ISPCore.Engine.Base
         css,
         js,
         jsLib,
+        blueprint
     }
 }

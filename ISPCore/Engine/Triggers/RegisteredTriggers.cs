@@ -47,8 +47,14 @@ namespace ISPCore.Engine.Triggers
                             // Отписываем текущие триггеры
                             foreach (var subs in cache.Subscriptions)
                             {
-                                if (dbEvents.TryGetValue(FileName + subs.StepId, out (EventInfo eventInfo, Object target, Delegate handler) data))
-                                    data.eventInfo.RemoveEventHandler(data.target, data.handler);
+                                foreach (string StepId in subs.Value.StepIds.Split(','))
+                                {
+                                    if (string.IsNullOrWhiteSpace(StepId))
+                                        continue;
+
+                                    if (dbEvents.TryGetValue(FileName + StepId, out (EventInfo eventInfo, Object target, Delegate handler) data))
+                                        data.eventInfo.RemoveEventHandler(data.target, data.handler);
+                                }
                             }
 
                             // Подписываем новый триггер 
@@ -77,21 +83,26 @@ namespace ISPCore.Engine.Triggers
                 // Обрабатываем подписки
                 foreach (var subs in triggerConf.Subscriptions)
                 {
-                    // Ищем нужный event
-                    EventInfo eventInfo = Assembly.GetExecutingAssembly().GetType($"ISPCore.Models.Triggers.Events.{subs.TrigerPath}").GetEvent(subs.TrigerName);
+                    foreach (string StepId in subs.Value.StepIds.Split(','))
+                    {
+                        if (string.IsNullOrWhiteSpace(StepId))
+                            continue;
 
-                    // Создаем делегат EventPush
-                    MethodInfo EventPushMethod = typeof(EventPush).GetMethod("EventHandler", BindingFlags.NonPublic | BindingFlags.Instance);
-                    Delegate handler = Delegate.CreateDelegate(eventInfo.EventHandlerType, new EventPush(triggerConf, subs), EventPushMethod);
+                        // Ищем нужный event
+                        EventInfo eventInfo = Assembly.GetExecutingAssembly().GetType($"ISPCore.Models.Triggers.Events.{subs.Value.TrigerPath}").GetEvent(subs.Value.TrigerName);
 
-                    // Подписываемся на события
-                    object target = Activator.CreateInstance(Assembly.GetExecutingAssembly().GetType($"ISPCore.Models.Triggers.Events.{subs.TrigerPath}"));
-                    eventInfo.AddEventHandler(target, handler);
+                        // Создаем делегат EventPush
+                        MethodInfo EventPushMethod = typeof(EventPush).GetMethod("EventHandler", BindingFlags.NonPublic | BindingFlags.Instance);
+                        Delegate handler = Delegate.CreateDelegate(eventInfo.EventHandlerType, new EventPush(triggerConf, subs.Value), EventPushMethod);
 
-                    // Сохраняем Event для отписки
-                    var data = (eventInfo, target, handler);
-                    dbEvents.AddOrUpdate(Path.GetFileName(triggerConf.TriggerFile) + subs.StepId, data, (s, e) => data);
+                        // Подписываемся на события
+                        object target = Activator.CreateInstance(Assembly.GetExecutingAssembly().GetType($"ISPCore.Models.Triggers.Events.{subs.Value.TrigerPath}"));
+                        eventInfo.AddEventHandler(target, handler);
 
+                        // Сохраняем Event для отписки
+                        var data = (eventInfo, target, handler);
+                        dbEvents.AddOrUpdate(Path.GetFileName(triggerConf.TriggerFile) + StepId, data, (s, e) => data);
+                    }
                 }
             }
             catch (Exception ex) {
@@ -145,8 +156,14 @@ namespace ISPCore.Engine.Triggers
             // Отписываем текущие триггеры
             foreach (var subs in triggerConf.Subscriptions)
             {
-                if (dbEvents.TryGetValue(Path.GetFileName(triggerConf.TriggerFile) + subs.StepId, out (EventInfo eventInfo, Object target, Delegate handler) data))
-                    data.eventInfo.RemoveEventHandler(data.target, data.handler);
+                foreach (string StepId in subs.Value.StepIds.Split(','))
+                {
+                    if (string.IsNullOrWhiteSpace(StepId))
+                        continue;
+
+                    if (dbEvents.TryGetValue(Path.GetFileName(triggerConf.TriggerFile) + StepId, out (EventInfo eventInfo, Object target, Delegate handler) data))
+                        data.eventInfo.RemoveEventHandler(data.target, data.handler);
+                }
             }
         }
         #endregion

@@ -77,8 +77,8 @@ namespace ISPCore.Controllers
                 // Обновляем базу
                 RegisteredTriggers.UpdateDB();
 
-                // Отдаем сообщение и Id новых алиасов
-                return Json(new Text("Настройки триггера сохранены"));
+                // Отдаем сообщение
+                return Json(new Text("Настройки успешно сохранены"));
             }
         }
         #endregion

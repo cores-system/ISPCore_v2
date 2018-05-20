@@ -5,9 +5,14 @@ namespace ISPCore.Models.Triggers
     public class Trigger
     {
         /// <summary>
-        /// Имя
+        /// Отображаемое имя
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Позиция обьекта
+        /// </summary>
+        public Position position { get; set; } = new Position();
 
         /// <summary>
         /// Условие
@@ -27,7 +32,7 @@ namespace ISPCore.Models.Triggers
         /// <summary>
         /// Что делать дальше
         /// </summary>
-        public ReturnType returnType { get; set; }
+        public ReturnType returnType => string.IsNullOrWhiteSpace(NextSteps) ? ReturnType.exit : ReturnType.NextStep;
 
         /// <summary>
         /// Ссылки на следующие условия

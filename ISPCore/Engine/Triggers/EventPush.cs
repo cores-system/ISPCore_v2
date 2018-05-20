@@ -65,9 +65,15 @@ namespace ISPCore.Engine.Triggers
                     model.SetValue(TrigerAttributes[i], tuple[i]);
                 }
 
-                // Выполняем тригер
-                if (RunTrigger(triggerConf.Id, triggerConf.LastUpdateFile, model, triggerConf.Trigger, subs.StepId))
-                    triggerConf.LastRunToSuccess = DateTime.Now;
+                // Выполняем тригеры
+                foreach (string StepId in subs.StepIds.Split(','))
+                {
+                    if (string.IsNullOrWhiteSpace(StepId))
+                        continue;
+
+                    if (RunTrigger(triggerConf.Id, triggerConf.LastUpdateFile, model, triggerConf.Trigger, StepId))
+                        triggerConf.LastRunToSuccess = DateTime.Now;
+                }
             }
             catch (Exception ex) {
                 File.AppendAllText(Folders.File.TriggerErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");

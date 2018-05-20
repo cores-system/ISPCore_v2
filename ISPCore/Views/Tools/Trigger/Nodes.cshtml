@@ -1,0 +1,107 @@
+﻿@using ISPCore.Engine.Base
+@model string
+
+@{
+    int Id = (int)ViewData["Id"];
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+<script type="text/javascript">
+    var NodeId = '@Id';
+    var BlueprintData = @Html.Raw(Model);
+</script>
+
+<link rel="stylesheet" href="/style/blueprint/css/program.css" type="text/css" />
+<script type="text/javascript" src="/style/blueprint/classes/arrays.js"></script>
+<script type="text/javascript" src="/style/blueprint/classes/event.js"></script>
+<script type="text/javascript" src="/style/generate/@Generate.Style(ActionStyle.blueprint)"></script>
+
+<script src="/style/blueprint/ace/ace.jgz" type="text/javascript" charset="utf-8"></script>
+<script src="/style/blueprint/ace/theme-crimson_editor.jgz" type="text/javascript" charset="utf-8"></script>
+<script src="/style/blueprint/ace/mode-csharp.jgz" type="text/javascript" charset="utf-8"></script>
+
+
+<div class="wrapper wrapper-page-title">
+
+    <div class="page-subtitle margin-bottom-0">
+        <button class="btn btn-success t_right margin-left-10" id="blueprint-save">Сохранить изменения</button>
+        <h3>Настройка условий</h3>
+        <p>Расширьте возможности программы</p>
+    </div>
+
+    @if (Id != 0)
+    {
+        @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "TriggerId", Id }, { "NavigationTab", "Nodes" } })
+    }
+
+    <div class="modal fade" id="modal-editor" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Логика</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="ace-editor-code" style="height: 400px"></div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-bottom: 0px">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="ace-editor-save">Сохранить изменения</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper wrapper-white" style="padding: 0px 5px 0px">
+        <div class="row">
+            <div class="tab-pane active row" id="tab-site">
+                <div class="col-md-12">
+
+                    <div class="blueprint-container">
+                        <div id="blueprint-blueprints"></div>
+                        <div class="blueprint-option">
+                            <div id="blueprint-node-option"></div>
+
+                            
+                        </div>
+                    </div>
+
+                    <div class="blueprint-process">
+                        <div class="blueprint-process-content">
+                            <div class="blueprint-process-title">Процесс 10 из 100</div>
+                            <div class="blueprint-process-bar">
+                                <div class="blueprint-process-bar-inside"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="blueprint-menu" id="blueprint-menu">
+                        <div class="blueprint-menu-search">
+                            <div class="form-input">
+                                <input type="text" placeholder="Search">
+                            </div>
+                        </div>
+                        <div class="blueprint-menu-container">
+                            <ul class="blueprint-menu-list"></ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    Blueprint.Initialization.program();
+</script>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)
+

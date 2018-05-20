@@ -30,7 +30,7 @@ namespace ISPCore.Models.Triggers
         /// <summary>
         /// Подписки
         /// </summary>
-        public List<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+        public Dictionary<string, Subscription> Subscriptions { get; set; } = new Dictionary<string, Subscription>();
 
         /// <summary>
         /// Условия триггера

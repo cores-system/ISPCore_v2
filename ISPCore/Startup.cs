@@ -27,6 +27,7 @@ using ISPCore.Models.Command_Line;
 using ModelIPtables = ISPCore.Models.Security.IPtables;
 using ISPCore.Engine.Security;
 using ISPCore.Engine.Triggers;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace ISPCore
 {
@@ -191,8 +192,14 @@ namespace ISPCore
             Engine.Security.IPtables.UpdateCacheToUserAgent();
             #endregion
 
-            // Статичиские файлы
-            app.UseStaticFiles();
+            #region Статичиские файлы
+            var provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".jgz"] = "application/javascript";
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ContentTypeProvider = provider
+            });
+            #endregion
 
             #region IP-адрес клиента
             app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -640,7 +647,8 @@ namespace ISPCore
                 routes.MapRoute(null, "trigger/export", new { controller = "ToolsToTriggerSettings", action = "Export" });
                 routes.MapRoute(null, "trigger/import", new { controller = "ToolsToTriggerSettings", action = "Import" });
 
-                routes.MapRoute(null, "trigger/node", new { controller = "ToolsToTriggerNode", action = "Index" });
+                routes.MapRoute(null, "trigger/nodes", new { controller = "ToolsToTriggerNodes", action = "Index" });
+                routes.MapRoute(null, "trigger/nodes/save", new { controller = "ToolsToTriggerNodes", action = "Save" });
             });
             #endregion
 
