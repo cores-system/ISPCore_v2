@@ -38,7 +38,7 @@
         /// <summary>
         /// Автоматическое обновление ISPCore
         /// </summary>
-        public bool AutoUpdate { get; set; } = true;
+        public bool AutoUpdate { get; set; }
 
         /// <summary>
         /// Режим дебага

@@ -15,6 +15,8 @@
 
     <link rel="icon" href="/img/ico.png" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="/style/generate/@Generate.Style(ActionStyle.css)">
+    <script type="text/javascript" src="/style/jquery.min.jgz"></script>
+    <script type="text/javascript" src="/style/old/js/sl.js"></script>
 
     <style>
         .dev-page {
@@ -39,11 +41,10 @@
                         </div>
                         <div class="form-group text-center">
                             <div class="col-md-8 col-md-offset-2">
-                                <button class="btn btn-danger btn-block login">Продолжить</button>
+                                <button id="login" class="btn btn-danger btn-block login">Продолжить</button>
                             </div>
                         </div>
                     </div>
-                    <p style="color: #E74E40; display: none; text-align: center;" class="error">Ошибка</p>
 
                     <div class="basement">
                         © 2018 <strong>ISPCore</strong>. All rights reserved.
@@ -53,19 +54,17 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="/style/jquery.min.jgz"></script>
 
     <script>
-        $('.login').click(function (e) {
+        $('.login').click(function (e)
+        {
             e.preventDefault();
 
-            $.post('/auth/confirm/unlock', $('#form').serializeArray(), function (data) {
-                var json = JSON.parse(JSON.stringify(data));
-
-                if (json.msg) $('.error').show().text(json.msg);
-                else if (json.result) window.location = window.location.origin;
-                else $('.error').show().text('Неизвестная ошибка');
-
+            $('#login').sl('load', '/auth/confirm/unlock', { back: false, ignore: true, data: $('#form').serializeArray(), dataType: 'json' }, function (json)
+            {
+                if (json.msg) $.sl('info', json.msg)
+                else if (json.result) window.location = window.location.href;
+                else $.sl('info', 'Ошибка авторизации');
             })
         })
     </script>
