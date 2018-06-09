@@ -24,6 +24,13 @@ namespace ISPCore.Controllers
             return View("~/Views/Tools/Trigger/Base.cshtml", RegisteredTriggers.List().Where(i => i.Id == Id).FirstOrDefault());
         }
 
+        public IActionResult FAQ(bool ajax, int Id = 0)
+        {
+            ViewData["Id"] = Id;
+            ViewData["ajax"] = ajax;
+            return View("~/Views/Tools/Trigger/FAQ.cshtml");
+        }
+
         #region Save
         [HttpPost]
         public JsonResult Save(TriggerConf tgr, bool IsAPI = false)

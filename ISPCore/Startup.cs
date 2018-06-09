@@ -642,6 +642,7 @@ namespace ISPCore
                 routes.MapRoute(null, "triggers", new { controller = "ToolsToTriggers", action = "Index" });
 
                 routes.MapRoute(null, "trigger", new { controller = "ToolsToTriggerSettings", action = "Index" });
+                routes.MapRoute(null, "trigger/faq", new { controller = "ToolsToTriggerSettings", action = "FAQ" });
                 routes.MapRoute(null, "trigger/save", new { controller = "ToolsToTriggerSettings", action = "Save" });
                 routes.MapRoute(null, "trigger/remove", new { controller = "ToolsToTriggerSettings", action = "Remove" });
                 routes.MapRoute(null, "trigger/export", new { controller = "ToolsToTriggerSettings", action = "Export" });

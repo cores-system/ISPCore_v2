@@ -1,0 +1,80 @@
+﻿@using ISPCore.Engine.Common.Views
+@model ISPCore.Models.Triggers.TriggerConf
+
+@{
+    int Id = (int)ViewData["Id"];
+    if ((bool)ViewData["ajax"])
+    {
+        Layout = null;
+    }
+}
+
+<div class="wrapper wrapper-page-title">
+    <div class="page-subtitle margin-bottom-0">
+        <h3>FAQ</h3>
+    </div>
+
+    <form id="form" method="POST">
+        <input type="hidden" name="tgr.Id" value="@Id" />
+
+        @if (Id != 0)
+        {
+            @Html.Partial("Common/Navigation.cshtml", new ViewDataDictionary(ViewData) { { "TriggerId", Id }, { "NavigationTab", "Faq" } })
+        }
+
+        <div class="wrapper wrapper-white">
+            <div class="row">
+                <div class="tabs">
+                    <div class="tab-pane row" id="tab-faq">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 col-md-offset-3">
+
+                                    <div id="dev-faq-form">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="dev-faq-keyword" placeholder="Search...">
+                                                <div class="input-group-btn">
+                                                    <span class="btn btn-default" id="dev-faq-search"><i class="fa fa-search"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p id="dev-faq-search-result"></p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="faq">
+                                <h2><i class="fa fa-cubes"></i>Список условий</h2>
+
+                                <div class="faq-item">
+                                    <div class="faq-title"><span class="fa fa-angle-down"></span>События</div>
+                                    <div class="faq-text">
+                                        <h5>Список событий</h5>
+                                        <p>https://github.com/cores-system/ISPCore/tree/master/ISPCore/Models/Triggers/Events</p>
+
+                                        <br />
+                                        <h5>Подписка</h5>
+                                        <p>
+                                            1) Категория триггера - Берется путь с namespace и имя класса<br />
+                                            2) Имя триггера - Событие "event EventHandler<ITuple>" в классе
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@ISPCore.Engine.Common.Views.ButtonTo.Refresh(Context)
+@ISPCore.Engine.Common.Views.JavaScriptTo.pushState(Context)
+

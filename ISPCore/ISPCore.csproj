@@ -64,4 +64,10 @@
     <Folder Include="Views\Common\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Tools\Trigger\FAQ.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>
