@@ -75,19 +75,6 @@ namespace ISPCore.Controllers
                 return Json(new Text("Отметка бэкапа имеет неправильный формат"));
             #endregion
 
-            #region Добовляем задание в WorkNote
-            CancellationToken cancellationToken = new CancellationToken();
-            var WorkNoteNotation = new Notation()
-            {
-                TaskId = task.Id,
-                Category = "Восстановление",
-                Msg = $"Задание: {task.Description}",
-                Time = DateTime.Now,
-                More = new List<More>() { new More("Состояние", "Выполняется поиск всех папок") }
-            };
-            CoreDB.SyncBackupWorkNote.Add(WorkNoteNotation, cancellationToken);
-            #endregion
-
             // Искать файлы только в текущем каталоге
             bool SearchToCurrentDirectory = false;
             if (nameAndValue.TryGetValue("SearchOption", out string SearchOption) && SearchOption == "CurrentDirectory")
@@ -96,6 +83,19 @@ namespace ISPCore.Controllers
             // Выполняем задание в потоке
             ThreadPool.QueueUserWorkItem(ob =>
             {
+                #region Добовляем задание в WorkNote
+                CancellationToken cancellationToken = new CancellationToken();
+                var WorkNoteNotation = new Notation()
+                {
+                    TaskId = task.Id,
+                    Category = "Восстановление",
+                    Msg = $"Задание: {task.Description}",
+                    Time = DateTime.Now,
+                    More = new List<More>() { new More("Состояние", "Выполняется поиск всех папок") }
+                };
+                CoreDB.SyncBackupWorkNote.Add(WorkNoteNotation, cancellationToken);
+                #endregion
+
                 // Создание отчета по ошибкам
                 Report report = new Report(task);
 
