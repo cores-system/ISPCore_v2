@@ -14226,7 +14226,7 @@ Interactive Layer
   position: absolute;
   z-index: 3;
   height: 100%;
-  width: 300px;
+  width: 260px;
   background: #304056;
   color: #f0f4f6;
   -webkit-transition: width 200ms cubic-bezier(0.99, 0, 0.5, 0.99);
@@ -14242,7 +14242,7 @@ Interactive Layer
   width: 100%;
   height: 100%;
   min-height: 100%;
-  padding-left: 300px;
+  padding-left: 260px;
   -webkit-transition: padding 200ms cubic-bezier(0.99, 0, 0.5, 0.99);
   -moz-transition: padding 200ms cubic-bezier(0.99, 0, 0.5, 0.99);
   -ms-transition: padding 200ms cubic-bezier(0.99, 0, 0.5, 0.99);
@@ -14777,7 +14777,7 @@ Interactive Layer
 /* elements */
 .dev-page .dev-page-header .dph-logo {
   float: left;
-  width: 300px;
+  width: 260px;
   height: 55px;
   line-height: 55px;
   background: #364760;
@@ -14925,12 +14925,6 @@ Interactive Layer
 .dev-page .dev-page-header .dph-container.pull-right {
   margin-right: 0px;
   margin-left: 10px;
-}
-@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
-  .dev-page .dev-page-header .dph-logo > a {
-    background-image: url(../img/logo@2x.png);
-    background-size: 300px 55px;
-  }
 }
 @media all and (max-width: 992px) {
   .dev-page .dev-page-header {
@@ -16573,12 +16567,6 @@ table[data-sortable] th[data-sorted-direction="ascending"]:after {
 @media all and (max-width: 992px) {
   .dev-page.dev-page-login .dev-page-login-block {
     margin: 50px auto;
-  }
-}
-@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
-  .dev-page.dev-page-login .dev-page-login-block__logo {
-    background-image: url(../img/logo@2x.png);
-    background-size: 300px 55px;
   }
 }
 /* variables */
