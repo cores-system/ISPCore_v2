@@ -65,6 +65,61 @@
                                     </div>
                                 </div>
 
+                                <h2><i class="fa fa-cubes"></i>Доступные методы</h2>
+
+                                <div class="faq-item">
+                                    <div class="faq-title"><span class="fa fa-angle-down"></span>Получить/Записать значение</div>
+                                    <div class="faq-text">
+                                        <h5>Получить</h5>
+                                        <p>GetValue<T>(string key)</p>
+
+                                        <h5>Записать</h5>
+                                        <p>SetValue(string key, object ob)</p>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-title"><span class="fa fa-angle-down"></span>Invoke</div>
+                                    <div class="faq-text">
+                                        <p>
+                                            Invoke.Bash(string s)<br />
+                                            Invoke.API("/add/whitelist", "type=PTR", "value=127.0.0.1")<br />
+                                            Invoke.BrowserGet(url, "arg1=ok", "arg2=false")<br />
+                                            Invoke.BrowserPost(url, "arg1=ok", "arg2=false")
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-title"><span class="fa fa-angle-down"></span>Отправка уведомлений</div>
+                                    <div class="faq-text">
+                                        <p>
+                                            SendTo.Telegram(int chatId, string msg)<br />
+                                            SendTo.Email(string email, string subject, string message)<br />
+                                            SendTo.Sms(string phone, string text)
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="faq-item">
+                                    <div class="faq-title"><span class="fa fa-angle-down"></span>Memory Cache</div>
+                                    <div class="faq-text">
+                                        <p>
+                                            memoryCache.Get<T>(string key)<br />
+                                            memoryCache.Set(string key, object ob, int seconds)<br />
+                                            memoryCache.Contains(string key)
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <h2><i class="fa fa-cubes"></i>Дополнительно</h2>
+
+                                <div class="faq-item">
+                                    <div class="faq-title"><span class="fa fa-angle-down"></span>Использование dll</div>
+                                    <div class="faq-text">
+                                        <p>DLL библиотеки загруженные в "/core/dll" доступны для всех триггеров.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
