@@ -68,8 +68,7 @@ namespace ISPCore.Controllers.core.Gen
 {
     setTimeout(function()
     {
-	    HubConnection = new signalR.HttpConnection('" + CoreApiUrl + @"/AntiBotHub');
-	    Hub = new signalR.HubConnection(HubConnection);
+        Hub = new signalR.HubConnectionBuilder().withUrl('" + CoreApiUrl + @"/AntiBotHub').build();
 
 	    Hub.on('OnCookie', function(cookie, HourToCookie) 
 	    {

@@ -63,8 +63,7 @@
         {
             setTimeout(function()
             {
-	            HubConnection = new signalR.HttpConnection('{isp:CoreApiUrl}/AntiBotHub');
-	            Hub = new signalR.HubConnection(HubConnection);
+				Hub = new signalR.HubConnectionBuilder().withUrl('{isp:CoreApiUrl}/AntiBotHub').build();
 
                 Hub.on('OnError', function(error) 
                 {

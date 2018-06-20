@@ -145,9 +145,14 @@ namespace ISPCore
         }
 
 
+        static DateTime StartCronTime = DateTime.Now;
+
         #region CronSeconds
         public static void CronSeconds(object ob)
         {
+            if (StartCronTime > DateTime.Now.AddMinutes(-1))
+                return;
+
             try
             {
                 // Триггер
@@ -168,7 +173,11 @@ namespace ISPCore
             }
             catch (Exception ex)
             {
-                File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
+                try
+                {
+                    File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
+                }
+                catch { }
             }
         }
         #endregion
@@ -176,6 +185,9 @@ namespace ISPCore
         #region CronMinutes
         public static void CronMinutes(object ob)
         {
+            if (StartCronTime > DateTime.Now.AddMinutes(-1))
+                return;
+
             try
             {
                 using (CoreDB coreDB = Service.Get<CoreDB>())
@@ -206,7 +218,11 @@ namespace ISPCore
             }
             catch (Exception ex)
             {
-                File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
+                try
+                {
+                    File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
+                }
+                catch { }
             }
         }
         #endregion
