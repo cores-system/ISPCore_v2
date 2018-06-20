@@ -350,11 +350,7 @@ namespace ISPCore.Engine.Base.SqlAndCache
             }
             catch (Exception ex)
             {
-                try
-                {
-                    File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
-                }
-                catch { }
+                Log.Write(Folders.File.SystemErrorLog, ex.ToString());
             }
 
             IsWriteLogToSqlRun = false;

@@ -173,11 +173,7 @@ namespace ISPCore
             }
             catch (Exception ex)
             {
-                try
-                {
-                    File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
-                }
-                catch { }
+                Log.Write(Folders.File.SystemErrorLog, ex.ToString());
             }
         }
         #endregion
@@ -218,11 +214,7 @@ namespace ISPCore
             }
             catch (Exception ex)
             {
-                try
-                {
-                    File.AppendAllText(Folders.File.SystemErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
-                }
-                catch { }
+                Log.Write(Folders.File.SystemErrorLog, ex.ToString());
             }
         }
         #endregion

@@ -76,7 +76,7 @@ namespace ISPCore.Engine.Triggers
                 }
             }
             catch (Exception ex) {
-                File.AppendAllText(Folders.File.TriggerErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
+                Log.Write(Folders.File.TriggerErrorLog, ex.ToString());
             }
         }
         #endregion
@@ -141,7 +141,7 @@ namespace ISPCore.Engine.Triggers
             }
             catch (Exception ex)
             {
-                File.AppendAllText(Folders.File.TriggerErrorLog, ex.ToString() + "\n\n=======================================================================\n\n");
+                Log.Write(Folders.File.TriggerErrorLog, ex.ToString());
                 return false;
             }
         }
