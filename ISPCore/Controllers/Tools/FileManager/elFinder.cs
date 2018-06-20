@@ -2,8 +2,8 @@
 using System;
 using System.IO;
 using ISPCore.Engine.Base;
+using System.Threading.Tasks;
 using ISPCore.Engine.FileManager;
-using ISPCore.Models.Base;
 
 namespace ISPCore.Controllers
 {
@@ -15,16 +15,16 @@ namespace ISPCore.Controllers
             return View("~/Views/Tools/FileManager/elFinder.cshtml");
         }
 
-        public virtual IActionResult Сonnector()
+        public async Task<IActionResult> Connector()
         {
             var connector = GetConnector();
-            return connector.Process(HttpContext.Request);
+            return await connector.ProcessAsync(Request);
         }
-        
-        public IActionResult Thumbs(string hash)
+
+        async public Task<IActionResult> Thumbs(string hash)
         {
             var connector = GetConnector();
-            return connector.GetThumbnail(HttpContext.Request, HttpContext.Response, hash);
+            return await connector.GetThumbnailAsync(HttpContext.Request, HttpContext.Response, hash);
         }
 
         public IActionResult Target(string targetfile)
@@ -40,23 +40,22 @@ namespace ISPCore.Controllers
         private Connector GetConnector()
         {
             var driver = new FileSystemDriver();
-            driver.IsUnix = Platform.Get == PlatformOS.Unix;
 
-            var root = new elFinder.NetCore.Root(
-                new DirectoryInfo(DirectoryRoot),
+            var root = new elFinder.NetCore.RootVolume(
+                DirectoryRoot,
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/target/",
                 $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}/file-manager/thumb/")
             {
-                IsReadOnly = Platform.IsDemo, // Can be readonly according to user's membership permission
-                //Alias = "elFinder", // Beautiful name given to the root/home folder
+                IsReadOnly = Platform.IsDemo,
+                Alias = "elFinder", // Beautiful name given to the root/home folder
                 MaxUploadSizeInKb = 200000, // Limit imposed to user uploaded file <= 200000 KB / 2GB
                 //LockedFolders = new List<string>(new string[] { "Folder1" })
-                IsUnix = Platform.Get == PlatformOS.Unix
             };
 
             driver.AddRoot(root);
 
             return new Connector(driver);
+
         }
 
 
@@ -65,7 +64,7 @@ namespace ISPCore.Controllers
             get
             {
                 if (Platform.IsDebug)
-                    return "C:/Users/htc/Desktop/test";
+                    return @"C:\Users\htc\Desktop\test";
 
                 if (Platform.IsDemo)
                     return "/home/demo/elFinder";

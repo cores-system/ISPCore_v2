@@ -631,7 +631,7 @@ namespace ISPCore
             {
                 routes.MapRoute(null, "file-manager", new { controller = "ToolsToFileManager", action = "Index" });
                 routes.MapRoute(null, "file-manager/target/{targetfile}", new { controller = "ToolsToFileManager", action = "Target" });
-                routes.MapRoute(null, "file-manager/connector", new { controller = "ToolsToFileManager", action = "Сonnector" });
+                routes.MapRoute(null, "file-manager/connector", new { controller = "ToolsToFileManager", action = "Connector" });
                 routes.MapRoute(null, "file-manager/thumb/{hash}", new { controller = "ToolsToFileManager", action = "Thumbs" });
             });
             #endregion

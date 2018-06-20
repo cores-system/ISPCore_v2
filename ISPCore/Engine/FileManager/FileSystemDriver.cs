@@ -1,13 +1,17 @@
-﻿using ISPCore.Models.FileManager;
+﻿using elFinder.NetCore;
+using elFinder.NetCore.Models;
+using elFinder.NetCore.Models.Commands;
+using ISPCore.Models.FileManager;
 using ISPCore.Models.FileManager.Response;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ISPCore.Engine.FileManager
 {
-    public class FileSystemDriver : elFinder.NetCore.FileSystemDriver
+    public class FileSystemDriver : elFinder.NetCore.Drivers.FileSystem.FileSystemDriver
     {
         #region Json/GetEncoding
         /// <summary>
@@ -15,7 +19,7 @@ namespace ISPCore.Engine.FileManager
         /// </summary>
         /// <param name="ob">Данные для конверта</param>
         /// <param name="charset">Кодировка</param>
-        private JsonResult Json(object ob, string charset = null) => new JsonResult(ob) { ContentType = $"text/html{(charset != null ? $"; charset={charset}" : "" )}" };
+        private JsonResult Json(object ob, string charset = null) => new JsonResult(ob) { ContentType = $"text/html{(charset != null ? $"; charset={charset}" : "")}" };
 
         /// <summary>
         /// Поток кодировки
@@ -36,12 +40,10 @@ namespace ISPCore.Engine.FileManager
         /// </summary>
         /// <param name="target">Цель в формате elFinder</param>
         /// <param name="conv">Кодировка</param>
-        public JsonResult GetAsync(string target, string conv)
+        public async Task<JsonResult> GetAsync(FullPath path, string conv)
         {
-            var fullPath = ParsePath(target);
-            var response = new GetResponseModel();
-            
-            using (var reader = new StreamReader(fullPath.File.OpenRead(), GetEncoding(conv)))
+            var response = new Models.FileManager.Response.GetResponseModel();
+            using (var reader = new StreamReader(await path.File.OpenReadAsync(), GetEncoding(conv)))
             {
                 response.Encoding = conv;
                 response.Content = reader.ReadToEnd();
@@ -58,20 +60,17 @@ namespace ISPCore.Engine.FileManager
         /// <param name="target">Цель в формате elFinder</param>
         /// <param name="content">Текст</param>
         /// <param name="conv">Кодировка</param>
-        public JsonResult PutAsync(string target, string content, string conv)
+        async public Task<JsonResult> PutAsync(FullPath path, string content, string conv)
         {
-            var fullPath = ParsePath(target);
             var response = new ChangedResponseModel();
-
-            using (var fileStream = new FileStream(fullPath.File.FullName, FileMode.Create))
+            using (var fileStream = new FileStream(path.File.FullName, FileMode.Create))
             {
                 using (var writer = new StreamWriter(fileStream, GetEncoding(conv)))
                 {
                     writer.Write(content);
                 }
             }
-
-            response.Changed.Add((FileModel)BaseModel.Create(fullPath.File, fullPath.Root));
+            response.Changed.Add((FileModel)await BaseModel.CreateAsync(this, path.File, path.RootVolume));
             return Json(response);
         }
         #endregion

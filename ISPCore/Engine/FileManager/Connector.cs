@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using elFinder.NetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,18 +16,18 @@ namespace ISPCore.Engine.FileManager
         }
 
         #region Process
-        public new IActionResult Process(HttpRequest request)
+        public new async Task<IActionResult> ProcessAsync(HttpRequest request)
         {
-            IDictionary<string, string> parameters = request.Query.Count > 0
-                ? request.Query.ToDictionary(k => k.Key, v => string.Join(";", v.Value))
-                : request.Form.ToDictionary(k => k.Key, v => string.Join(";", v.Value));
+            var parameters = request.Query.Any()
+                ? request.Query.ToDictionary(k => k.Key, v => v.Value)
+                : request.Form.ToDictionary(k => k.Key, v => v.Value);
 
             // Переопределяем логику
-            string cmd = parameters["cmd"];
+            string cmd = parameters.GetValueOrDefault("cmd");
             if (!string.IsNullOrWhiteSpace(cmd))
             {
                 string target = parameters.GetValueOrDefault("target");
-                if (string.IsNullOrWhiteSpace(target) || target.ToLower() == "null")
+                if (string.IsNullOrEmpty(target) || target.ToLower() == "null")
                     target = null;
 
                 switch (cmd)
@@ -36,12 +37,14 @@ namespace ISPCore.Engine.FileManager
                             if (target == null)
                                 return MissedParameter(cmd);
 
+                            var path = await driver.ParsePathAsync(target);
+
                             // Content Encoding
-                            if (parameters.TryGetValue("conv", out string conv) && conv != "0")
-                                return driver.GetAsync(target, conv);
+                            if (parameters.TryGetValue("conv", out var conv) && conv != "0")
+                                return await driver.GetAsync(path, conv.ToString());
 
                             // Оригинал файла
-                            return driver.GetAsync(target).Result;
+                            return await driver.GetAsync(path);
                         }
 
                     case "put":
@@ -49,53 +52,21 @@ namespace ISPCore.Engine.FileManager
                             if (target == null)
                                 return MissedParameter(cmd);
 
+                            var path = await driver.ParsePathAsync(target);
                             string content = parameters.GetValueOrDefault("content");
-                            if (string.IsNullOrWhiteSpace(target))
-                                return MissedParameter("content");
 
                             // Content Encoding
-                            if (parameters.TryGetValue("encoding", out string conv))
-                                return driver.PutAsync(target, content, conv);
+                            if (parameters.TryGetValue("encoding", out var conv))
+                                return await driver.PutAsync(path, content, conv.ToString());
 
                             // Оригинал
-                            return driver.PutAsync(target, content).Result;
+                            return await driver.PutAsync(path, content);
                         }
                 }
             }
 
             // Базовая логика
-            return base.Process(request).Result;
-        }
-        #endregion
-
-        #region GetTargetsArray
-        private IEnumerable<string> GetTargetsArray(HttpRequest request)
-        {
-            IEnumerable<string> targets = null;
-            // At the moment, request.Form is throwing an InvalidOperationException...
-            //if (request.Form.ContainsKey("targets"))
-            //{
-            //    targets = request.Form["targets"];
-            //}
-
-            IDictionary<string, string> parameters = request.Query.Count > 0
-                ? request.Query.ToDictionary(k => k.Key, v => string.Join(";", v.Value))
-                : request.Form.ToDictionary(k => k.Key, v => string.Join(";", v.Value));
-
-            if (targets == null)
-            {
-                string t = parameters.GetValueOrDefault("targets[]");
-                if (string.IsNullOrEmpty(t))
-                {
-                    t = parameters.GetValueOrDefault("targets");
-                }
-                if (string.IsNullOrEmpty(t))
-                {
-                    return null;
-                }
-                targets = t.Split(';'); // 2018.02.23: Bug Fix Issue #3
-            }
-            return targets;
+            return await base.ProcessAsync(request);
         }
         #endregion
 
