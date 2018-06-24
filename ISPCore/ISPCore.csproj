@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="elFinder.NetCore" Version="1.0.7" />
+    <PackageReference Include="elFinder.NetCore" Version="1.0.9" />
     <PackageReference Include="FluentFTP" Version="19.2.2" />
     <PackageReference Include="IPNetwork2" Version="2.1.2" />
     <PackageReference Include="MailKit" Version="2.0.4" />
