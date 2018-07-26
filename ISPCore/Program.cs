@@ -106,6 +106,7 @@ namespace ISPCore
 
             // Настройки сервера
             var host = WebHost.CreateDefaultBuilder(args)
+                .UseLibuv()
                 .UseKestrel(op =>
                 {
                     #region Unix Socket

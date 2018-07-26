@@ -57,12 +57,12 @@ namespace ISPCore.Controllers.core.Gen
             AntiBotBase antiBotConf = (antiBotToGlobalConf.conf.Enabled || Domain.AntiBot.UseGlobalConf) ? (AntiBotBase)antiBotToGlobalConf.conf : (AntiBotBase)Domain.AntiBot;
 
             // Генерируем код SignalR
-            return Content(JsToSignalR(antiBotConf, IP, jsonDB.Base.CoreAPI, HostConvert), "application/javascript");
+            return Content(JsToSignalR(antiBotConf, IP, jsonDB.Base.CoreAPI, HostConvert, Domain.AntiBot.HashKey), "application/javascript");
         }
 
 
         #region JsToSignalR
-        static string JsToSignalR(AntiBotBase conf, string IP, string CoreApiUrl, string HostConvert)
+        static string JsToSignalR(AntiBotBase conf, string IP, string CoreApiUrl, string HostConvert, string AntiBotHashKey)
         {
             return Engine.core.AntiBot.JsToBase64(conf.RewriteToOriginalDomain) + Engine.core.AntiBot.JsToRewriteUser(conf.RewriteToOriginalDomain, HostConvert) + @"
 {
@@ -77,7 +77,7 @@ namespace ISPCore.Controllers.core.Gen
 	    })
 
 	    Hub.start().then(function () {
-		    Hub.invoke('GetValidCookie', '" + IP + "', '" + conf.HourCacheToUser + "', '" + md5.text($"{IP}:{conf.HourCacheToUser}:{PasswdTo.salt}") + @"');
+		    Hub.invoke('GetValidCookie', '" + IP + "', '" + HostConvert + "', '" + conf.HourCacheToUser + "', '" + AntiBotHashKey + "', '" + md5.text($"{IP}:{HostConvert}:{conf.HourCacheToUser}:{AntiBotHashKey}:{PasswdTo.salt}") + @"');
 	    })
 
     }," + conf.WaitUser + @");

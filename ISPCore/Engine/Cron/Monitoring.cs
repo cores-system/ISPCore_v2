@@ -71,8 +71,8 @@ namespace ISPCore.Engine.Cron
                     #region Очищаем NumberOfRequestMonth
                     foreach (var item in coreDB.RequestsFilter_NumberOfRequestMonth.AsNoTracking())
                     {
-                        // Если записи больше 90 дней
-                        if ((DateTime.Now - item.Time).TotalDays > 90)
+                        // Если записи больше 30 дней
+                        if ((DateTime.Now - item.Time).TotalDays > 30)
                             coreDB.Database.ExecuteSqlCommand(ComandToSQL.Delete(nameof(coreDB.RequestsFilter_NumberOfRequestMonth), item.Id));
                     }
                     #endregion
