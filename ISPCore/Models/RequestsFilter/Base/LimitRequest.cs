@@ -9,7 +9,7 @@ namespace ISPCore.Models.RequestsFilter.Base
         /// </summary>
         public LimitToBlockType BlockType { get; set; } = LimitToBlockType._403;
 
-        /// <summary>
+        /// <summary> 
         /// Количество запросов перед повторной проверкой reCAPTCHA
         /// </summary>
         public int MaxRequestToAgainСheckingreCAPTCHA { get; set; } = 300;

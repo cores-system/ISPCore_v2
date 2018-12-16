@@ -39,7 +39,7 @@ namespace ISPCore.Controllers
             if (string.IsNullOrWhiteSpace(IP) || (!IP.Contains(".") && !IP.Contains(":")) || (IP.Contains(".") && !Regex.IsMatch(IP, @"^[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+|\*)$")))
                 return Json(new Modal("Поле 'IP-адрес' имеет недопустимое значение"));
 
-            // ППроверка домена
+            // Проверка домена
             if (accessType != AccessType.allDomain && string.IsNullOrWhiteSpace(host))
                 return Json(new Modal("Поле 'Домен' не может быть пустым"));
 

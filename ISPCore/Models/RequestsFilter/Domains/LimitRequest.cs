@@ -7,6 +7,6 @@
         /// <summary>
         /// Id домена
         /// </summary>
-        public int DomainId { get; set; }
+        public int DomainId { get; set; } 
     }
 }
